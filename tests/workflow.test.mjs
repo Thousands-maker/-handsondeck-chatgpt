@@ -43,6 +43,7 @@ function setup(seed, blocked = false) {
     for (const attr of tag[2].matchAll(/([\w-]+)(?:="([^"]*)")?/g)) attributes[attr[1]] = attr[2] ?? '';
     const node = new Node(tag[1],attributes); nodes.push(node); if (node.id) ids.set(node.id,node);
   }
+  for (const match of html.matchAll(/<script id="([^"]+)" type="application\/json">([\s\S]*?)<\/script>/g)) { const node = new Node('script', { id:match[1] }); node.textContent = match[2]; ids.set(node.id,node); }
   const saved = new Node('script', { id:'saved-project' }); saved.textContent = '{}'; ids.set(saved.id,saved);
   const document = { activeElement:null, body:nodes.find(n => n.tagName === 'BODY'), documentElement:{outerHTML:html.replace(/^<!doctype html>\s*/i,'')},
     getElementById:id => ids.get(id) || null, createElement:tag => new Node(tag),
@@ -50,7 +51,7 @@ function setup(seed, blocked = false) {
     addEventListener() {}, visibilityState:'visible' };
   const context = vm.createContext({ document, console, Blob, URL, TextEncoder, structuredClone,
     window:{ addEventListener() {}, confirm:() => true, clearTimeout() {}, setTimeout:() => 1, requestAnimationFrame:() => 1 },
-    navigator:{}, setTimeout:() => 1, clearTimeout() {}, requestAnimationFrame:() => 1, cancelAnimationFrame() {},
+    navigator:{}, location:{ protocol:'file:' }, setTimeout:() => 1, clearTimeout() {}, requestAnimationFrame:() => 1, cancelAnimationFrame() {},
     localStorage:{ getItem:k => { if (blocked) throw Error('blocked'); return storage.get(k) ?? null; }, setItem:(k,v) => { if (blocked) throw Error('blocked'); storage.set(k,v); }, removeItem:k => storage.delete(k) } });
   for (const script of scripts) vm.runInContext(script,context);
   return { get:id => ids.get(id), run:code => vm.runInContext(code,context), storage };
@@ -58,6 +59,7 @@ function setup(seed, blocked = false) {
 
 test('first visit starts with guidance, validates notes, previews an outline and builds a real editable deck', () => {
   const app = setup();
+  app.get('guide-engine').value = 'standard';
   assert.equal(app.run('flow.page'),'welcome');
   assert.equal(app.run('state.slides.length'),0);
   app.get('start-guided').click(); app.get('guide-next').click();
@@ -104,4 +106,33 @@ test('storage failures remain usable and the downloaded editor contains the comp
   assert.ok(copy.includes('function parseSavedProject('));
   const saved = copy.match(/^\s*<script id="saved-project" type="application\/json">([\s\S]*?)<\/script>/m);
   assert.ok(JSON.parse(saved[1]).slides.length >= 3);
+});
+
+test('clicking the slide logo opens upload/remove controls and presentation mode has no logo button', () => {
+  const app = setup(); app.run("loadExample('decision')");
+  const logo = app.get('slide-frame').querySelector('.slide-logo-button');
+  assert.ok(logo); logo.click();
+  assert.equal(app.get('drawer-dialog').open,true);
+  assert.equal(app.get('branding-panel').classList.contains('hidden'),false);
+  app.get('remove-logo').click(); assert.equal(app.run('state.logo'),null);
+  assert.equal(app.get('slide-frame').querySelector('.slide-logo-button'),null);
+  app.get('reset-logo').click(); app.run('startPresenting()');
+  assert.equal(app.get('slide-frame').querySelector('.slide-logo-button'),null);
+});
+
+test('AI drafting takes the actual brief, requires setup, and applies only a reviewed proposal', async () => {
+  const app = setup(); app.run("loadExample('decision')");
+  const original = app.run('JSON.stringify(state.slides)');
+  app.run('openAIFromBrief(true)');
+  assert.equal(app.run('flow.page'),'ai');
+  assert.ok(app.get('ai-notes').value.includes('Booking a room'));
+  assert.equal(app.get('ai-generate').disabled,true);
+  assert.match(app.get('ai-status').textContent,/HTTPS/);
+  app.run(`aiState.source = {purpose:'Agree a trial',audience:'Team',messagesText:'Original facts and caveats.',style:'executive',inputMode:'free',count:'3'};
+    aiState.proposal = HandsAI.parseProposal(JSON.stringify({slides:[{title:'A clear opening',points:['Fact one']},{title:'A focused middle',points:['Keep the caveat']},{title:'Decide the next step',points:['Owner to confirm']}]})); aiRenderProposal();`);
+  assert.equal(app.run('JSON.stringify(state.slides)'),original);
+  app.run('aiApply()'); assert.equal(app.run('state.slides.length'),3);
+  assert.equal(app.run('state.slides[1].title'),'A focused middle');
+  assert.equal(app.get('messages').value,'Original facts and caveats.');
+  assert.equal(app.run('flow.page'),'editor');
 });

@@ -14,7 +14,7 @@ Both groups use the same brief, with structured and free-text input formats. Fir
 - One standalone HTML editor that works offline from the outset.
 - Standalone HTML presentations that recipients can open independently.
 - Local generation using fixed rules, described honestly.
-- Structured, layout-aware blocks and a professional light interface.
+- Structured, layout-aware blocks and an ink-and-orange studio interface.
 - Edits preserved when navigating slides or changing styles.
 - Confirmation before regeneration replaces on-slide edits.
 - Text rendered safely and local images embedded in exports.
@@ -23,17 +23,17 @@ Both groups use the same brief, with structured and free-text input formats. Fir
 - Browser recovery with a visible failure state and a control to remove it.
 - Safe import of editable HTML or JSON without executing the imported file.
 - Undo for the most recent slide or element deletion.
-- The standalone editor needs no runtime CDNs, remote fonts, analytics, accounts or model calls.
+- Standard editing needs no runtime CDNs, remote fonts, analytics, accounts or model calls.
 - Optional MCP tools let a connected AI application or agent synthesise a brief, propose a deck, review it and render a presentation.
-- Model selection and agent orchestration belong to the connected host; the manual offline editor remains usable independently.
+- Local browser AI is opt-in; external-agent model selection and orchestration belong to the connected host.
 
 ## AI and agent integration
 
 MCP is the integration interface for an AI application or agent to use Hands on Deck. The connected host runs a cloud or local model and supplies the reasoning and writing. The MCP server exposes deck planning, content review and HTML rendering. An agent can author its own plan, call review, revise the plan and render again; the fixed-rule planner is an optional starting point.
 
-The current interface is a local stdio server. It accepts explicitly supplied data and returns results. A live connection to the browser's current deck, an in-editor model selector and a remote HTTP MCP endpoint are not implemented.
+The current interface is a local stdio server. It accepts explicitly supplied data and returns results. A live MCP connection to the browser’s current deck and a remote HTTP MCP endpoint are not implemented.
 
-The **Supercharged** screen explains Qwen2.5 0.5B and Ministral 3 3B using illustrative tasks and a reusable prompt. Both are explicitly marked unconnected. This release does not download or run either model.
+The **Supercharged** screen downloads and runs Qwen2.5 0.5B or 1.5B on supported devices. It checks assets and graphics support, generates an outline locally, and requires review before applying. The guided brief and direct brief both lead into this flow. Standard keeps the original wording and is clearly distinguished from AI synthesis.
 
 ## Current limits
 
@@ -45,7 +45,7 @@ The editor has no cloud storage, collaboration, PowerPoint export or factual ver
 2. Add user-defined version names for editable snapshots.
 3. Refine guidance from user testing and improve content-fitting feedback.
 4. Evaluate additional export formats through real usage.
-5. Evaluate an optional browser-local AI download with explicit consent, a verified complete asset manifest, size limits and device testing before describing it as ready offline.
+5. Verify local AI inference, offline reload and writing quality across actual supported devices.
 6. Add a connection for a configured AI host or agent to read and update the current editor deck, with visible connection state and a way to disconnect.
 
 ## Useful measures

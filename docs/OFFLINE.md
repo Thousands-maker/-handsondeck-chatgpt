@@ -1,55 +1,42 @@
 # Offline use
 
-Hands on Deck runs from a single HTML file. Its scripts, styles, placeholder logo and deck images are embedded. It makes no runtime network requests and has no account requirement.
+Standard editing works from a single HTML file. Scripts, styles, the placeholder logo and deck images are embedded. There is no account requirement or automatic model download.
 
 ## Save an editable copy
 
-1. Open **Save & share**.
-2. Review the file size and choose **Download editable copy**.
-3. Open the downloaded HTML file in a browser that supports local HTML.
+Choose **Save & share → Download editable copy**. The file contains the editor, deck, original brief and embedded images, with a 10 MiB limit. Open it in a browser that supports local HTML. Download a fresh copy after editing. A presentation copy is for viewing; a project JSON needs an editor to reopen it.
 
-The download includes the editor and the current deck, brief, style and embedded images. It is limited to **10 MiB**. The editor refuses larger downloads and asks you to remove or reduce images. Nothing downloads until you select the button. A SHA-256 checksum is displayed when supported; it helps compare file bytes but is not a publisher signature.
+Browser recovery saves the brief and deck locally when storage is available. It can be disabled and removed in Save & share. Storage failures and a newer draft in another tab are reported. Recovery is a convenience, not a file backup; keep an editable download before clearing browser data or changing devices.
 
-A downloaded file is a snapshot. Download a new copy after making further changes. Refreshing or closing the editor without saving loses unsaved work. Mobile file preview apps may show the file without running its editor; use a compatible browser.
+## Standard and Supercharged
 
-**Download presentation** creates a presentation for viewing. **Download editable copy** creates a copy for continued editing.
+Standard organises up to 20,000 characters of free text into sentences and paragraphs while preserving wording. It does not synthesise an argument or rewrite content.
 
-## Free-text capability in this version
+Supercharged runs WebLLM 0.2.86 in a dedicated worker using a compatible WebGPU device. Qwen2.5 0.5B is the smaller download (283.1 MiB); Qwen2.5 1.5B is the larger option (846.8 MiB). These totals cover runtime, compiled model library, configuration, tokenizer, tensor manifest and every weight shard. The app shell is saved separately and is under 1 MiB without user images. Runtime graphics memory needs are higher than download size; the setup screen gives an approximate allowance.
 
-Choose **Free text** in the Brief drawer to organise up to 20,000 characters into a suggested slide structure. The organiser groups paragraphs and sentences, preserves the supplied wording and uses short opening sentences as headings. It runs entirely on the device, including without internet.
+The first setup needs internet. Nothing is downloaded before the user chooses **Download & enable**. Input is capped at 2,400 combined characters and output at 1,050 tokens. A draft has 3–6 slides, one headline and 1–3 points per slide. Users review the proposal before applying; applying retains the original notes in the brief. The model can invent or omit information, so users must check facts and caveats.
 
-This is a basic rule-based starting point. It does not infer the main argument, rewrite or summarise it intelligently, fact-check statements or use a language model. Review the structure and edit the wording before presenting.
+## Download and storage boundaries
 
-## AI and agents through MCP
+- `ai/models.json` lists exact bytes and SHA-256 hashes for every required asset. Model/configuration and compiled libraries use immutable revision URLs. The runtime is a checksum-locked CDN bundle of a fixed package version. A CDN rebundle fails closed and requires a reviewed catalogue update.
+- HTTPS downloads omit credentials and referrer information. Each streamed response is stopped at its declared file limit, then checked for exact size and checksum before storage. There is no retry loop or automatic fallback provider.
+- Cancellation preserves only previously verified files. Resume rechecks those files and fetches missing assets. Only one model is kept; selecting another removes the previous model after device/storage checks. Remove download clears this app’s model caches without clearing a deck or another app’s caches.
+- The worker receives a read-only view of the verified cache. It verifies cached bytes again, blocks unknown URLs and replaces its fetch function with cache-only reads. Prompts and outputs remain local. Cached assets are not duplicated into shared vendor caches.
+- Setup saves the app shell through a scoped service worker. The worker handles only this app’s navigation, not other projects on the same host. A small inference self-check must pass before the model is labelled ready.
+- Keep the same browser profile and web address. Clearing site data, private browsing or storage eviction can remove the app/model. The app never silently redownloads missing weights. Return online and choose setup again when necessary.
 
-The optional local MCP server lets a compatible AI application or agent use the deck tools. The connected host supplies the model and can synthesise the user's brief, author a plan, review it and render a standalone presentation. This is separate from the basic free-text organiser in the HTML editor.
+A local `file://` editable copy supports Standard. It cannot register the service worker or share the HTTPS site’s model cache. It is not a portable offline AI package. For offline AI, first complete setup at the published web address, then reopen that address in the same browser. Check this on the actual device before relying on it without internet.
 
-- A host using a cloud model needs internet while generating or revising content.
-- A fully local host with its model already installed can run inference and the local MCP tools without internet, provided the host has no other network dependencies.
-- The resulting self-contained presentation can be viewed offline regardless of where it was generated.
+## Separate agent connection
 
-MCP does not download a model for the user. Configure the host and model separately using [MCP setup](MCP.md). This version does not synchronise a connected agent's plan with an open browser editor.
+[MCP setup](MCP.md) exposes local deck tools to a separately configured model or agent. Cloud hosts need internet; fully local hosts can use the tools offline. MCP does not automatically control this browser’s current deck.
 
-## Optional AI inside the browser: future design
+## Verification
 
-True offline synthesis is possible with a language model running on the device. A browser implementation could use WebLLM and WebGPU to turn free text into a structured deck plan. This version does **not** install, download or run such a model.
-
-An implementation would need:
-
-- An explicit opt-in screen showing model identity, exact total download size, device requirements and a hard size limit before downloading.
-- Pinned runtime, model, tokenizer and configuration assets, downloaded over HTTPS with hashes checked against a trusted manifest.
-- Progress, cancellation, storage checks and a way to remove downloaded files.
-- A check that every required asset is present, followed by a successful restart with networking blocked before showing “Ready offline”.
-- Local-only inference with no automatic network fallback, bounded input/output lengths and validation of generated deck data.
-- Evaluation of writing quality and actual desktop and mobile performance, plus source-text retention and user review of suggestions.
-
-Small model weights can still require hundreds of megabytes; running them needs additional memory. The final cap must cover the complete download, not only the weights. Browser storage can be evicted, so readiness must be rechecked and any replacement download must require a new user action.
-
-A cached web app would need separate hosting and storage work. Service workers require a suitable secure web origin and cannot be registered by an ordinary standalone `file://` editor. A downloaded HTML file alone is not a complete offline AI package.
+Automated tests exercise download boundaries, checksum failures, cancellation, cache-only worker failures, output validation and review/apply behaviour with mocked browser surfaces. Manifest files were checked against published model trees and tensor records; the runtime bundle has no external module imports. Actual WebGPU inference, real-browser offline reload, visual layout and model-writing quality have not been verified in the maintainer environment. Runtime self-checks help detect unsupported user devices but do not replace those tests.
 
 ## Technical references
 
 - [WebLLM documentation](https://webllm.mlc.ai/docs/)
-- [Example small-model files](https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/tree/main)
-- [Service worker registration](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/register)
-- [Browser storage quotas and eviction](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria)
+- [Model files](https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/tree/main)
+- [Browser storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria)

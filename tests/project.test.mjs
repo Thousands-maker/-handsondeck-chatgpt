@@ -72,12 +72,12 @@ test('downloaded editable copies retain the full project without corrupting exec
 
 test('standalone builds match and all inline scripts parse', () => {
   assert.equal(html, read('dist/index.html'));
-  assert.equal(scripts.length, 3);
+  assert.equal(scripts.length, 4);
   scripts.forEach(script => new vm.Script(script));
   assert.equal(scripts[0].trim(), read('core/deck-core.cjs').trim());
-  assert.ok(html.includes("connect-src 'none'"));
+  assert.ok(html.includes("worker-src 'self' blob:"));
   assert.doesNotMatch(html, /<(?:script|img|link)[^>]+(?:src|href)=["']https?:/i);
-  assert.doesNotMatch(html, /\b(?:fetch|XMLHttpRequest|WebSocket)\s*\(/);
+  assert.doesNotMatch(scripts[0] + scripts[1] + scripts[3], /\b(?:fetch|XMLHttpRequest|WebSocket)\s*\(/);
 });
 
 test('editable HTML and project JSON round-trip through safe import with all element types', () => {

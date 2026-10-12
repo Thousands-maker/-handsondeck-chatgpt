@@ -37,6 +37,16 @@ That version included direct editing, an element picker, local image embedding, 
 - Added illustrative Supercharged model examples and explicit unconnected status.
 - Added import validation and DOM contract tests for onboarding, recovery, deletion undo and presentation state. These are not real-browser or visual tests.
 
+## Local AI and studio release
+
+- Replaced the explainer-only Supercharged screen with model download, hash verification, cancellation/resume, device checks, removal and a local inference worker.
+- Added Qwen2.5 0.5B and 1.5B model manifests with fixed revisions, sizes and hashes; no weights or runtime are downloaded automatically.
+- Added opt-in offline app caching, bounded prompts, structured outline validation and review before applying AI output.
+- Connected the guided and direct brief to AI synthesis, while keeping the original notes.
+- Designed a distinct ink-and-orange studio shell, vertical desktop navigation, a typographic start page and model setup/workspace.
+- Made the slide logo a keyboard-accessible control for replacement or removal; presentations stay read-only.
+- Added download boundary, cache isolation, proposal, workflow and logo-control checks. Device inference and visual browser QA were unavailable in the maintainer environment.
+
 ## Verification limits
 
 Automated checks cover JavaScript syntax, matching standalone builds, generation, text escaping, and MCP request/response behaviour. They do not certify visual layout, browser-native undo, virtual keyboards, accessibility or cross-browser interaction. Those checks remain on the product backlog.

@@ -1,0 +1,366 @@
+{
+  "version": "2026-10-12.1",
+  "runtimeVersion": "0.2.86",
+  "models": [
+    {
+      "id": "Qwen2.5-0.5B-Instruct-q4f16_1-MLC",
+      "label": "Supercharged",
+      "name": "Qwen2.5 0.5B Instruct",
+      "model": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/",
+      "model_lib": "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/00fe7a40e57e5e8eb9fef87526a4bf28ad5846c0/web-llm-models/v0_2_86/base/Qwen2-0.5B-Instruct-q4f16_1_cs1k-webgpu.wasm",
+      "totalBytes": 296863095,
+      "downloadLimit": 296863095,
+      "memoryMB": 1000,
+      "assets": [
+        {
+          "name": "WebLLM 0.2.86",
+          "url": "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.86/+esm",
+          "bytes": 6178306,
+          "sha256": "1c0b56de66be49746c038076f20fc370d32d391cd0c0a1bcb743c22e69470394",
+          "role": "runtime"
+        },
+        {
+          "name": "mlc-chat-config.json",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/mlc-chat-config.json",
+          "bytes": 2041,
+          "sha256": "5439c03bdf4ee7cfe0f8a97a6588018b0144dc1280c71bbaea2853cdbab874b9",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_0.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/params_shard_0.bin",
+          "bytes": 68067328,
+          "sha256": "9f309954d310dc63adfaf3ef6aa987c681b8aa6d1b9686aa2525b454b0d058d5",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_1.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/params_shard_1.bin",
+          "bytes": 33234176,
+          "sha256": "6d174758dd299d9ef4222b1ad4283be832ebd43853951da25b50501ab1b75ba7",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_2.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/params_shard_2.bin",
+          "bytes": 33505280,
+          "sha256": "83e0b530bf5c44cbead1a6c220af81040a975f7c81fb708977a02e3ac8d7ffa7",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_3.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/params_shard_3.bin",
+          "bytes": 33053696,
+          "sha256": "5ff16197c197d8783d398d0c35fa9641e606e6e2dc1d53b9f26a0c9c17a97921",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_4.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/params_shard_4.bin",
+          "bytes": 33020928,
+          "sha256": "a7a3d2b02aa9258154f250a714d1743672e423c5c7c8e5c5eefcb9bf337aa0fd",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_5.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/params_shard_5.bin",
+          "bytes": 29211648,
+          "sha256": "19dfd7a3064b84082915575c0e5a57fc1cd7108828e1ce9fbbbaf9db4b63b9af",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_6.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/params_shard_6.bin",
+          "bytes": 33297408,
+          "sha256": "192576d43956aa977ec60848b8a7fc8483b5fe38ca9669aa9a3ca2ba795a7a33",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_7.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/params_shard_7.bin",
+          "bytes": 14605824,
+          "sha256": "1ee25c2a41dad6833e000b7e3ec13a5a1761c32ffbed0ad8a98a6ad313338dc0",
+          "role": "model"
+        },
+        {
+          "name": "tensor-cache.json",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/tensor-cache.json",
+          "bytes": 102431,
+          "sha256": "23a54b5e9b271204561901b513c5b359498733429ee219ccc907eb1cd0790e3f",
+          "role": "model"
+        },
+        {
+          "name": "tokenizer.json",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC/resolve/32ff081fe7e4dfe4ffb167b94c66fdf11e02b8ad/tokenizer.json",
+          "bytes": 7031645,
+          "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+          "role": "model"
+        },
+        {
+          "name": "qwen05.wasm",
+          "url": "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/00fe7a40e57e5e8eb9fef87526a4bf28ad5846c0/web-llm-models/v0_2_86/base/Qwen2-0.5B-Instruct-q4f16_1_cs1k-webgpu.wasm",
+          "bytes": 5552384,
+          "sha256": "a618074b30f7d022ab7886d0cf57be2aefdac342901d43bee4e19110e1b4b739",
+          "role": "wasm"
+        }
+      ]
+    },
+    {
+      "id": "Qwen2.5-1.5B-Instruct-q4f16_1-MLC",
+      "label": "Supercharged Pro",
+      "name": "Qwen2.5 1.5B Instruct",
+      "model": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/",
+      "model_lib": "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/00fe7a40e57e5e8eb9fef87526a4bf28ad5846c0/web-llm-models/v0_2_86/base/Qwen2-1.5B-Instruct-q4f16_1_cs1k-webgpu.wasm",
+      "totalBytes": 887915811,
+      "downloadLimit": 887915811,
+      "memoryMB": 1700,
+      "assets": [
+        {
+          "name": "WebLLM 0.2.86",
+          "url": "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.86/+esm",
+          "bytes": 6178306,
+          "sha256": "1c0b56de66be49746c038076f20fc370d32d391cd0c0a1bcb743c22e69470394",
+          "role": "runtime"
+        },
+        {
+          "name": "mlc-chat-config.json",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/mlc-chat-config.json",
+          "bytes": 2043,
+          "sha256": "7da4954212d3f21a91cc3e693d179f63213fd57356796847f65d7f95478a1f9e",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_0.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_0.bin",
+          "bytes": 116686848,
+          "sha256": "29e46841454786b2c36cbcfd1d9a0777f8cb2bb55fb7cdf9ebd3df6ea6aa61f6",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_1.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_1.bin",
+          "bytes": 22330368,
+          "sha256": "a99a03870f60127bdc3891f0bdc13a0f6e25efa984e9a5d6b188b5aae6f4fbae",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_10.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_10.bin",
+          "bytes": 26331136,
+          "sha256": "cbe9fa5eaff5463502bf9cc766b39081482e7df30ffc250d8f3e83c45d1700d1",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_11.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_11.bin",
+          "bytes": 26331136,
+          "sha256": "f99e7bfc14e17d88d905360dd1f0ecbaab98d5778acdd762e397254c293a2b42",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_12.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_12.bin",
+          "bytes": 26331136,
+          "sha256": "3ec7ea81f305fc10b5ed9958ae279486d113d2621029f5f4a4cb820bc803c2ca",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_13.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_13.bin",
+          "bytes": 26331136,
+          "sha256": "6eb032a6d30b5d2bbf4b0d16ecdfaf6fa295dffa676e828917d5f8fe4d4d7ef2",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_14.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_14.bin",
+          "bytes": 26331136,
+          "sha256": "e1a10d9e18641e9eab280e7c9cb4c7ee05b6dc3ab35b244ffe559da00b1fc950",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_15.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_15.bin",
+          "bytes": 26331136,
+          "sha256": "fe24b3ddc07e311556e6968bb62506ae8980ca1ec55393f12ae41de468d93067",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_16.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_16.bin",
+          "bytes": 26331136,
+          "sha256": "f86a010144bfae8748ac0abdd705d3d9c54bcb864bc51a4b7d3da8dab7d6c379",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_17.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_17.bin",
+          "bytes": 26331136,
+          "sha256": "b473e5c8b5c226c751a393d666066cb6e8b1bf7e61604691a31fea2f82abef66",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_18.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_18.bin",
+          "bytes": 26331136,
+          "sha256": "e36912a08ea82dfdcad4ebc288a6541d2112038e987d98f7f2f5cd8f8957cf2d",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_19.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_19.bin",
+          "bytes": 26331136,
+          "sha256": "795125e8c8eb20e28733df956ab32bb57ea2376ec99cd84b4d36f8f6f32b1f42",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_2.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_2.bin",
+          "bytes": 26331136,
+          "sha256": "c67f6aff8524441396efaa09488ea4536437e35389e0843d87fda796be9d3412",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_20.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_20.bin",
+          "bytes": 26331136,
+          "sha256": "ea919f0b2a79aa359eab6cc8003dfce9cf7c742fe254651211793eb56bfb3122",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_21.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_21.bin",
+          "bytes": 26331136,
+          "sha256": "221e4cef4c28ac298fd44678378e506188a537f2752e0aba2f45066fdee27a85",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_22.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_22.bin",
+          "bytes": 26331136,
+          "sha256": "13c31268f630b52a72c158f2b7d97a672d128e760540b318566cfd70fe5e62ee",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_23.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_23.bin",
+          "bytes": 26331136,
+          "sha256": "498c729548a5afbf07735b0183534867cad01dc57132ae1e8802041f193f6f23",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_24.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_24.bin",
+          "bytes": 26331136,
+          "sha256": "103fdc607fcb3dc31d0861999f1f692768a3e2edfa81ef2f53eefc6713caf8ae",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_25.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_25.bin",
+          "bytes": 26331136,
+          "sha256": "d60dffdf3c88f4990e04a18c343a0ce479b8f98960afb75154a1a835f29f6ea4",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_26.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_26.bin",
+          "bytes": 26331136,
+          "sha256": "086adb852f72e13c69f0cd06628375f4d5810d8fb8e00450fb1e1c964b510f77",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_27.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_27.bin",
+          "bytes": 26331136,
+          "sha256": "473be20481f3a4dcdb7128827edfe16e92c6d1b3019c330ff4dd05156a1f9a43",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_28.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_28.bin",
+          "bytes": 26331136,
+          "sha256": "a7f2c9235da81fce6230b160007449d8f000a1f8c57a68313dce91ca080f088f",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_29.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_29.bin",
+          "bytes": 18589696,
+          "sha256": "59a8497760bc9da56ce4619e082490c607b3f107bad7ec312fb33ce1a0d3dc71",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_3.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_3.bin",
+          "bytes": 26331136,
+          "sha256": "b14d44d720b45dbedd9c7786f1f9db1ce79392fcda0ecc8cbd6deddef6ca3ebd",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_4.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_4.bin",
+          "bytes": 26331136,
+          "sha256": "e96c7b30a24f581df1ee5758e1697a214187a89e9e9bc93529950e2f16beecbf",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_5.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_5.bin",
+          "bytes": 26331136,
+          "sha256": "8370ade73f96fe5cdb4a816da39703032ca5610699e9714790e6e9c49be5086e",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_6.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_6.bin",
+          "bytes": 26331136,
+          "sha256": "48e651ada394e162b0bb016d8b3e340a8d29b0b67e06121ecdc6c368eec1b96d",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_7.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_7.bin",
+          "bytes": 26331136,
+          "sha256": "9eb581bc89582d23c43f66197a63ca2e80291c32eefd66695f6b6eaedf3e24ab",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_8.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_8.bin",
+          "bytes": 26331136,
+          "sha256": "f8d5dfd8eaf86d361d20310d1d9aa7ba661156112d8524874aae78410cb3b663",
+          "role": "model"
+        },
+        {
+          "name": "params_shard_9.bin",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/params_shard_9.bin",
+          "bytes": 26331136,
+          "sha256": "ace7a4a00e819481571e08ead14f031e3b014f6f8cef665142b6b6463045b493",
+          "role": "model"
+        },
+        {
+          "name": "tensor-cache.json",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/tensor-cache.json",
+          "bytes": 124489,
+          "sha256": "6d16a8936b1c9f372305064c4688eae17a609b62693f6782454d4fa2055c6e94",
+          "role": "model"
+        },
+        {
+          "name": "tokenizer.json",
+          "url": "https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC/resolve/9bd564b064631febf14deadcac492efb761d60c3/tokenizer.json",
+          "bytes": 7031645,
+          "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+          "role": "model"
+        },
+        {
+          "name": "qwen15.wasm",
+          "url": "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/00fe7a40e57e5e8eb9fef87526a4bf28ad5846c0/web-llm-models/v0_2_86/base/Qwen2-1.5B-Instruct-q4f16_1_cs1k-webgpu.wasm",
+          "bytes": 6031744,
+          "sha256": "436462adad407e0914d2350fd452a5a3d983e0031d77c940c43ea351c8cd3000",
+          "role": "wasm"
+        }
+      ]
+    }
+  ]
+}

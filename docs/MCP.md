@@ -11,7 +11,7 @@ The AI host selects and runs the model and contains the MCP client. Hands on Dec
 - It can optionally call the fixed-rule planner for a starting structure. AI-authored plans do not have to use that planner.
 - Tool discovery includes the slide and content-block schemas so the host can construct valid arguments.
 
-The current implementation does not read or edit an open browser deck, select a model inside the editor, perform inference itself, or expose a remote HTTP endpoint. No model connection has been configured automatically.
+This MCP server does not read or edit an open browser deck, perform inference itself, or expose a remote HTTP endpoint. The editor’s separate Supercharged feature runs an opt-in local browser model. No model connection has been configured automatically.
 
 ## Enable the connection
 

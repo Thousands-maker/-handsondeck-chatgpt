@@ -72,6 +72,7 @@ function showPage(page, focus = true) {
   if (page === 'guide') { syncGuideFromBrief(); renderGuide(); }
   if (page === 'review') renderReviewPage();
   if (page === 'offline') refreshDownloadInfo();
+  if (page === 'ai' && typeof aiRefresh === 'function') { aiRefresh(); if (!byId('ai-notes').value) aiCopyBrief(); }
   if (page === 'editor') scheduleFit();
   if (focus) {
     const heading = { welcome: 'welcome-title', guide: `guide-title-${flow.step}`, review: 'review-title', ai: 'ai-title', offline: 'offline-title', editor: 'editor-heading' }[page];
@@ -107,6 +108,7 @@ function validGuideStep(step) {
 function moveGuide(next) {
   if (next > flow.step && !validGuideStep(flow.step)) return;
   syncBriefFromGuide();
+  if (next === 3 && byId('guide-engine').value === 'ai') { openAIFromBrief(true); return; }
   flow.step = Math.max(0, Math.min(3, next)); flow.highest = Math.max(flow.highest, flow.step);
   renderGuide();
   byId(`guide-title-${flow.step}`).focus({ preventScroll: true });
@@ -124,7 +126,7 @@ function renderGuide() {
     if (step === flow.step) node.setAttribute('aria-current', 'step'); else node.removeAttribute('aria-current');
   });
   byId('guide-back').textContent = flow.step === 0 ? 'Back to start' : '← Back';
-  byId('guide-next').textContent = ['Next: your content →', 'Next: your style →', 'Preview your outline →', 'Build my deck →'][flow.step];
+  byId('guide-next').textContent = ['Next: your content →', 'Next: your style →', byId('guide-engine').value === 'ai' ? 'Suggest my outline →' : 'Preview arranged wording →', 'Build my deck →'][flow.step];
   byId('guide-error').hidden = true;
   if (flow.step === 3) renderOutline();
 }
@@ -287,6 +289,10 @@ byId('guide-next').addEventListener('click', () => {
   flow.example = false; generateDeck(false);
 });
 byId('guide-mode').addEventListener('change', () => { updateGuideMode(); syncBriefFromGuide(); queueRecovery(); });
+byId('guide-engine').addEventListener('change', () => {
+  byId('guide-engine-help').textContent = byId('guide-engine').value === 'ai' ? 'Local AI needs a one-time model download, starting at 283.1 MiB. You will choose and confirm the download before it starts. Your notes stay on this device.' : 'Standard splits and arranges the sentences you supplied. It does not summarise, rewrite or infer a storyline.';
+  renderGuide();
+});
 byId('guide-example').addEventListener('click', () => {
   if (byId('guide-notes').value.trim() && !window.confirm('Replace these notes with a fictional example?')) return;
   byId('guide-notes').value = 'Room bookings currently rely on email. Double bookings interrupt meetings.\n\nWe propose testing a shared calendar for two rooms over four weeks. Keep the existing process available during the trial.\n\nTrack booking errors and gather staff feedback before expanding.';

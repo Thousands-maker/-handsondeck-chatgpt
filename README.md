@@ -6,18 +6,18 @@ Open **index.html** in your browser. No installation, account, server or interne
 
 ## Use it
 
-1. Choose **Help me shape my deck** for four guided steps, or **I know what I want to say** for the one-page brief form.
-2. Add the outcome, audience and content. Choose a style, then preview the outline before building.
+1. Choose **Create a deck** for the guided brief, or **Paste a ready brief** for one form.
+2. Add the outcome, audience and notes. Choose **Suggest headings, points and a storyline with AI**, or **Arrange my existing wording without AI**. AI opens the opt-in model setup; it never starts a download automatically.
 3. Edit text directly on the slides. Use **Add element** for visuals, tables and callouts. Deletions have a one-step undo.
 4. Open **Review** to follow suggested checks and read through the deck in presentation mode.
 5. Choose **Save & share → Download editable copy** to keep the editor and deck together, or **Download presentation** for a viewing copy.
 6. Reopen an editable HTML copy directly in a browser, or choose **Open a saved deck** on the start screen to import editable HTML or a project JSON file.
 
-Three clearly labelled fictional examples demonstrate a decision, an update and a discussion. **Help** is available throughout. **Supercharged** explains the optional model choices with illustrative examples; it is not a connected model selector or downloader.
+Three clearly labelled fictional examples demonstrate a decision, an update and a discussion. **Help** is available throughout. **Supercharged** downloads and runs a local model on compatible WebGPU devices. It turns rough notes into a reviewable outline. Apply it only after checking the facts and caveats; the original notes remain in the brief.
 
 The editor includes text, bullets, quotes, callouts, statistics, columns, cards, tables, bar charts, local images and dividers. You can reorder, duplicate and remove slides and elements, and choose Executive, Operational or Minimal styling.
 
-The standalone editor's built-in generation uses fixed local rules. Free text organisation preserves sentence wording; it does not perform AI rewriting or factual verification. The optional MCP integration lets a separately configured AI application or agent supply intelligent synthesis and use the deck tools. No model is bundled with or automatically connected to the editor.
+Standard generation uses fixed local rules. Free text organisation preserves sentence wording; it does not perform AI rewriting or factual verification. The optional MCP integration lets a separately configured AI application or agent supply intelligent synthesis and use the deck tools. No model is bundled with or automatically connected to the editor.
 
 A recovery copy of the brief and deck is saved in this browser when storage is available. **Save & share** includes a switch to turn recovery off and remove its saved copy. Blocked or full storage is reported; a newer draft in another tab pauses recovery writes. Browser recovery is not a durable file backup. Download your work before clearing browser data or moving to another device.
 
@@ -25,13 +25,26 @@ An exported presentation is for viewing. An editable copy includes a snapshot yo
 
 ## Logo and page numbers
 
-The **Logo** control replaces or removes the neutral Hands on Deck placeholder. All logos are embedded for offline use. Title/front and Cover layouts have no page number; Content and Statement slides count from 1 and renumber after reordering or deletion. Select **Cover** for an unnumbered closing slide.
+Click the logo in the top-right of any editable slide to upload a replacement or remove it from all slides. The toolbar **Logo** control also works after the logo has been removed. All logos are embedded for offline use. Title/front and Cover layouts have no page number; Content and Statement slides count from 1 and renumber after reordering or deletion. Select **Cover** for an unnumbered closing slide.
 
 ## Offline downloads
 
-The **Save & share** screen shows the actual editor-copy size before downloading. Copies are limited to 10 MiB, including images, and are generated on the device only after a button click. A SHA-256 checksum is shown when the browser supports it. No external scripts, fonts, trackers or model files are fetched by the editor. Some mobile file previewers do not execute HTML; use a browser with local-HTML support.
+The **Save & share** screen shows the actual editor-copy size before downloading. Copies are limited to 10 MiB, including images, and are generated on the device only after a button click. A SHA-256 checksum is shown when the browser supports it. Standard mode fetches no external scripts, fonts, trackers or model files. Supercharged fetches its declared model files only after an explicit setup action. Some mobile file previewers do not execute HTML; use a browser with local-HTML support.
 
-See [offline behaviour and optional local AI design](docs/OFFLINE.md) for capabilities and limitations. A local AI model is a future option, not an implemented feature in this version.
+## Supercharged local AI
+
+Open **Supercharged**, select a model and choose **Download & enable**. Compatible WebGPU hardware (including shader-f16), HTTPS and available browser storage are required. The page checks the device, shows progress, supports cancellation/resume and removal, verifies every file, and performs a tiny inference check before showing ready.
+
+| Option | Model | Complete model/runtime download |
+| --- | --- | --- |
+| Supercharged | Qwen2.5 0.5B Instruct | 296,863,095 bytes (283.1 MiB) |
+| Supercharged Pro | Qwen2.5 1.5B Instruct | 887,915,811 bytes (846.8 MiB) |
+
+After setup, reopen the same web address in the same browser to use the cached editor and model offline. Only one model is stored at a time. The separate editable HTML download works in Standard mode; browser model storage is not packaged into it.
+
+AI accepts up to 2,400 combined characters of notes, outcome and audience and suggests 3–6 slides. Writing quality varies, especially with the smaller model. No factual accuracy guarantee or writing-quality benchmark is implied. Review before applying. No prompt is uploaded and there is no cloud fallback.
+
+See [offline behaviour and local AI](docs/OFFLINE.md) for the storage, download and verification details.
 
 ## Connect an AI model or agent through MCP
 
@@ -52,10 +65,10 @@ node scripts/build.mjs
 node --test tests/*.test.mjs
 ```
 
-`core/deck-core.cjs` contains the shared generator and HTML exporter. The `ui/` files contain the guided interface, styles and navigation. The build script embeds these and the engine in `index.html` and copies the finished editor to `dist/index.html`. Both HTML files are self-contained.
+`core/deck-core.cjs` contains the shared generator and HTML exporter. The `ui/` files contain the guided interface, styles and navigation. The build script embeds these, `ai/ai-core.cjs`, the model catalogue and worker source into `index.html`, then copies the editor and opt-in service worker into `dist/`. Standard editing is self-contained. AI assets are separate, verified downloads.
 
 - [Product direction](docs/PRODUCT.md)
 - [Development history and verification](docs/DEVELOPMENT.md)
 - [Optional MCP setup](docs/MCP.md)
 
-Responsive layouts are implemented. Full touch-device and cross-browser verification remains outstanding.
+Automated checks cover download limits and hashes, blocked inference network fallback, AI proposal validation, review-before-apply, logo controls and the existing editing workflows. Actual GPU inference, model quality and visual/touch/cross-browser verification remain outstanding in the maintainer environment. Each device must pass the runtime self-check before AI is marked ready.
