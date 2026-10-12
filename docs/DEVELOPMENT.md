@@ -26,6 +26,17 @@ That version included direct editing, an element picker, local image embedding, 
 - Added checks for numbering after reordering/deletion, logo replacement/removal, free-text preservation and safe saved-project restoration.
 - Documented optional local AI as future work; no model is downloaded and MCP remains off by default.
 
+## Guided editing release
+
+- Added a start screen with guided and direct paths, three fictional examples, and saved-deck import.
+- Added a four-step brief flow with validation and an outline preview before building.
+- Added persistent Brief / Edit / Review / Save navigation, contextual editing help and a final review checklist.
+- Added browser recovery with error reporting, opt-out/removal and protection from another tab overwriting its recovery copy.
+- Separated editable HTML, presentation HTML and project JSON downloads; retained the 10 MiB cap.
+- Added undo for the last deletion and read-only presentation mode with visible exit controls.
+- Added illustrative Supercharged model examples and explicit unconnected status.
+- Added import validation and DOM contract tests for onboarding, recovery, deletion undo and presentation state. These are not real-browser or visual tests.
+
 ## Verification limits
 
 Automated checks cover JavaScript syntax, matching standalone builds, generation, text escaping, and MCP request/response behaviour. They do not certify visual layout, browser-native undo, virtual keyboards, accessibility or cross-browser interaction. Those checks remain on the product backlog.

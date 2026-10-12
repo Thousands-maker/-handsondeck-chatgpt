@@ -6,17 +6,22 @@ Open **index.html** in your browser. No installation, account, server or interne
 
 ## Use it
 
-1. Open the Brief drawer and enter your purpose, audience and key messages. Choose **Free text** to organise paragraphs and sentences into a basic starting structure.
-2. Generate a three-to-six-slide starting structure.
-3. Edit text directly on the slides and use **Add element** to insert content.
-4. Review the checks, then choose **Export deck** for a standalone HTML presentation.
-5. Choose **Offline → Download offline editor** to save an editable copy with your current deck, images and logo. Reopen that file in a browser to keep editing without internet.
+1. Choose **Help me shape my deck** for four guided steps, or **I know what I want to say** for the one-page brief form.
+2. Add the outcome, audience and content. Choose a style, then preview the outline before building.
+3. Edit text directly on the slides. Use **Add element** for visuals, tables and callouts. Deletions have a one-step undo.
+4. Open **Review** to follow suggested checks and read through the deck in presentation mode.
+5. Choose **Save & share → Download editable copy** to keep the editor and deck together, or **Download presentation** for a viewing copy.
+6. Reopen an editable HTML copy directly in a browser, or choose **Open a saved deck** on the start screen to import editable HTML or a project JSON file.
+
+Three clearly labelled fictional examples demonstrate a decision, an update and a discussion. **Help** is available throughout. **Supercharged** explains the optional model choices with illustrative examples; it is not a connected model selector or downloader.
 
 The editor includes text, bullets, quotes, callouts, statistics, columns, cards, tables, bar charts, local images and dividers. You can reorder, duplicate and remove slides and elements, and choose Executive, Operational or Minimal styling.
 
 The standalone editor's built-in generation uses fixed local rules. Free text organisation preserves sentence wording; it does not perform AI rewriting or factual verification. The optional MCP integration lets a separately configured AI application or agent supply intelligent synthesis and use the deck tools. No model is bundled with or automatically connected to the editor.
 
-Briefs and edits remain in browser memory; **download your work before closing or refreshing the page**. An exported presentation is for viewing. An offline editor copy includes a snapshot you can reopen and edit. Save a fresh copy after further edits; the file on disk does not update itself.
+A recovery copy of the brief and deck is saved in this browser when storage is available. **Save & share** includes a switch to turn recovery off and remove its saved copy. Blocked or full storage is reported; a newer draft in another tab pauses recovery writes. Browser recovery is not a durable file backup. Download your work before clearing browser data or moving to another device.
+
+An exported presentation is for viewing. An editable copy includes a snapshot you can reopen and edit. Save a fresh copy after further edits; the file on disk does not update itself.
 
 ## Logo and page numbers
 
@@ -24,7 +29,7 @@ The **Logo** control replaces or removes the neutral Hands on Deck placeholder. 
 
 ## Offline downloads
 
-The **Offline** screen shows the actual editor-copy size before downloading. Copies are limited to 10 MiB, including images, and are generated on the device only after a button click. A SHA-256 checksum is shown when the browser supports it. No external scripts, fonts, trackers or model files are fetched by the editor. Some mobile file previewers do not execute HTML; use a browser with local-HTML support.
+The **Save & share** screen shows the actual editor-copy size before downloading. Copies are limited to 10 MiB, including images, and are generated on the device only after a button click. A SHA-256 checksum is shown when the browser supports it. No external scripts, fonts, trackers or model files are fetched by the editor. Some mobile file previewers do not execute HTML; use a browser with local-HTML support.
 
 See [offline behaviour and optional local AI design](docs/OFFLINE.md) for capabilities and limitations. A local AI model is a future option, not an implemented feature in this version.
 
@@ -47,7 +52,7 @@ node scripts/build.mjs
 node --test tests/*.test.mjs
 ```
 
-`core/deck-core.cjs` contains the shared generator and HTML exporter. The build script embeds that engine in `index.html` and copies the finished editor to `dist/index.html`. Both HTML files are self-contained.
+`core/deck-core.cjs` contains the shared generator and HTML exporter. The `ui/` files contain the guided interface, styles and navigation. The build script embeds these and the engine in `index.html` and copies the finished editor to `dist/index.html`. Both HTML files are self-contained.
 
 - [Product direction](docs/PRODUCT.md)
 - [Development history and verification](docs/DEVELOPMENT.md)

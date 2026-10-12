@@ -171,7 +171,71 @@
     }
 
 
-  const api = { uid, clone, parseMessageGroups, organiseFreeText, embedEditorProject, distribute, newBlock, buildSlides, escapeHtml, blockToHtml, renderDeckHtml, DEFAULT_LOGO, isEmbeddedImage, deckLogo, slidePageNumber };
+    function parseSavedProject(source) {
+      if (typeof source !== 'string' || source.length > 10 * 1024 * 1024) throw new Error('Choose a project no larger than 10 MiB.');
+      let json = source.trim();
+      if (json.startsWith('<')) {
+        const match = source.match(/^\s*<script id="saved-project" type="application\/json">([\s\S]*?)<\/script>/m);
+        if (!match) throw new Error('This is a presentation copy. Open an editable copy downloaded from Save & share.');
+        json = match[1];
+      }
+      let value;
+      try { value = JSON.parse(json); } catch { throw new Error('This file does not contain a readable Hands on Deck project.'); }
+      return normaliseProject(value);
+    }
+
+    function normaliseProject(value) {
+      const fail = () => { throw new Error('This project contains unsupported or damaged slide data.'); };
+      const obj = v => { if (!v || typeof v !== 'object' || Array.isArray(v)) fail(); return v; };
+      const str = (v, max = 10000) => { if (typeof v !== 'string' || v.length > max) fail(); return v; };
+      const list = (v, max = 100) => { if (!Array.isArray(v) || v.length > max) fail(); return v; };
+      const styles = ['executive', 'operational', 'minimal'];
+      const kinds = ['title', 'cover', 'content', 'statement'];
+      obj(value);
+      if (value.version !== 1 || !styles.includes(value.style)) fail();
+      const detail = v => ({ title: str(obj(v).title), text: str(v.text) });
+      const blocks = v => list(v, 30).map(raw => {
+        obj(raw);
+        const b = { id: uid(), type: raw.type };
+        if (b.type === 'paragraph') b.text = str(raw.text);
+        else if (b.type === 'bullets') b.items = list(raw.items).map(v => str(v));
+        else if (b.type === 'callout') { b.label = str(raw.label); b.text = str(raw.text); }
+        else if (b.type === 'quote') { b.quote = str(raw.quote); b.attribution = str(raw.attribution); }
+        else if (b.type === 'stat') { b.value = str(raw.value); b.label = str(raw.label); }
+        else if (b.type === 'columns') b.columns = list(raw.columns).map(detail);
+        else if (b.type === 'cards') b.items = list(raw.items).map(detail);
+        else if (b.type === 'chart') b.items = list(raw.items).map(v => {
+          obj(v); if (typeof v.value !== 'number' || !Number.isFinite(v.value) || v.value < 0) fail();
+          return { label: str(v.label), value: v.value };
+        });
+        else if (b.type === 'table') {
+          b.headers = list(raw.headers, 12).map(v => str(v));
+          if (!b.headers.length) fail();
+          b.rows = list(raw.rows).map(row => { const cells = list(row, 12).map(v => str(v)); if (cells.length !== b.headers.length) fail(); return cells; });
+        } else if (b.type === 'image') {
+          b.src = str(raw.src, 8 * 1024 * 1024); b.alt = str(raw.alt); b.caption = str(raw.caption);
+          if (b.src && !/^data:image\/(?:png|jpeg|gif|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(b.src)) fail();
+        } else if (b.type === 'divider') b.label = str(raw.label);
+        else fail();
+        return b;
+      });
+      const slides = list(value.slides).map(raw => {
+        obj(raw); if (!kinds.includes(raw.kind)) fail();
+        return { id: uid(), kind: raw.kind, title: str(raw.title), eyebrow: str(raw.eyebrow), blocks: blocks(raw.blocks) };
+      });
+      let logo = clone(DEFAULT_LOGO);
+      if (value.logo === null) logo = null;
+      else if (value.logo !== undefined) { obj(value.logo); const src = str(value.logo.src, 1500000); if (!isEmbeddedImage(src)) fail(); logo = { src, alt: str(value.logo.alt ?? '') }; }
+      const brief = obj(value.brief || {});
+      const inputMode = brief.inputMode === 'free' ? 'free' : 'structured';
+      const metadata = {};
+      for (const key of ['requested', 'grouped', 'underfilled']) metadata[key] = Number.isFinite(value.metadata?.[key]) ? Math.max(0, value.metadata[key]) : 0;
+      return { version: 1, slides, logo, style: value.style, current: Math.max(0, Math.min(Number.isInteger(value.current) ? value.current : 0, slides.length - 1)), metadata,
+        brief: { purpose: str(brief.purpose ?? ''), audience: str(brief.audience ?? ''), messagesText: str(brief.messagesText ?? '', inputMode === 'free' ? 20000 : 50000), inputMode,
+          style: styles.includes(brief.style) ? brief.style : value.style, count: ['auto', '3', '4', '5', '6'].includes(String(brief.count)) ? String(brief.count) : 'auto' } };
+    }
+
+  const api = { uid, clone, parseMessageGroups, organiseFreeText, embedEditorProject, distribute, newBlock, buildSlides, escapeHtml, blockToHtml, renderDeckHtml, DEFAULT_LOGO, isEmbeddedImage, deckLogo, slidePageNumber, parseSavedProject, normaliseProject };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.DeckCore = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

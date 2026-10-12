@@ -554,27 +554,261 @@
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } }
   </style>
+  <style id="interface-style">
+/* The app shell and guided journey; slide styling remains in the shared editor. */
+:root { --ink:#233a38; --muted:#64716e; --line:#dce4e0; --surface-soft:#f7f9f7; --workspace:#edf1ef; --teal-700:#14695e; --teal-600:#167b6d; --teal-100:#e7f3ed; }
+body { height:100vh; height:100dvh; display:flex; flex-direction:column; background:#f7f9f7; }
+[hidden] { display:none !important; }
+.appbar { height:72px; min-height:72px; flex-shrink:0; padding:0 28px; box-shadow:none; border-bottom:0; }
+.brand { border:0; padding:0; background:transparent; color:var(--ink); text-align:left; cursor:pointer; }
+.brand-mark { background:#176d60; border-radius:11px; font-size:14px; letter-spacing:-.04em; }
+.brand-name { font-size:17px; letter-spacing:-.035em; }
+.brand-note { display:block; font-size:11px; letter-spacing:.015em; }
+.app-actions .btn { font-weight:600; }
+.btn { min-height:42px; font-weight:650; }
+.btn:focus-visible, .path-card:focus-visible, .journey-step:focus-visible, .chip:focus-visible, a:focus-visible, summary:focus-visible { outline:3px solid #269b86; outline-offset:3px; }
+.btn-dark { background:#233e38; }
+.eyebrow { color:var(--teal-700); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.14em; }
+.journey-bar { flex-shrink:0; display:flex; gap:24px; align-items:center; justify-content:space-between; border-block:1px solid var(--line); background:white; padding:0 28px; min-height:56px; }
+.journey-steps { display:flex; align-items:center; gap:8px; }
+.journey-step { display:flex; align-items:center; gap:8px; min-height:54px; border:0; border-bottom:3px solid transparent; background:none; color:var(--muted); padding:8px 16px; font-size:13px; font-weight:650; }
+.journey-step b { width:23px; height:23px; display:grid; place-items:center; border:1px solid var(--line); border-radius:50%; font-size:11px; }
+.journey-step[aria-current="step"] { color:var(--teal-700); border-bottom-color:var(--teal-700); }
+.journey-step[aria-current="step"] b { background:var(--teal-700); color:white; border-color:var(--teal-700); }
+.save-state { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+.save-state::before { content:''; width:6px; height:6px; border-radius:50%; background:#768b80; }
+.flow-page { flex:1; min-height:0; overflow:auto; padding:48px 28px 60px; }
+.flow-wrap { width:min(100%,1040px); margin:auto; }
+.flow-page h1 { margin:12px 0 16px; font-size:clamp(32px,4.5vw,52px); max-width:720px; font-weight:650; letter-spacing:-.045em; line-height:1.08; color:#183d35; }
+.lead { color:var(--muted); font-size:16px; max-width:600px; line-height:1.65; margin:0 0 28px; }
+.home-hero { display:grid; grid-template-columns:1.45fr 1fr; gap:50px; align-items:center; margin-bottom:36px; }
+.home-proof { display:flex; flex-wrap:wrap; gap:16px; color:#477063; font-size:12px; }
+.home-proof span::before { content:'✓'; margin-right:6px; }
+.deck-art { background:#e4eee7; padding:30px; border-radius:24px; position:relative; }
+.deck-art::after { content:''; position:absolute; inset:27px 26px 18px 41px; border:1px solid #b7c9be; border-radius:9px; transform:rotate(5deg); }
+.deck-art figure { aspect-ratio:16/10; position:relative; z-index:1; border-radius:8px; background:#fff; box-shadow:0 12px 24px #214f3312; margin:0; padding:28px; transform:rotate(-3deg); }
+.deck-art figcaption { color:#1f4f40; font-size:21px; font-weight:650; letter-spacing:-.04em; margin:10px 0 18px; line-height:1.2; }
+.deck-art .art-line { display:block; height:6px; width:75%; margin:9px 0; border-radius:3px; background:#dce7e1; }
+.deck-art .art-line:last-of-type { width:54%; }
+.deck-art .art-label { font-size:9px; color:#487562; letter-spacing:.11em; text-transform:uppercase; }
+.path-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.path-card { display:flex; flex-direction:column; align-items:flex-start; text-align:left; border:1px solid var(--line); border-radius:16px; padding:26px; background:white; color:var(--ink); transition:border-color .16s, transform .16s; }
+.path-card:hover { border-color:#47957a; transform:translateY(-2px); }
+.path-card.primary { border-color:#88b79e; background:#f1f8f2; }
+.path-card h2 { margin:14px 0 8px; font-size:24px; font-weight:600; letter-spacing:-.035em; }
+.path-card p { color:var(--muted); font-size:14px; margin:0 0 24px; line-height:1.6; max-width:390px; }
+.path-card .go { color:#176b52; font-size:13px; font-weight:700; margin-top:auto; }
+.tag { display:inline-block; padding:4px 8px; border-radius:5px; color:#356b55; background:#e0eddf; font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+.tag.neutral { background:#edf0ee; color:#64716b; }
+.home-alternatives { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:22px 0 32px; }
+.text-button { min-height:42px; border:0; padding:7px 0; background:transparent; color:var(--teal-700); text-decoration:underline; text-underline-offset:4px; font-size:13px; }
+.example-row { border-top:1px solid var(--line); padding-top:24px; display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+.example-row p { margin:0 auto 0 0; font-size:13px; color:var(--muted); }
+.chip { min-height:40px; border:1px solid #d7e1da; border-radius:7px; background:#fff; color:#3d6452; padding:8px 12px; font-size:12px; }
+.chip:hover { background:#eaf4ed; border-color:#84ac98; }
+.resume-card { padding:18px 22px; border:1px solid #b9d5c3; border-radius:12px; display:flex; flex-wrap:wrap; align-items:center; gap:14px; background:#eff7f1; margin-bottom:26px; }
+.resume-card div { flex:1; }
+.resume-card p { font-size:12px; margin:3px 0 0; color:var(--muted); }
+.guide-wrap { max-width:780px; }
+.guide-top { display:flex; justify-content:space-between; gap:12px; align-items:center; font-size:12px; color:var(--muted); margin-bottom:20px; }
+.guide-progress { display:flex; gap:6px; margin-bottom:28px; }
+.guide-progress button { min-height:44px; flex:1; border:0; border-top:3px solid #dee6e0; background:none; color:var(--muted); text-align:left; padding:9px 0; font-size:12px; }
+.guide-progress button[aria-current="step"] { border-color:#14695e; color:#14695e; font-weight:750; }
+.guide-progress button.completed { border-color:#8db59e; }
+.guide-card { padding:32px; border-radius:18px; border:1px solid var(--line); background:#fff; }
+.guide-card h1 { font-size:32px; margin-top:0; }
+.guide-card .lead { font-size:14px; margin-bottom:24px; }
+.form-field { margin-bottom:20px; }
+.form-field label, .field-label { display:block; color:#29493e; font-size:13px; font-weight:650; margin-bottom:8px; }
+.form-field small { color:var(--muted); font-weight:400; }
+.form-field input, .form-field textarea, .form-field select, .prompt-copy { width:100%; padding:12px 13px; border:1px solid #c6d2ca; background:#fff; border-radius:8px; color:#233a38; font:inherit; font-size:15px; }
+.form-field textarea { min-height:180px; resize:vertical; line-height:1.6; }
+.form-field [aria-invalid="true"] { border-color:#b33b36; }
+.field-help { color:var(--muted); font-size:12px; line-height:1.6; margin:7px 0 0; }
+.guide-error { color:#a8312d; margin:12px 0; font-size:13px; }
+.guide-bottom { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:24px; }
+.guide-bottom .btn { min-width:110px; }
+.style-options { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+.style-option { border:1px solid var(--line); border-radius:9px; padding:15px; position:relative; cursor:pointer; }
+.style-option:has(input:checked) { border-color:#3c9472; background:#f0f8f2; box-shadow:0 0 0 1px #3c9472; }
+.style-option input { position:absolute; right:10px; top:10px; accent-color:#14695e; }
+.style-option strong { display:block; font-size:14px; margin:12px 0 5px; }
+.style-option small { display:block; color:var(--muted); font-size:11px; line-height:1.5; }
+.style-mini { height:55px; margin-right:15px; padding:10px; background:#fff; border:1px solid var(--line); border-radius:3px; }
+.style-mini i { display:block; height:4px; margin:4px 0; width:80%; background:#94bca8; }
+.style-mini i:first-child { width:65%; height:7px; background:#294b3c; }
+.style-mini.dense i { height:3px; width:95%; margin:3px 0; }
+.style-mini.minimal i { background:#767676; }
+.review-brief { display:grid; grid-template-columns:90px 1fr; gap:12px; font-size:13px; line-height:1.6; margin:0 0 20px; }
+.review-brief dt { color:var(--muted); }
+.review-brief dd { margin:0; overflow-wrap:anywhere; }
+.outline-list { list-style:none; padding:0; margin:14px 0 0; display:grid; gap:8px; }
+.outline-list li { display:grid; grid-template-columns:30px 1fr; gap:10px; padding:14px; border:1px solid var(--line); border-radius:8px; }
+.outline-list .outline-number { font-size:12px; color:#6f8b78; padding-top:3px; }
+.outline-list strong { font-size:13px; font-weight:650; }
+.outline-list p { color:var(--muted); margin:4px 0 0; font-size:12px; }
+.app-shell { height:auto; flex:1; min-height:0; }
+.editor-coach { display:flex; gap:16px; justify-content:space-between; align-items:center; padding:14px 20px; background:#f5faf6; border-bottom:1px solid var(--line); flex-shrink:0; }
+.editor-coach strong { font-size:13px; font-weight:650; }
+.editor-coach p { font-size:12px; color:var(--muted); margin:3px 0 0; }
+.editor-coach .btn { white-space:nowrap; }
+.editor-toolbar { flex-wrap:wrap; overflow:visible; padding:10px 16px; }
+.stage-shell { min-height:200px; container-type:size; }
+.stage-shell .slide-frame { width:min(1120px,100cqw,calc(100cqh * 16 / 9)); }
+.slide-rail { background:#f4f7f4; }
+.slide-list { scrollbar-width:thin; }
+.thumb-row.current .thumb-card { border-color:#458b70; }
+.toolbar-select { min-height:40px; }
+.offline-page { flex:1; min-height:0; height:auto; background:#f7f9f7; }
+.offline-wrap { max-width:1000px; }
+.offline-grid { grid-template-columns:1fr 1fr; }
+.offline-card { border-radius:14px; }
+.offline-card.featured { border-color:#a7cbb6; }
+.offline-card .btn { width:100%; }
+.download-size { color:#244b3b; }
+.save-help { padding:20px 24px; border-radius:12px; border:1px solid var(--line); margin:18px 0; background:#fff; }
+.save-help h2 { font-size:17px; margin:0 0 14px; }
+.save-help p, .save-help li { font-size:13px; color:var(--muted); line-height:1.65; }
+.save-help summary { cursor:pointer; font-size:14px; font-weight:650; min-height:40px; }
+.recovery-control { display:flex; gap:10px; align-items:flex-start; font-size:13px; cursor:pointer; }
+.recovery-control input { accent-color:#14695e; width:18px; height:18px; margin-top:0; }
+.review-grid { display:grid; grid-template-columns:1.2fr 1fr; gap:22px; }
+.review-grid .offline-card h2 { margin-top:0; }
+.review-check { display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; font-size:13px; color:#476455; }
+.review-check input { accent-color:#14695e; width:18px; height:18px; flex-shrink:0; margin:1px 0; }
+.review-actions { display:flex; justify-content:space-between; gap:12px; margin-top:24px; flex-wrap:wrap; }
+.review-warning { width:100%; text-align:left; border:1px solid #ebd8b6; background:#fff9ed; padding:14px; border-radius:8px; margin-bottom:10px; font-size:13px; color:#745216; line-height:1.5; }
+.review-warning small { display:block; margin-top:8px; font-weight:650; }
+.model-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.model-card { padding:26px; border:1px solid var(--line); border-radius:14px; background:#fff; }
+.model-card h2 { font-size:21px; letter-spacing:-.025em; margin:16px 0 4px; }
+.model-card p { color:var(--muted); font-size:13px; line-height:1.7; }
+.model-example { background:#f5f8f5; border-radius:8px; padding:16px; margin-top:18px; }
+.model-example span { display:block; color:#357056; font-size:10px; font-weight:750; text-transform:uppercase; letter-spacing:.08em; }
+.model-example p { margin:6px 0 12px; color:#345847; }
+.model-example p:last-child { margin-bottom:0; }
+.prompt-copy { resize:vertical; min-height:140px; font-size:13px; margin-bottom:12px; }
+.help-dialog { width:min(560px,calc(100vw - 30px)); border:1px solid var(--line); border-radius:16px; padding:28px; color:var(--ink); }
+.help-dialog::backdrop { background:#203e3c66; }
+.help-dialog h2 { margin:0; letter-spacing:-.03em; font-size:26px; }
+.help-dialog ol { padding-left:22px; }
+.help-dialog li { margin:18px 0; color:var(--muted); font-size:14px; line-height:1.65; }
+.help-dialog li strong { color:#345446; }
+.help-dialog kbd { font-size:12px; padding:2px 4px; background:#edf1ee; border-radius:3px; }
+.help-head { display:flex; justify-content:space-between; gap:20px; align-items:center; }
+.present-exit { display:none; }
+body.is-presenting .appbar, body.is-presenting .journey-bar, body.is-presenting .slide-rail, body.is-presenting .editor-toolbar, body.is-presenting .editor-coach { display:none; }
+body.is-presenting .app-shell { display:block; height:100dvh; }
+body.is-presenting .editor-area { height:100%; }
+body.is-presenting .stage-shell { background:#17251f; flex:1; padding:12px; }
+body.is-presenting .stage-footer { min-height:58px; justify-content:center; }
+body.is-presenting .present-exit { display:inline-flex; margin-left:20px; }
+body.is-presenting .edit-hint { display:none; }
+@media (max-width:1000px) { .appbar { padding-inline:18px; } .journey-bar { gap:12px; padding-inline:12px; } .journey-step { padding-inline:10px; } .brand-note { display:none; } .home-hero { gap:24px; } .deck-art { padding:20px; } .deck-art figure { padding:20px; } }
+@media (max-width:900px) { body { overflow:hidden; } .appbar { align-items:center; flex-wrap:wrap; min-height:72px; height:auto; padding:14px 16px; } .app-shell { display:grid; min-height:0; grid-template-rows:138px minmax(0,1fr); overflow:auto; } .slide-rail { max-height:none; } .rail-head { padding:6px 12px; } .slide-list { min-height:0; flex:1; } .thumb-row { min-width:125px; } .rail-actions { display:flex; padding:4px 12px; position:absolute; right:10px; top:0; border:0; background:transparent; } .rail-head { padding-right:175px; } .slide-rail { position:relative; } .rail-actions .btn { min-height:34px; min-width:34px; } .editor-area { min-height:480px; } .stage-shell { flex:1; } .editor-toolbar { overflow:visible; } .editor-coach { padding:10px 14px; } .app-shell .element-menu { left:0; width:min(650px,calc(100vw - 24px)); top:100%; } .save-state { max-width:180px; font-size:10px; } body.is-presenting .editor-area { min-height:0; } }
+@media (max-width:650px) { .flow-page { padding:28px 18px 48px; } .appbar { gap:12px; } .app-actions { gap:5px; } .app-actions .btn { padding:7px 9px; font-size:12px; } .app-actions .btn span.label { display:inline; } .app-actions .local-badge { display:none; } .brand-name { font-size:15px; } .brand-mark { width:32px; height:32px; } .journey-bar { display:block; padding-inline:8px; } .journey-steps { justify-content:space-between; gap:0; } .journey-step { flex:1; justify-content:center; gap:6px; padding-inline:5px; font-size:11px; } .journey-step b { width:20px; height:20px; } .save-state { display:none; } .home-hero { grid-template-columns:1fr; margin-bottom:26px; } .deck-art { display:none; } .home-hero .lead { margin-bottom:18px; } .path-grid { gap:12px; } .path-card { padding:20px; } .path-card h2 { font-size:20px; } .path-card p { font-size:13px; } .path-grid, .offline-grid, .model-grid, .review-grid { grid-template-columns:1fr; } .home-alternatives { margin-block:18px; } .guide-card { padding:23px 18px; } .guide-card h1 { font-size:27px; } .guide-progress button { font-size:11px; } .style-options { gap:8px; } .style-option { padding:12px 9px; } .style-option strong { font-size:12px; } .style-mini { margin-right:7px; padding:7px; } .guide-top { flex-wrap:wrap; } .review-brief { grid-template-columns:65px 1fr; } .offline-page { padding:24px 18px 48px; } .editor-coach { align-items:flex-start; gap:8px; } .editor-coach p { max-width:250px; font-size:11px; } .editor-coach .btn { font-size:11px; min-height:38px; } .editor-toolbar { gap:5px; } .toolbar-group { flex-wrap:wrap; } .toolbar-select { max-width:140px; font-size:12px; } .editor-area { min-height:440px; } .offline-card { padding:22px; } }
+</style>
 </head>
 <body>
   <header class="appbar">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">HD</div>
-      <div>
-        <div class="brand-name">Hands on Deck <span style="color:var(--teal-700);font-size:.68em;letter-spacing:.06em;text-transform:uppercase">Offline editor</span></div>
-        <div class="brand-note">Edit where you see it. Export one self-contained HTML deck.</div>
-      </div>
-    </div>
+    <button class="brand" id="home" type="button" aria-label="Hands on Deck — back to start">
+      <span class="brand-mark" aria-hidden="true">HD</span>
+      <span><span class="brand-name">Hands on Deck</span><span class="brand-note">From a clear brief to a confident presentation</span></span>
+    </button>
     <div class="app-actions">
-      <span class="local-badge">Works offline</span>
-      <button class="btn btn-quiet" id="open-brief" type="button"><span aria-hidden="true">☷</span><span class="label">Brief</span></button>
-      <button class="btn btn-quiet" id="open-checks" type="button"><span aria-hidden="true">✓</span><span class="label">Checks</span><span class="badge clear" id="checks-badge">0</span></button>
-      <button class="btn btn-quiet" id="open-offline" type="button" aria-label="Offline download"><span aria-hidden="true">⇩</span><span class="label">Offline</span></button>
-      <button class="btn btn-quiet" id="present" type="button"><span aria-hidden="true">▶</span><span class="label">Present</span></button>
-      <button class="btn btn-dark" id="download" type="button" aria-label="Export presentation"><span aria-hidden="true">↓</span><span class="label">Export deck</span></button>
+      <span class="local-badge">Standard · on this device</span>
+      <button class="btn" id="open-ai" type="button">✦ Supercharged</button>
+      <button class="btn btn-quiet" id="open-help" type="button">Help</button>
+      <button class="btn btn-quiet" id="present" type="button" hidden>▷ Present</button>
+      <button class="btn btn-dark" id="download" type="button" hidden>Save / export</button>
     </div>
   </header>
+  <!-- interface:start -->
+<nav class="journey-bar" aria-label="Build your presentation">
+  <div class="journey-steps">
+    <button class="journey-step" id="open-brief" type="button"><b>1</b> Brief</button>
+    <button class="journey-step" id="nav-edit" type="button"><b>2</b> Edit</button>
+    <button class="journey-step" id="open-checks" type="button"><b>3</b> Review <span class="badge clear" id="checks-badge">0</span></button>
+    <button class="journey-step" id="open-offline" type="button"><b>4</b> Save &amp; share</button>
+  </div>
+  <span class="save-state" id="save-state" role="status">Your work stays on this device</span>
+</nav>
 
-  <main class="app-shell">
+<main class="flow-page" id="welcome-page" aria-labelledby="welcome-title">
+  <div class="flow-wrap">
+    <div class="resume-card" id="resume-card" hidden><div><strong>Your deck is here.</strong><p id="resume-description">Continue editing where you left off.</p></div><button class="btn btn-primary" id="resume-deck" type="button">Continue editing →</button></div>
+    <div class="home-hero">
+      <div><div class="eyebrow">A clear story starts here</div><h1 id="welcome-title" tabindex="-1">Your ideas.<br>A deck that makes sense.</h1><p class="lead">You bring the knowledge. We’ll help you turn it into slides, one manageable step at a time.</p><div class="home-proof"><span>No account</span><span>No uploads</span><span>Download to work offline</span></div></div>
+      <div class="deck-art" aria-hidden="true"><figure><span class="art-label">From a few notes to a clear story</span><figcaption>Make the next<br>decision easier.</figcaption><i class="art-line"></i><i class="art-line"></i><i class="art-line"></i></figure></div>
+    </div>
+    <div class="path-grid">
+      <button class="path-card primary" id="start-guided" type="button"><span class="tag">A little guidance · 4 short steps</span><h2>Help me shape my deck</h2><p>Start with your audience and goal. Add your notes, choose a style, then check your outline.</p><span class="go">Start with a few questions →</span></button>
+      <button class="path-card" id="start-direct" type="button"><span class="tag neutral">Have a brief ready?</span><h2>I know what I want to say</h2><p>Paste your notes or key messages into one form and go straight to an editable first draft.</p><span class="go">Open the brief form →</span></button>
+    </div>
+    <div class="home-alternatives"><button class="btn btn-quiet" id="open-project" type="button">↑ Open a saved deck</button><span class="field-help">An editable HTML copy or a Hands on Deck project file.</span></div>
+    <div class="example-row"><p>Want to see how it works?<br><strong>Try a fictional example.</strong></p><button class="chip" data-example="decision" type="button">Get a decision ↗</button><button class="chip" data-example="update" type="button">Share an update ↗</button><button class="chip" data-example="workshop" type="button">Start a discussion ↗</button></div>
+    <p class="field-help" style="margin-top:22px">Standard mode organises your words with local rules. You stay in control of the wording and the final story.</p>
+  </div>
+</main>
+
+<main class="flow-page hidden" id="guide-page" aria-labelledby="guide-title-0">
+  <div class="flow-wrap guide-wrap">
+    <div class="guide-top"><span class="eyebrow">Shape your deck</span><button class="text-button" id="guide-to-direct" type="button">Prefer one form? Open the brief</button></div>
+    <nav class="guide-progress" aria-label="Brief steps"><button type="button" data-guide-step="0">1. Your goal</button><button type="button" data-guide-step="1">2. Your content</button><button type="button" data-guide-step="2">3. Your style</button><button type="button" data-guide-step="3">4. Your outline</button></nav>
+    <div class="guide-card">
+      <section data-guide-panel="0"><h1 id="guide-title-0" tabindex="-1">What should this deck achieve?</h1><p class="lead">A useful deck gives its audience something to understand, decide or do.</p>
+        <div class="form-field"><label for="guide-purpose">By the end, I want them to…</label><input id="guide-purpose" maxlength="1000" placeholder="e.g. Approve a four-week pilot for the new booking process" aria-describedby="guide-purpose-help"><p class="field-help" id="guide-purpose-help">Write one clear outcome. This also helps shape your closing slide.</p></div>
+        <div class="home-alternatives"><button class="chip" data-goal="Approve " type="button">Approve something</button><button class="chip" data-goal="Understand " type="button">Understand an update</button><button class="chip" data-goal="Give feedback on " type="button">Give their input</button></div>
+        <div class="form-field"><label for="guide-audience">Who is it for? <small>Optional</small></label><input id="guide-audience" maxlength="1000" placeholder="e.g. My team, senior leaders or project partners"><p class="field-help">Keep their level of knowledge in mind as you write.</p></div>
+      </section>
+      <section data-guide-panel="1" hidden><h1 id="guide-title-1" tabindex="-1">What do they need to know?</h1><p class="lead">Paste your notes, or give each key message a heading and a few supporting points.</p>
+        <div class="form-field"><label for="guide-mode">How are your notes written?</label><select id="guide-mode"><option value="free">Free text — paragraphs or rough notes</option><option value="structured">Structured — headings and supporting points</option></select></div>
+        <div class="form-field"><label for="guide-notes">Your content</label><textarea id="guide-notes" rows="9" maxlength="20000" placeholder="What is happening? Why does it matter? What should happen next?" aria-describedby="guide-notes-help"></textarea><p class="field-help" id="guide-notes-help">Use a new paragraph for each main idea. Your sentences are kept as written; Standard mode does not rewrite or fact-check them.</p><p class="field-help" id="guide-char-count">0 / 20,000 characters</p></div>
+        <button class="text-button" id="guide-example" type="button">Fill in a short example</button>
+      </section>
+      <section data-guide-panel="2" hidden><h1 id="guide-title-2" tabindex="-1">Give your story some space.</h1><p class="lead">Pick a starting style. You can change it while editing.</p>
+        <fieldset style="border:0;padding:0;margin:0"><legend class="field-label">Presentation style</legend><div class="style-options">
+          <label class="style-option"><input type="radio" name="guide-style" value="executive" checked><div class="style-mini" aria-hidden="true"><i></i><i></i><i></i></div><strong>Executive</strong><small>A concise story for decisions and proposals.</small></label>
+          <label class="style-option"><input type="radio" name="guide-style" value="operational"><div class="style-mini dense" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><strong>Operational</strong><small>More supporting detail for working reviews.</small></label>
+          <label class="style-option"><input type="radio" name="guide-style" value="minimal"><div class="style-mini minimal" aria-hidden="true"><i></i><i></i></div><strong>Minimal</strong><small>Simple slides with fewer distractions.</small></label>
+        </div></fieldset>
+        <div class="form-field"><label for="guide-count">How many slides?</label><select id="guide-count"><option value="auto">Let the content decide · 3–6 slides</option><option value="3">3 slides</option><option value="4">4 slides</option><option value="5">5 slides</option><option value="6">6 slides</option></select><p class="field-help">A short deck may group points together. More slides will not create extra facts.</p></div>
+      </section>
+      <section data-guide-panel="3" hidden><h1 id="guide-title-3" tabindex="-1">Does this tell the right story?</h1><p class="lead">Here is your first outline. Go back to change your brief, or build it and edit any slide.</p><dl class="review-brief" id="guide-summary"></dl><p class="field-help" id="outline-note"></p><ol class="outline-list" id="guide-outline"></ol></section>
+      <p class="guide-error" id="guide-error" role="alert" hidden></p>
+      <div class="guide-bottom"><button class="btn btn-quiet" id="guide-back" type="button">Back to start</button><button class="btn btn-primary" id="guide-next" type="button">Next: your content →</button></div>
+    </div>
+    <p class="field-help" style="text-align:center;margin-top:18px">Your notes stay on this device. You can go back without losing your answers.</p>
+  </div>
+</main>
+
+<main class="flow-page hidden" id="review-page" aria-labelledby="review-title"><div class="flow-wrap">
+  <div class="eyebrow">One last look</div><h1 id="review-title" tabindex="-1">Make it ready for the room.</h1><p class="lead">These checks catch common issues. You know the facts and your audience best.</p>
+  <div class="review-grid"><section class="offline-card"><h2 id="review-result">Checking your deck…</h2><p>Choose an issue to return to that slide.</p><div id="review-warnings"></div></section>
+    <section class="offline-card"><h2>Your final read-through</h2><label class="review-check"><input type="checkbox">The facts, numbers and sources are correct.</label><label class="review-check"><input type="checkbox">Each slide makes a clear point for this audience.</label><label class="review-check"><input type="checkbox">The closing slide says what happens next.</label><label class="review-check"><input type="checkbox">I have checked every slide at presentation size.</label><button class="btn btn-quiet" id="review-present" type="button">Preview the presentation</button></section>
+  </div><div class="review-actions"><button class="btn btn-quiet" id="review-back" type="button">← Keep editing</button><button class="btn btn-primary" id="review-save" type="button">Save &amp; share →</button></div>
+</div></main>
+
+<main class="flow-page hidden" id="ai-page" aria-labelledby="ai-title"><div class="flow-wrap">
+  <div class="eyebrow">Optional AI support</div><h1 id="ai-title" tabindex="-1">Supercharged, explained.</h1><p class="lead">AI can help rewrite and organise your notes. This editor currently runs in Standard mode; no AI model is connected or downloaded.</p>
+  <div class="resume-card"><div><strong>Standard is ready now.</strong><p>Arrange your notes, edit slides and save a deck entirely on your device.</p></div><button class="btn btn-primary" id="ai-standard" type="button">Continue in Standard →</button></div>
+  <div class="model-grid">
+    <article class="model-card"><span class="tag neutral">Model not connected</span><h2>Supercharged</h2><p><strong>Qwen2.5 0.5B Instruct</strong><br>Example task: turn a short, wordy sentence into a slide headline.</p><div class="model-example"><span>Your note</span><p>“The team reduced the time it takes to prepare the weekly report from 3 hours to 1 hour.”</p><span>A suggested headline to aim for</span><p>“Weekly reporting time fell from 3 hours to 1.”</p></div><p>Check that every number and qualification survives the rewrite.</p></article>
+    <article class="model-card"><span class="tag neutral">Model not connected</span><h2>Supercharged Pro</h2><p><strong>Ministral 3 3B Instruct</strong><br>Example task: separate progress, concerns and next steps in a longer update.</p><div class="model-example"><span>Your note</span><p>“The pilot finished on time. Staff still need training, so we should delay the wider rollout.”</p><span>A suggested structure to aim for</span><p>Progress: pilot complete.<br>Concern: training incomplete.<br>Recommendation: delay expansion.</p></div><p>Check the meaning and recommendation, especially where notes contain caveats.</p></article>
+  </div>
+  <p class="field-help" style="margin:18px 0">These are illustrative examples, not tested outputs or guarantees. Model downloads are not available in this editor.</p>
+  <section class="save-help"><h2>Use your own AI app or agent</h2><p>You can use the prompt below in your chosen AI app, then paste its draft into the brief. If it runs in the cloud, that app will receive whatever you send to it.</p><textarea class="prompt-copy" id="ai-prompt" readonly aria-label="Prompt for your AI app">Turn my notes into a presentation outline. Use one clear headline per slide, followed by supporting points starting with a hyphen. Keep every fact, number and caveat accurate. Do not invent evidence. Flag missing information as a question. Finish with the decision or next step the audience needs to take.
+
+Audience: [who will see this]
+Outcome: [what they should understand, decide or do]
+Notes: [paste your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" type="button">Copy example prompt</button><details style="margin-top:20px"><summary>Connect an agent with MCP</summary><p>A compatible AI app or agent can use the project’s deck tools to review and render a plan. Set up the connection in that app. It does not control this open editor automatically.</p><a href="https://github.com/Thousands-maker/handsondeck-chatgpt/blob/main/docs/MCP.md" target="_blank" rel="noopener noreferrer">Open connection instructions on GitHub ↗</a></details></section>
+</div></main>
+
+<dialog class="help-dialog" id="help-dialog" aria-labelledby="help-title"><div class="help-head"><h2 id="help-title">A little help at every step.</h2><button class="btn btn-quiet" id="close-help" type="button" aria-label="Close help">×</button></div><ol><li><strong>Brief.</strong> Say who the deck is for, the outcome you need and the key information. Try an example if you are unsure.</li><li><strong>Edit.</strong> Click any text on the slide. Use Add element for a chart, image, table or callout. Select a slide in the left rail to move, duplicate or delete it.</li><li><strong>Review.</strong> Follow the suggested checks, then use Present to check the whole story. Use the arrow buttons or <kbd>←</kbd> <kbd>→</kbd>; press <kbd>Esc</kbd> to leave presentation mode.</li><li><strong>Save &amp; share.</strong> An editable copy keeps your deck and the editor together. A presentation copy is for viewing. Download again after making changes.</li></ol><p class="field-help">Your notes and images are not uploaded. Browser recovery is a convenience; keep an editable download as your backup.</p></dialog>
+<input id="project-input" type="file" accept=".html,.json,text/html,application/json" hidden>
+<!-- interface:end -->
+
+  <main class="app-shell hidden" aria-label="Edit your presentation">
     <aside class="slide-rail" aria-label="Slides">
       <div class="rail-head">
         <strong>Slides</strong>
@@ -590,6 +824,7 @@
     </aside>
 
     <section class="editor-area" aria-label="Slide editor">
+      <div class="editor-coach"><div><strong id="editor-heading" tabindex="-1">Your deck, ready to edit.</strong><p id="editor-guidance">Click text to edit it. Add visuals, then review the story before saving.</p></div><button class="btn btn-quiet btn-small" id="coach-review" type="button">Review deck →</button></div>
       <div class="editor-toolbar">
         <div class="toolbar-group">
           <button class="btn btn-primary btn-small" id="add-element" type="button" aria-haspopup="true" aria-expanded="false">+ Add element</button>
@@ -630,7 +865,9 @@
         <button class="btn btn-quiet btn-small btn-icon" id="previous" type="button" aria-label="Previous slide">←</button>
         <span class="counter" id="counter">0 / 0</span>
         <button class="btn btn-quiet btn-small btn-icon" id="next" type="button" aria-label="Next slide">→</button>
-        <span class="edit-hint">Click any text on the slide to edit it directly.</span>
+        <span class="edit-hint">Click text to edit · use the arrows to move between slides.</span>
+        <button class="btn btn-quiet btn-small" id="undo-delete" type="button" hidden>Undo deletion</button>
+        <button class="btn btn-quiet present-exit" id="exit-present" type="button">Exit presentation</button>
       </div>
     </section>
   </main>
@@ -638,29 +875,29 @@
   <section class="offline-page hidden" id="offline-page" aria-labelledby="offline-title">
     <div class="offline-wrap">
       <button class="btn btn-quiet" id="back-to-editor" type="button">← Back to editor</button>
-      <h1 id="offline-title" tabindex="-1">Take your editor offline.</h1>
-      <p class="intro">Download a self-contained copy with your current deck, logo and images. Reopen the saved file to keep editing without an internet connection.</p>
+      <h1 id="offline-title" tabindex="-1">Save now. Present anywhere.</h1>
+      <p class="intro">Choose the file you need. Keep an editable copy for yourself, and share a presentation copy when your deck is ready.</p>
       <div class="offline-grid">
-        <article class="offline-card">
-          <span class="local-badge">Single HTML file</span>
-          <h2>Editor + current deck</h2>
-          <p>The first visit to this website needs internet. After saving this file, open it directly in your browser. A download starts only when you choose the button below.</p>
+        <article class="offline-card featured">
+          <span class="tag">Keep working · recommended backup</span>
+          <h2>Editable copy</h2>
+          <p>One HTML file with your deck and this editor. Reopen it in a browser to edit, even without internet. Download a fresh copy after making changes.</p>
           <div class="download-size"><span id="editor-download-size">Calculating…</span><small>Maximum download: 10 MiB, including your images</small></div>
-          <button class="btn btn-primary" id="download-editor" type="button">Download offline editor</button>
+          <button class="btn btn-primary" id="download-editor" type="button">Download editable copy</button>
           <p id="download-status" role="status" aria-live="polite">Your content stays on this device. No account or additional installation is required.</p>
           <code id="download-checksum" class="download-checksum"></code>
         </article>
         <article class="offline-card">
-          <h2>Before you go offline</h2>
-          <ol><li>Download the editor and open the saved <strong>.html</strong> file in a browser.</li><li>Turn off Wi-Fi or mobile data and check that you can edit, generate and export a deck.</li><li>After making changes, download a fresh editor copy to keep them. The file on disk does not update automatically.</li></ol>
-          <p>On phones and tablets, a file preview may not run the editor. Open it in a browser that supports local HTML.</p>
+          <span class="tag neutral">Present or send</span><h2>Presentation copy</h2>
+          <p>A clean slideshow without editing controls. Open it in a browser, use the arrows to navigate, and present without internet.</p>
+          <div class="download-size">Ready to share<small>HTML slideshow · for viewing</small></div>
+          <button class="btn btn-quiet" id="download-presentation" type="button">Download presentation</button>
+          <p class="field-help">This file does not contain the editor. Keep an editable copy too if you may need to make changes.</p>
         </article>
       </div>
-      <article class="offline-card">
-        <h2>What works without internet?</h2>
-        <p>Edit slides, change the logo, add local images, organise free text into a starting deck, present and export. Fonts, the placeholder logo and all code are included in the file.</p>
-        <p><strong>Text organisation uses local rules.</strong> It keeps your sentences and suggests headings and layouts. It does not understand or rewrite your meaning like an AI model. No AI model is installed or downloaded in this version.</p>
-      </article>
+      <section class="save-help"><h2>Keep a recovery copy here</h2><label class="recovery-control"><input id="recovery-toggle" type="checkbox" checked><span>Save a recovery copy in this browser. Turning this off removes that copy.</span></label><p id="recovery-note" role="status">Recovery is a convenience, not a file backup. Browser data can be cleared or storage can fill up. Download an editable copy to keep your work.</p></section>
+      <section class="save-help"><details><summary>First time using the editor offline?</summary><ol><li>Download an editable copy while you have internet.</li><li>Open the saved <strong>.html</strong> file in a browser. Some mobile file previewers do not run HTML apps.</li><li>Turn off Wi-Fi and check that you can edit and save a new copy.</li></ol><p>The editor includes its fonts, code and embedded images. No model is installed or downloaded. File downloads are created on this device and limited to 10 MiB.</p></details></section>
+      <section class="save-help"><details><summary>Save a smaller project file</summary><p>A JSON project contains your slides and brief. Return to the start screen and choose <strong>Open a saved deck</strong> to reopen it. It needs a copy of this editor.</p><button class="btn btn-quiet" id="download-project" type="button">Download project data</button></details></section>
     </div>
   </section>
 
@@ -675,13 +912,13 @@
       </div>
       <div class="drawer-body" id="brief-panel">
         <label for="purpose">Purpose</label>
-        <textarea id="purpose" rows="3"></textarea>
+        <textarea id="purpose" rows="3" placeholder="What should the audience understand, decide or do?"></textarea>
         <label for="audience">Audience</label>
-        <input id="audience" type="text">
+        <input id="audience" type="text" placeholder="Who will see this? (optional)">
         <label for="input-mode">Input format</label>
         <select id="input-mode"><option value="structured">Structured messages</option><option value="free">Free text · basic offline organisation</option></select>
         <label for="messages" id="messages-label">Key messages and supporting points</label>
-        <textarea id="messages" rows="10"></textarea>
+        <textarea id="messages" rows="10" placeholder="Paste your notes or key messages here."></textarea>
         <p class="syntax-hint" id="input-hint">Start each key message on a new line. Add supporting points beneath it with “-”.</p>
         <div class="field-grid">
           <div>
@@ -705,7 +942,8 @@
         </div>
         <div class="drawer-actions">
           <button class="btn btn-primary" id="generate" type="button">Generate deck</button>
-          <button class="btn btn-quiet" id="reset" type="button">Reset sample</button>
+          <button class="btn btn-quiet" id="reset" type="button">Try an example</button>
+          <button class="text-button" id="direct-to-guide" type="button">Guide me through this</button>
         </div>
         <div class="mvp-note"><strong>Generated locally:</strong> your brief is arranged into slides using fixed rules. Review and edit the content before sharing.</div>
       </div>
@@ -728,7 +966,7 @@
     </div>
   </dialog>
 
-  <input id="image-input" type="file" accept="image/*" hidden>
+  <input id="image-input" type="file" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
   <input id="logo-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -906,7 +1144,71 @@
     }
 
 
-  const api = { uid, clone, parseMessageGroups, organiseFreeText, embedEditorProject, distribute, newBlock, buildSlides, escapeHtml, blockToHtml, renderDeckHtml, DEFAULT_LOGO, isEmbeddedImage, deckLogo, slidePageNumber };
+    function parseSavedProject(source) {
+      if (typeof source !== 'string' || source.length > 10 * 1024 * 1024) throw new Error('Choose a project no larger than 10 MiB.');
+      let json = source.trim();
+      if (json.startsWith('<')) {
+        const match = source.match(/^\s*<script id="saved-project" type="application\/json">([\s\S]*?)<\/script>/m);
+        if (!match) throw new Error('This is a presentation copy. Open an editable copy downloaded from Save & share.');
+        json = match[1];
+      }
+      let value;
+      try { value = JSON.parse(json); } catch { throw new Error('This file does not contain a readable Hands on Deck project.'); }
+      return normaliseProject(value);
+    }
+
+    function normaliseProject(value) {
+      const fail = () => { throw new Error('This project contains unsupported or damaged slide data.'); };
+      const obj = v => { if (!v || typeof v !== 'object' || Array.isArray(v)) fail(); return v; };
+      const str = (v, max = 10000) => { if (typeof v !== 'string' || v.length > max) fail(); return v; };
+      const list = (v, max = 100) => { if (!Array.isArray(v) || v.length > max) fail(); return v; };
+      const styles = ['executive', 'operational', 'minimal'];
+      const kinds = ['title', 'cover', 'content', 'statement'];
+      obj(value);
+      if (value.version !== 1 || !styles.includes(value.style)) fail();
+      const detail = v => ({ title: str(obj(v).title), text: str(v.text) });
+      const blocks = v => list(v, 30).map(raw => {
+        obj(raw);
+        const b = { id: uid(), type: raw.type };
+        if (b.type === 'paragraph') b.text = str(raw.text);
+        else if (b.type === 'bullets') b.items = list(raw.items).map(v => str(v));
+        else if (b.type === 'callout') { b.label = str(raw.label); b.text = str(raw.text); }
+        else if (b.type === 'quote') { b.quote = str(raw.quote); b.attribution = str(raw.attribution); }
+        else if (b.type === 'stat') { b.value = str(raw.value); b.label = str(raw.label); }
+        else if (b.type === 'columns') b.columns = list(raw.columns).map(detail);
+        else if (b.type === 'cards') b.items = list(raw.items).map(detail);
+        else if (b.type === 'chart') b.items = list(raw.items).map(v => {
+          obj(v); if (typeof v.value !== 'number' || !Number.isFinite(v.value) || v.value < 0) fail();
+          return { label: str(v.label), value: v.value };
+        });
+        else if (b.type === 'table') {
+          b.headers = list(raw.headers, 12).map(v => str(v));
+          if (!b.headers.length) fail();
+          b.rows = list(raw.rows).map(row => { const cells = list(row, 12).map(v => str(v)); if (cells.length !== b.headers.length) fail(); return cells; });
+        } else if (b.type === 'image') {
+          b.src = str(raw.src, 8 * 1024 * 1024); b.alt = str(raw.alt); b.caption = str(raw.caption);
+          if (b.src && !/^data:image\/(?:png|jpeg|gif|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(b.src)) fail();
+        } else if (b.type === 'divider') b.label = str(raw.label);
+        else fail();
+        return b;
+      });
+      const slides = list(value.slides).map(raw => {
+        obj(raw); if (!kinds.includes(raw.kind)) fail();
+        return { id: uid(), kind: raw.kind, title: str(raw.title), eyebrow: str(raw.eyebrow), blocks: blocks(raw.blocks) };
+      });
+      let logo = clone(DEFAULT_LOGO);
+      if (value.logo === null) logo = null;
+      else if (value.logo !== undefined) { obj(value.logo); const src = str(value.logo.src, 1500000); if (!isEmbeddedImage(src)) fail(); logo = { src, alt: str(value.logo.alt ?? '') }; }
+      const brief = obj(value.brief || {});
+      const inputMode = brief.inputMode === 'free' ? 'free' : 'structured';
+      const metadata = {};
+      for (const key of ['requested', 'grouped', 'underfilled']) metadata[key] = Number.isFinite(value.metadata?.[key]) ? Math.max(0, value.metadata[key]) : 0;
+      return { version: 1, slides, logo, style: value.style, current: Math.max(0, Math.min(Number.isInteger(value.current) ? value.current : 0, slides.length - 1)), metadata,
+        brief: { purpose: str(brief.purpose ?? ''), audience: str(brief.audience ?? ''), messagesText: str(brief.messagesText ?? '', inputMode === 'free' ? 20000 : 50000), inputMode,
+          style: styles.includes(brief.style) ? brief.style : value.style, count: ['auto', '3', '4', '5', '6'].includes(String(brief.count)) ? String(brief.count) : 'auto' } };
+    }
+
+  const api = { uid, clone, parseMessageGroups, organiseFreeText, embedEditorProject, distribute, newBlock, buildSlides, escapeHtml, blockToHtml, renderDeckHtml, DEFAULT_LOGO, isEmbeddedImage, deckLogo, slidePageNumber, parseSavedProject, normaliseProject };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.DeckCore = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
@@ -915,26 +1217,8 @@
   <script id="saved-project" type="application/json">{}</script>
   <script>
     'use strict';
-    const editorTemplate = '<!doctype html>\n' + document.documentElement.outerHTML;
+    let editorTemplate = '';
     const { uid, clone, parseMessageGroups, distribute, newBlock, buildSlides, escapeHtml, blockToHtml } = DeckCore;
-
-    const sampleBrief = {
-      purpose: 'Secure approval to pilot a shared operations dashboard before wider rollout.',
-      audience: 'Senior leadership and operational owners',
-      messages: `Current reporting is fragmented and slow
-- Teams reconcile the same information in different spreadsheets
-- Leaders receive an inconsistent picture of operational risk
-
-A shared view can improve decision speed
-- Begin with one representative workflow and a bounded user cohort
-- Use existing authoritative data before adding new sources
-
-Pilot before scaling
-- Measure preparation time, data quality and decision usefulness
-- Return with evidence, unresolved risks and the next investment decision`,
-      style: 'executive',
-      count: '5'
-    };
 
     const elementCatalogue = [
       { category: 'Text', type: 'paragraph', glyph: 'T', label: 'Body text', note: 'A short explanatory paragraph' },
@@ -984,18 +1268,6 @@ Pilot before scaling
       return node;
     }
 
-    function applySample() {
-      byId('input-mode').value = 'structured';
-      updateInputMode();
-      byId('purpose').value = sampleBrief.purpose;
-      byId('audience').value = sampleBrief.audience;
-      byId('messages').value = sampleBrief.messages;
-      byId('brief-style').value = sampleBrief.style;
-      byId('style-select').value = sampleBrief.style;
-      byId('count').value = sampleBrief.count;
-      state.style = sampleBrief.style;
-    }
-
     function getBrief() {
       return {
         purpose: byId('purpose').value.trim(), audience: byId('audience').value.trim(),
@@ -1007,7 +1279,7 @@ Pilot before scaling
     function generateDeck(silent = false) {
       if (state.dirty && !silent && !window.confirm('Regenerating from the brief will replace your on-slide edits. Continue?')) return;
       const brief = getBrief();
-      if (!brief.purpose || !brief.messagesText) { toast('Add a purpose and at least one key message before generating.', true); return; }
+      if (!brief.purpose || !brief.messagesText) { toast('Add your intended outcome and some content before building.', true); byId(!brief.purpose ? 'purpose' : 'messages').focus(); return; }
       let groups;
       try { groups = brief.inputMode === 'free' ? DeckCore.organiseFreeText(brief.messagesText) : parseMessageGroups(brief.messagesText); }
       catch (error) { toast(error.message, true); return; }
@@ -1022,7 +1294,8 @@ Pilot before scaling
       byId('style-select').value = state.style;
       renderAll();
       if (byId('drawer-dialog').open) byId('drawer-dialog').close();
-      if (!silent) toast(`Generated ${state.slides.length} slides. Edit any text directly on the canvas.`);
+      afterBuild();
+      if (!silent) toast(`Built ${state.slides.length} slides. Click any text to edit it.`);
     }
 
     function currentSlide() { return state.slides[state.current] || null; }
@@ -1030,7 +1303,7 @@ Pilot before scaling
       const slide = currentSlide();
       return slide ? slide.blocks.find(block => block.id === state.selectedBlockId) || null : null;
     }
-    function markEdited() { state.dirty = true; }
+    function markEdited() { state.dirty = true; flow.reviewDone = false; document.querySelectorAll('.review-check input').forEach(node => { node.checked = false; }); queueRecovery(); updateJourney(); }
 
     function renderBlock(block, editMode = true) {
       let node;
@@ -1322,7 +1595,7 @@ Pilot before scaling
       frame.replaceChildren();
       const slide = currentSlide();
       if (!slide) frame.appendChild(make('div', 'slide-empty', 'Add or generate a slide to begin.'));
-      else frame.appendChild(renderSlide(slide, true));
+      else frame.appendChild(renderSlide(slide, !flow.presenting));
       byId('counter').textContent = state.slides.length ? `${state.current + 1} / ${state.slides.length}` : '0 / 0';
       byId('previous').disabled = state.current <= 0;
       byId('next').disabled = state.current >= state.slides.length - 1;
@@ -1391,6 +1664,8 @@ Pilot before scaling
     }
     function deleteSlide() {
       if (!currentSlide()) return;
+      const removed = clone(currentSlide()), position = state.current;
+      offerUndo(() => { state.slides.splice(Math.min(position, state.slides.length), 0, removed); state.current = state.slides.indexOf(removed); }, 'Slide deleted. Use Undo deletion to restore it.');
       state.slides.splice(state.current, 1);
       state.current = Math.max(0, Math.min(state.current, state.slides.length - 1));
       state.selectedBlockId = null; markEdited(); renderAll();
@@ -1428,6 +1703,8 @@ Pilot before scaling
     }
     function deleteBlock() {
       const slide = currentSlide(), block = selectedBlock(); if (!slide || !block) return;
+      const removed = clone(block), position = slide.blocks.indexOf(block), slideId = slide.id;
+      offerUndo(() => { const target = state.slides.find(item => item.id === slideId); if (target) { target.blocks.splice(Math.min(position, target.blocks.length), 0, removed); state.current = state.slides.indexOf(target); } }, 'Element deleted. Use Undo deletion to restore it.');
       slide.blocks = slide.blocks.filter(item => item.id !== block.id); state.selectedBlockId = null; markEdited(); renderAll();
     }
 
@@ -1480,7 +1757,7 @@ Pilot before scaling
     function collectWarnings() {
       const warnings = [];
       const brief = getBrief();
-      parseMessageGroups(brief.messagesText).forEach(group => {
+      (brief.inputMode === 'free' ? [] : parseMessageGroups(brief.messagesText)).forEach(group => {
         if (!group.points.length) warnings.push({ type: 'attention', text: `No supporting points under “${excerpt(group.heading, 58)}”.` });
       });
       if (state.metadata.grouped > 0) warnings.push({ type: 'note', text: `${state.metadata.grouped} key message${state.metadata.grouped === 1 ? '' : 's'} were grouped to meet the selected length.` });
@@ -1528,10 +1805,9 @@ Pilot before scaling
       state.thumbTimer = setTimeout(renderThumbnails, delay);
       state.checkTimer = setTimeout(renderChecks, delay);
     }
-    function renderAll() { renderPreview(); renderThumbnails(); renderChecks(); }
+    function renderAll() { renderPreview(); renderThumbnails(); renderChecks(); updateJourney(); }
 
     function openDrawer(mode) {
-      if (!byId('offline-page').classList.contains('hidden')) showOfflinePage(false);
       ['brief', 'checks', 'branding'].forEach(panel => byId(panel + '-panel').classList.toggle('hidden', panel !== mode));
       const titles = { brief: 'Presentation brief', checks: 'Quality checks', branding: 'Logo & page numbers' };
       const subtitles = { brief: 'Create a starting deck from a structured brief or free text.', checks: 'Review density, completeness and basic accessibility.', branding: 'Keep your presentation consistent, online and offline.' };
@@ -1569,20 +1845,8 @@ Pilot before scaling
     }
     function formatBytes(bytes) { return bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KiB` : `${(bytes / (1024 * 1024)).toFixed(2)} MiB`; }
     const MAX_EDITOR_BYTES = 10 * 1024 * 1024;
-    function showOfflinePage(show) {
-      document.querySelector('.app-shell').classList.toggle('hidden', show);
-      byId('offline-page').classList.toggle('hidden', !show);
-      byId('open-offline').setAttribute('aria-pressed', String(show));
-      if (show) {
-        const blob = editorDownloadBlob();
-        const overLimit = blob.size > MAX_EDITOR_BYTES;
-        byId('editor-download-size').textContent = formatBytes(blob.size);
-        byId('download-editor').disabled = overLimit;
-        byId('download-status').textContent = overLimit ? 'This copy exceeds the 10 MiB limit. Reduce or remove large images, then try again.' : 'Your content stays on this device. No account or additional installation is required.';
-        byId('download-checksum').textContent = '';
-        byId('offline-title').focus();
-      } else { byId('open-offline').focus(); scheduleFit(); }
-    }
+    function showOfflinePage(show) { showPage(show ? 'offline' : 'editor'); }
+
     function saveBlob(blob, filename) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a'); link.href = url; link.download = filename;
@@ -1594,6 +1858,8 @@ Pilot before scaling
       byId('download-editor').disabled = true;
       try {
         saveBlob(blob, 'handsondeck-offline.html');
+        flow.fileDirty = false;
+        byId('save-state').textContent = 'Editable download started · check your Downloads';
         byId('editor-download-size').textContent = formatBytes(blob.size);
         byId('download-status').textContent = 'Download started. This copy contains your current deck. Reopen it in a browser to continue editing offline.';
         let checksum = '';
@@ -1605,43 +1871,21 @@ Pilot before scaling
       } catch (error) { toast('The browser could not complete the download or checksum. Check your downloads before trying again.', true); }
       finally { byId('download-editor').disabled = false; }
     }
-    function restoreSavedProject() {
-      try {
-        const saved = JSON.parse(byId('saved-project').textContent);
-        if (saved.version !== 1 || !Array.isArray(saved.slides) || !saved.slides.length) return false;
-        state.slides = saved.slides;
-        state.dirty = true;
-        state.style = ['executive', 'operational', 'minimal'].includes(saved.style) ? saved.style : 'executive';
-        state.logo = saved.logo === null ? null : DeckCore.deckLogo(saved);
-        state.current = Math.min(Math.max(0, saved.current || 0), saved.slides.length - 1);
-        state.metadata = saved.metadata || state.metadata;
-        const brief = saved.brief || {};
-        byId('purpose').value = brief.purpose || '';
-        byId('audience').value = brief.audience || '';
-        byId('messages').value = brief.messagesText || '';
-        byId('count').value = String(brief.count || 'auto');
-        byId('input-mode').value = brief.inputMode === 'free' ? 'free' : 'structured';
-        byId('brief-style').value = state.style;
-        byId('style-select').value = state.style;
-        updateInputMode(); renderAll();
-        return true;
-      } catch { toast('The saved deck could not be restored. The sample editor is available.', true); return false; }
-    }
-
     function exportHtml() { return DeckCore.renderDeckHtml(state); }
 
     function downloadDeck() {
       if (!state.slides.length) { toast('Add or generate a deck before downloading.', true); return; }
       const blob = new Blob([exportHtml()], { type: 'text/html;charset=utf-8' });
+      if (blob.size > MAX_EDITOR_BYTES) { toast('This presentation exceeds 10 MiB. Reduce large images first.', true); return; }
       saveBlob(blob, 'handsondeck-presentation.html');
       toast(`Downloaded one offline HTML deck with ${state.slides.length} slides.`);
     }
 
-    byId('open-brief').addEventListener('click', () => openDrawer('brief'));
-    byId('open-checks').addEventListener('click', () => openDrawer('checks'));
+    byId('open-brief').addEventListener('click', () => openGuide());
+    byId('open-checks').addEventListener('click', () => showPage('review'));
     byId('open-branding').addEventListener('click', () => openDrawer('branding'));
     byId('input-mode').addEventListener('change', updateInputMode);
-    byId('open-offline').addEventListener('click', () => showOfflinePage(byId('offline-page').classList.contains('hidden')));
+    byId('open-offline').addEventListener('click', () => showPage('offline'));
     byId('back-to-editor').addEventListener('click', () => showOfflinePage(false));
     byId('download-editor').addEventListener('click', downloadEditor);
     byId('choose-logo').addEventListener('click', () => byId('logo-input').click());
@@ -1666,7 +1910,7 @@ Pilot before scaling
     byId('close-drawer').addEventListener('click', () => byId('drawer-dialog').close());
     byId('drawer-dialog').addEventListener('click', event => { if (event.target === byId('drawer-dialog')) byId('drawer-dialog').close(); });
     byId('generate').addEventListener('click', () => generateDeck(false));
-    byId('reset').addEventListener('click', () => { if (state.dirty && !window.confirm('Resetting will replace your on-slide edits. Continue?')) return; applySample(); generateDeck(true); toast('Sample brief restored.'); });
+    byId('reset').addEventListener('click', () => loadExample('decision'));
     byId('add-slide').addEventListener('click', addSlide);
     byId('slide-up').addEventListener('click', () => moveSlide(-1));
     byId('slide-down').addEventListener('click', () => moveSlide(1));
@@ -1676,7 +1920,7 @@ Pilot before scaling
     byId('next').addEventListener('click', () => selectSlide(state.current + 1));
     byId('layout-select').addEventListener('change', event => { const slide = currentSlide(); if (!slide) return; slide.kind = event.target.value; markEdited(); renderAll(); });
     byId('style-select').addEventListener('change', event => { state.style = event.target.value; byId('brief-style').value = state.style; markEdited(); renderAll(); toast(`Changed the deck to ${state.style} style.`); });
-    byId('brief-style').addEventListener('change', event => { state.style = event.target.value; byId('style-select').value = state.style; renderAll(); });
+    byId('brief-style').addEventListener('change', () => queueRecovery());
     byId('element-up').addEventListener('click', () => moveBlock(-1));
     byId('element-down').addEventListener('click', () => moveBlock(1));
     byId('duplicate-element').addEventListener('click', duplicateBlock);
@@ -1687,29 +1931,356 @@ Pilot before scaling
     byId('image-input').addEventListener('change', event => {
       const file = event.target.files[0], block = selectedBlock();
       if (!file || !block || block.type !== 'image') return;
-      if (file.size > 8 * 1024 * 1024) { toast('Choose an image smaller than 8 MB for a portable offline deck.', true); event.target.value = ''; return; }
+      if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(file.type) || file.size > 8 * 1024 * 1024) { toast('Choose a PNG, JPEG, GIF or WebP image smaller than 8 MiB.', true); event.target.value = ''; return; }
       const reader = new FileReader();
       reader.onload = () => { block.src = String(reader.result); block.alt = block.alt || file.name.replace(/\.[^.]+$/, ''); markEdited(); renderAll(); toast('Image added to the slide.'); };
       reader.readAsDataURL(file); event.target.value = '';
     });
-    byId('download').addEventListener('click', downloadDeck);
-    byId('present').addEventListener('click', () => {
-      if (!byId('offline-page').classList.contains('hidden')) showOfflinePage(false);
-      const frame = byId('slide-frame');
-      if (frame.requestFullscreen) frame.requestFullscreen().then(scheduleFit).catch(() => toast('Presentation mode could not be opened.', true));
-    });
+    byId('download').addEventListener('click', () => showPage('offline'));
+    byId('present').addEventListener('click', () => startPresenting());
     document.addEventListener('keydown', event => {
       const editing = event.target.closest('[contenteditable], input, textarea, select');
-      if (event.key === 'Escape') { closeElementMenu(); if (byId('drawer-dialog').open) byId('drawer-dialog').close(); }
+      if (event.key === 'Escape') { closeElementMenu(); if (flow.presenting) { stopPresenting(); byId('present').focus(); } if (byId('drawer-dialog').open) byId('drawer-dialog').close(); }
+      if (flow.page !== 'editor' || document.querySelector('dialog[open]')) return;
       if (!editing && ['ArrowRight', 'PageDown'].includes(event.key)) { event.preventDefault(); selectSlide(state.current + 1); }
       if (!editing && ['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); selectSlide(state.current - 1); }
     });
     window.addEventListener('resize', scheduleFit);
     document.addEventListener('fullscreenchange', scheduleFit);
 
-    applySample();
-    if (!restoreSavedProject()) generateDeck(true);
-    renderElementOptions();
+    // The guided interface starts after all its controls have been parsed.
   </script>
+  <script id="interface-code">
+'use strict';
+
+const flow = { page: 'welcome', step: 0, highest: 0, presenting: false, fileDirty: false, recoveryTimer: 0, recoveryEnabled: true, recoveryFailed: false, recoveryBlocked: false, reviewDone: false, example: false };
+const RECOVERY_KEY = 'hands-on-deck-recovery-v1';
+const RECOVERY_SETTING = 'hands-on-deck-recovery-enabled';
+const examples = {
+  decision: { purpose: 'Approve a four-week trial of online room booking.', audience: 'Office team leads', style: 'executive', count: '4', inputMode: 'structured', messagesText: 'Booking a room takes too many messages\n- Staff currently email the office team to check availability\n- Double bookings interrupt meetings\n\nTest one shared booking calendar\n- Start with two meeting rooms for four weeks\n- Keep the current process available during the trial\n\nDecide whether to continue\n- Track booking errors and time spent arranging meetings\n- Review staff feedback before expanding' },
+  update: { purpose: 'Understand progress on the website refresh and agree the next steps.', audience: 'Project team', style: 'operational', count: '4', inputMode: 'structured', messagesText: 'The first design review is complete\n- The team reviewed the homepage and contact page\n- Feedback has been added to the shared task list\n\nContent needs a final check\n- Two service descriptions still need an owner\n- The launch date depends on content approval\n\nFinish content before the next review\n- Assign owners for the remaining descriptions\n- Bring the revised pages to the next weekly meeting' },
+  workshop: { purpose: 'Agree one practical improvement to the team handover.', audience: 'Team members', style: 'minimal', count: '4', inputMode: 'structured', messagesText: 'Start with the handover today\n- Where does useful information get lost?\n- Share one recent example\n\nChoose the most important problem\n- Compare the impact of each issue\n- Pick one change the team can try this week\n\nMake a small commitment\n- Name an owner for the experiment\n- Agree when to check whether it helped' }
+};
+
+function putBrief(brief) {
+  byId('purpose').value = brief.purpose || '';
+  byId('audience').value = brief.audience || '';
+  byId('messages').value = brief.messagesText || brief.messages || '';
+  byId('input-mode').value = brief.inputMode || 'free';
+  byId('brief-style').value = brief.style || 'executive';
+  byId('count').value = String(brief.count || 'auto');
+  updateInputMode();
+}
+
+function syncGuideFromBrief() {
+  const brief = getBrief();
+  byId('guide-purpose').value = brief.purpose;
+  byId('guide-audience').value = brief.audience;
+  byId('guide-notes').value = brief.messagesText;
+  byId('guide-mode').value = brief.inputMode;
+  byId('guide-count').value = String(brief.count);
+  document.querySelectorAll('[name="guide-style"]').forEach(node => { node.checked = node.value === brief.style; });
+  updateGuideMode();
+}
+
+function syncBriefFromGuide() {
+  putBrief({ purpose: byId('guide-purpose').value, audience: byId('guide-audience').value, messagesText: byId('guide-notes').value, inputMode: byId('guide-mode').value,
+    style: document.querySelector('[name="guide-style"]:checked')?.value || 'executive', count: byId('guide-count').value });
+}
+
+function updateGuideMode() {
+  const free = byId('guide-mode').value === 'free';
+  byId('guide-notes').maxLength = free ? 20000 : 50000;
+  byId('guide-notes-help').textContent = free ? 'Use a new paragraph for each main idea. Your sentences are kept as written; Standard mode does not rewrite or fact-check them.' : 'Write a headline, then supporting points on separate lines starting with a hyphen. Leave a blank line before the next headline.';
+  byId('guide-notes').placeholder = free ? 'What is happening? Why does it matter? What should happen next?' : 'The main point\n- A supporting fact\n- Another detail\n\nThe next point\n- Its supporting detail';
+  byId('guide-char-count').textContent = `${byId('guide-notes').value.length.toLocaleString()} / ${(free ? 20000 : 50000).toLocaleString()} characters`;
+}
+
+function updateJourney() {
+  const hasSlides = !!state.slides.length;
+  const active = { guide: 'open-brief', editor: 'nav-edit', review: 'open-checks', offline: 'open-offline' }[flow.page];
+  for (const id of ['open-brief', 'nav-edit', 'open-checks', 'open-offline']) {
+    const node = byId(id);
+    if (id === active) node.setAttribute('aria-current', 'step'); else node.removeAttribute('aria-current');
+    node.disabled = id !== 'open-brief' && !hasSlides;
+  }
+  byId('present').hidden = !hasSlides || flow.page !== 'editor';
+  byId('download').hidden = !hasSlides;
+  byId('resume-card').hidden = !hasSlides;
+  byId('resume-description').textContent = `${state.slides.length} slides · ${state.slides[0]?.title || 'Untitled deck'}`;
+  byId('download-presentation').disabled = !hasSlides;
+  byId('download-project').disabled = !hasSlides;
+}
+
+function showPage(page, focus = true) {
+  if (flow.page === 'guide' && page !== 'guide') syncBriefFromGuide();
+  if (['editor', 'review', 'offline'].includes(page) && !state.slides.length) page = 'guide';
+  if (flow.presenting) stopPresenting();
+  if (byId('drawer-dialog').open) byId('drawer-dialog').close();
+  closeElementMenu();
+  flow.page = page;
+  for (const id of ['welcome', 'guide', 'review', 'ai', 'offline']) byId(id + '-page').classList.toggle('hidden', id !== page);
+  document.querySelector('.app-shell').classList.toggle('hidden', page !== 'editor');
+  updateJourney();
+  if (page === 'guide') { syncGuideFromBrief(); renderGuide(); }
+  if (page === 'review') renderReviewPage();
+  if (page === 'offline') refreshDownloadInfo();
+  if (page === 'editor') scheduleFit();
+  if (focus) {
+    const heading = { welcome: 'welcome-title', guide: `guide-title-${flow.step}`, review: 'review-title', ai: 'ai-title', offline: 'offline-title', editor: 'editor-heading' }[page];
+    byId(heading)?.focus({ preventScroll: true });
+  }
+}
+
+function openGuide() { syncGuideFromBrief(); flow.step = 0; showPage('guide'); }
+function openDirectBrief() {
+  if (flow.page === 'guide') syncBriefFromGuide();
+  if (state.slides.length) showPage('editor');
+  openDrawer('brief');
+  byId('purpose').focus();
+}
+
+function validGuideStep(step) {
+  byId('guide-error').hidden = true;
+  for (const id of ['guide-purpose', 'guide-notes']) byId(id).removeAttribute('aria-invalid');
+  let id, message;
+  if (step === 0 && !byId('guide-purpose').value.trim()) { id = 'guide-purpose'; message = 'Add the outcome you want, such as “Approve a four-week pilot”.'; }
+  if (step === 1) {
+    const notes = byId('guide-notes').value.trim();
+    if (!notes) { id = 'guide-notes'; message = 'Add at least one point or a short paragraph for your slides.'; }
+    else if (notes.length > byId('guide-notes').maxLength) { id = 'guide-notes'; message = 'Shorten your notes to fit the character limit before continuing.'; }
+  }
+  if (!message) return true;
+  byId('guide-error').textContent = message;
+  byId('guide-error').hidden = false;
+  byId(id).setAttribute('aria-invalid', 'true'); byId(id).focus();
+  return false;
+}
+
+function moveGuide(next) {
+  if (next > flow.step && !validGuideStep(flow.step)) return;
+  syncBriefFromGuide();
+  flow.step = Math.max(0, Math.min(3, next)); flow.highest = Math.max(flow.highest, flow.step);
+  renderGuide();
+  byId(`guide-title-${flow.step}`).focus({ preventScroll: true });
+  byId('guide-page').scrollTop = 0;
+  queueRecovery();
+}
+
+function renderGuide() {
+  byId('guide-page').setAttribute('aria-labelledby', `guide-title-${flow.step}`);
+  document.querySelectorAll('[data-guide-panel]').forEach(node => { node.hidden = Number(node.dataset.guidePanel) !== flow.step; });
+  document.querySelectorAll('[data-guide-step]').forEach(node => {
+    const step = Number(node.dataset.guideStep);
+    node.disabled = step > flow.highest + 1;
+    node.classList.toggle('completed', step < flow.step);
+    if (step === flow.step) node.setAttribute('aria-current', 'step'); else node.removeAttribute('aria-current');
+  });
+  byId('guide-back').textContent = flow.step === 0 ? 'Back to start' : '← Back';
+  byId('guide-next').textContent = ['Next: your content →', 'Next: your style →', 'Preview your outline →', 'Build my deck →'][flow.step];
+  byId('guide-error').hidden = true;
+  if (flow.step === 3) renderOutline();
+}
+
+function planFromBrief() {
+  const brief = getBrief();
+  const groups = brief.inputMode === 'free' ? DeckCore.organiseFreeText(brief.messagesText) : parseMessageGroups(brief.messagesText);
+  return { ...buildSlides(brief, groups), style: brief.style };
+}
+
+function renderOutline() {
+  const summary = byId('guide-summary'); summary.replaceChildren();
+  const brief = getBrief();
+  for (const [label, value] of [['Outcome', brief.purpose], ['Audience', brief.audience || 'Not specified'], ['Style', brief.style]]) summary.append(make('dt', '', label), make('dd', '', value));
+  const list = byId('guide-outline'); list.replaceChildren();
+  try {
+    const plan = planFromBrief();
+    for (const [i, slide] of plan.slides.entries()) {
+      const row = make('li'), copy = make('div');
+      copy.append(make('strong', '', slide.title), make('p', '', `${slide.kind === 'title' ? 'Opening' : slide.kind === 'statement' ? 'Closing' : 'Content'} · ${slide.blocks.length} content element${slide.blocks.length === 1 ? '' : 's'}`));
+      row.append(make('span', 'outline-number', String(i + 1).padStart(2, '0')), copy); list.appendChild(row);
+    }
+    byId('outline-note').textContent = `${plan.slides.length} suggested slides. ${plan.metadata.grouped ? 'Some messages are grouped to fit your chosen length. ' : ''}All wording can be edited after building.${state.slides.length ? ' Building again replaces the current slides; download a copy first to keep them.' : ''}`;
+  } catch (error) { byId('outline-note').textContent = error.message; }
+}
+
+function renderReviewPage() {
+  renderChecks();
+  const warnings = state.warnings;
+  byId('review-result').textContent = warnings.length ? `${warnings.length} suggestion${warnings.length === 1 ? '' : 's'} to look at` : 'No basic content issues found';
+  const list = byId('review-warnings'); list.replaceChildren();
+  if (!warnings.length) list.appendChild(make('p', '', 'Now check the facts and how each slide reads. Automated checks cannot judge your story or verify evidence.'));
+  warnings.forEach(item => {
+    const node = make(Number.isInteger(item.slide) ? 'button' : 'div', 'review-warning', item.text);
+    if (Number.isInteger(item.slide)) { node.type = 'button'; node.appendChild(make('small', '', `Edit slide ${item.slide + 1} →`)); node.addEventListener('click', () => { selectSlide(item.slide); showPage('editor'); }); }
+    list.appendChild(node);
+  });
+  flow.reviewDone = true;
+}
+
+function refreshDownloadInfo() {
+  const blob = editorDownloadBlob();
+  byId('editor-download-size').textContent = formatBytes(blob.size);
+  byId('download-editor').disabled = blob.size > MAX_EDITOR_BYTES;
+  byId('download-status').textContent = blob.size > MAX_EDITOR_BYTES ? 'This copy exceeds 10 MiB. Reduce or remove large images, then try again.' : 'Contains the editor, your slides, images and logo. Download only starts when you choose the button.';
+  byId('download-checksum').textContent = '';
+  byId('recovery-toggle').checked = flow.recoveryEnabled;
+}
+
+function queueRecovery() {
+  clearTimeout(flow.recoveryTimer);
+  flow.fileDirty = true;
+  if (flow.recoveryBlocked) { byId('save-state').textContent = 'Another tab has a newer draft — save a file'; return; }
+  if (!flow.recoveryEnabled) { byId('save-state').textContent = 'Not saved · download an editable copy'; return; }
+  byId('save-state').textContent = 'Saving a browser recovery copy…';
+  flow.recoveryTimer = setTimeout(saveRecovery, 500);
+}
+
+function saveRecovery() {
+  if (!flow.recoveryEnabled || flow.recoveryBlocked) return;
+  try {
+    if (flow.page === 'guide') syncBriefFromGuide();
+    const snapshot = editorSnapshot();
+    if (!snapshot.slides.length && !snapshot.brief.purpose && !snapshot.brief.messagesText) return;
+    localStorage.setItem(RECOVERY_KEY, JSON.stringify(snapshot));
+    flow.recoveryFailed = false;
+    byId('save-state').textContent = 'Recovery saved in this browser';
+    byId('recovery-note').textContent = 'Recovery is on for this browser. Download an editable file before changing devices or clearing browser data.';
+  } catch {
+    flow.recoveryFailed = true;
+    byId('save-state').textContent = 'Recovery unavailable · download your work';
+    byId('recovery-note').textContent = 'Browser recovery is unavailable or full. Download an editable copy to keep your work.';
+  }
+}
+
+function applyProject(project) {
+  flow.undo = null; byId('undo-delete').hidden = true;
+  state.slides = project.slides; state.logo = project.logo; state.style = project.style;
+  state.current = project.current; state.metadata = project.metadata; state.dirty = !!project.slides.length; state.selectedBlockId = null;
+  putBrief(project.brief); byId('style-select').value = state.style;
+  flow.example = false; flow.reviewDone = false; flow.highest = 0; flow.step = 0;
+  syncGuideFromBrief(); renderAll(); updateJourney();
+}
+
+function allowReplacement() {
+  return !(state.slides.length || getBrief().messagesText) || window.confirm('Replace the current deck and brief? Download an editable copy first if you want to keep them.');
+}
+
+function loadExample(key) {
+  if (!allowReplacement()) return;
+  putBrief(examples[key]); flow.example = true; state.dirty = false;
+  generateDeck(true);
+  toast('Fictional example loaded. Click any text to make it yours.');
+}
+
+function afterBuild() {
+  flow.fileDirty = true; flow.reviewDone = false;
+  flow.undo = null; byId('undo-delete').hidden = true;
+  byId('editor-heading').textContent = flow.example ? 'A fictional example. Make it yours.' : 'Your first draft is ready.';
+  byId('editor-guidance').textContent = 'Click text to edit it. Use Add element for visuals, then review the story before saving.';
+  document.querySelectorAll('.review-check input').forEach(node => { node.checked = false; });
+  showPage('editor'); queueRecovery();
+}
+
+function startPresenting() {
+  if (!state.slides.length) return;
+  showPage('editor'); flow.presenting = true; document.body.classList.add('is-presenting'); renderPreview();
+  byId('exit-present').focus();
+}
+function stopPresenting() { flow.presenting = false; document.body.classList.remove('is-presenting'); renderPreview(); }
+
+function offerUndo(action, message) { flow.undo = action; byId('undo-delete').hidden = false; toast(message); }
+byId('undo-delete').addEventListener('click', () => { if (!flow.undo) return; flow.undo(); flow.undo = null; byId('undo-delete').hidden = true; markEdited(); renderAll(); toast('Deletion undone.'); });
+
+byId('home').addEventListener('click', () => showPage('welcome'));
+byId('start-guided').addEventListener('click', openGuide);
+byId('start-direct').addEventListener('click', openDirectBrief);
+byId('guide-to-direct').addEventListener('click', openDirectBrief);
+byId('direct-to-guide').addEventListener('click', () => { byId('drawer-dialog').close(); openGuide(); });
+byId('nav-edit').addEventListener('click', () => showPage('editor'));
+byId('resume-deck').addEventListener('click', () => showPage('editor'));
+byId('open-help').addEventListener('click', () => byId('help-dialog').showModal());
+byId('close-help').addEventListener('click', () => byId('help-dialog').close());
+byId('open-ai').addEventListener('click', () => showPage('ai'));
+byId('ai-standard').addEventListener('click', () => showPage(state.slides.length ? 'editor' : 'welcome'));
+byId('coach-review').addEventListener('click', () => showPage('review'));
+byId('review-back').addEventListener('click', () => showPage('editor'));
+byId('review-save').addEventListener('click', () => showPage('offline'));
+byId('review-present').addEventListener('click', startPresenting);
+byId('exit-present').addEventListener('click', () => { stopPresenting(); byId('present').focus(); });
+byId('download-presentation').addEventListener('click', downloadDeck);
+byId('download-project').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(editorSnapshot(), null, 2)], { type: 'application/json' });
+  if (blob.size > MAX_EDITOR_BYTES) { toast('This project exceeds 10 MiB. Reduce large images first.', true); return; }
+  saveBlob(blob, 'hands-on-deck-project.json'); flow.fileDirty = false;
+  toast('Project download started. Use Open a saved deck to import it later.');
+});
+byId('open-project').addEventListener('click', () => byId('project-input').click());
+byId('project-input').addEventListener('change', async event => {
+  const file = event.target.files[0]; event.target.value = ''; if (!file) return;
+  if (file.size > MAX_EDITOR_BYTES) { toast('Choose a file no larger than 10 MiB.', true); return; }
+  try {
+    const project = DeckCore.parseSavedProject(await file.text());
+    if (!allowReplacement()) return;
+    applyProject(project); flow.fileDirty = false;
+    showPage(project.slides.length ? 'editor' : 'guide'); saveRecovery();
+    toast('Your editable deck is open. Nothing was uploaded.');
+  } catch (error) { toast(error.message || 'This file could not be opened.', true); }
+});
+
+document.querySelectorAll('[data-example]').forEach(node => node.addEventListener('click', () => loadExample(node.dataset.example)));
+document.querySelectorAll('[data-goal]').forEach(node => node.addEventListener('click', () => { const input = byId('guide-purpose'); if (!input.value.trim() || window.confirm('Replace the outcome you have written with this starter?')) input.value = node.dataset.goal; input.focus(); syncBriefFromGuide(); queueRecovery(); }));
+document.querySelectorAll('[data-guide-step]').forEach(node => node.addEventListener('click', () => moveGuide(Number(node.dataset.guideStep))));
+byId('guide-back').addEventListener('click', () => flow.step ? moveGuide(flow.step - 1) : showPage('welcome'));
+byId('guide-next').addEventListener('click', () => {
+  if (!validGuideStep(flow.step)) return;
+  if (flow.step < 3) { moveGuide(flow.step + 1); return; }
+  syncBriefFromGuide();
+  if (!getBrief().purpose || !getBrief().messagesText) { moveGuide(!getBrief().purpose ? 0 : 1); validGuideStep(flow.step); return; }
+  flow.example = false; generateDeck(false);
+});
+byId('guide-mode').addEventListener('change', () => { updateGuideMode(); syncBriefFromGuide(); queueRecovery(); });
+byId('guide-example').addEventListener('click', () => {
+  if (byId('guide-notes').value.trim() && !window.confirm('Replace these notes with a fictional example?')) return;
+  byId('guide-notes').value = 'Room bookings currently rely on email. Double bookings interrupt meetings.\n\nWe propose testing a shared calendar for two rooms over four weeks. Keep the existing process available during the trial.\n\nTrack booking errors and gather staff feedback before expanding.';
+  updateGuideMode(); syncBriefFromGuide(); queueRecovery();
+});
+byId('guide-page').addEventListener('input', () => { updateGuideMode(); syncBriefFromGuide(); queueRecovery(); });
+byId('guide-count').addEventListener('change', () => { syncBriefFromGuide(); queueRecovery(); });
+byId('brief-panel').addEventListener('input', queueRecovery);
+byId('brief-panel').addEventListener('change', queueRecovery);
+byId('recovery-toggle').addEventListener('change', event => {
+  flow.recoveryEnabled = event.target.checked;
+  let removed = true;
+  try { localStorage.setItem(RECOVERY_SETTING, String(flow.recoveryEnabled)); if (!flow.recoveryEnabled) localStorage.removeItem(RECOVERY_KEY); }
+  catch { flow.recoveryFailed = true; removed = false; }
+  if (flow.recoveryEnabled) { flow.recoveryBlocked = false; saveRecovery(); }
+  else { clearTimeout(flow.recoveryTimer); byId('save-state').textContent = 'Recovery off · download your work'; byId('recovery-note').textContent = removed ? 'The browser recovery copy has been removed. Your open deck is still here. Download an editable copy to keep it.' : 'Recovery is off, but its saved copy could not be removed. Clear this site’s browser data to remove it. Your open deck is still here.'; }
+});
+byId('copy-ai-prompt').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(byId('ai-prompt').value); toast('Prompt copied. Add your audience, outcome and notes in your AI app.'); }
+  catch { byId('ai-prompt').focus(); byId('ai-prompt').select(); toast('Select and copy this prompt using your browser’s Copy command.'); }
+});
+window.addEventListener('storage', event => { if (event.key === RECOVERY_KEY && event.newValue) { flow.recoveryBlocked = true; clearTimeout(flow.recoveryTimer); byId('save-state').textContent = 'Another tab saved a draft · download this copy'; toast('Another tab saved a recovery copy. Download this deck before closing to keep both versions.', true); } });
+window.addEventListener('beforeunload', event => { if (flow.fileDirty) saveRecovery(); if (flow.fileDirty && (!flow.recoveryEnabled || flow.recoveryFailed || flow.recoveryBlocked)) { event.preventDefault(); event.returnValue = ''; } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && flow.fileDirty) saveRecovery(); });
+
+// Capture the complete, still-unmodified page, including this inline workflow.
+editorTemplate = '<!doctype html>\n' + document.documentElement.outerHTML;
+putBrief({});
+try { flow.recoveryEnabled = localStorage.getItem(RECOVERY_SETTING) !== 'false'; } catch { flow.recoveryEnabled = false; flow.recoveryFailed = true; }
+let restored = false;
+try {
+  const embedded = JSON.parse(byId('saved-project').textContent);
+  if (embedded.version === 1) { applyProject(DeckCore.normaliseProject(embedded)); restored = true; }
+  else if (flow.recoveryEnabled) {
+    const saved = localStorage.getItem(RECOVERY_KEY);
+    if (saved) { applyProject(DeckCore.parseSavedProject(saved)); restored = true; byId('save-state').textContent = 'Recovered from this browser'; }
+  }
+} catch { toast('The saved copy could not be restored. Open a downloaded editable file to recover your deck.', true); }
+renderAll(); renderElementOptions();
+showPage(restored ? (state.slides.length ? 'editor' : 'guide') : 'welcome', false);
+if (restored) toast('Welcome back. Your saved work is ready.');
+</script>
 </body>
 </html>

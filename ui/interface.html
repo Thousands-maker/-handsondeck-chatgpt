@@ -1,0 +1,82 @@
+<nav class="journey-bar" aria-label="Build your presentation">
+  <div class="journey-steps">
+    <button class="journey-step" id="open-brief" type="button"><b>1</b> Brief</button>
+    <button class="journey-step" id="nav-edit" type="button"><b>2</b> Edit</button>
+    <button class="journey-step" id="open-checks" type="button"><b>3</b> Review <span class="badge clear" id="checks-badge">0</span></button>
+    <button class="journey-step" id="open-offline" type="button"><b>4</b> Save &amp; share</button>
+  </div>
+  <span class="save-state" id="save-state" role="status">Your work stays on this device</span>
+</nav>
+
+<main class="flow-page" id="welcome-page" aria-labelledby="welcome-title">
+  <div class="flow-wrap">
+    <div class="resume-card" id="resume-card" hidden><div><strong>Your deck is here.</strong><p id="resume-description">Continue editing where you left off.</p></div><button class="btn btn-primary" id="resume-deck" type="button">Continue editing →</button></div>
+    <div class="home-hero">
+      <div><div class="eyebrow">A clear story starts here</div><h1 id="welcome-title" tabindex="-1">Your ideas.<br>A deck that makes sense.</h1><p class="lead">You bring the knowledge. We’ll help you turn it into slides, one manageable step at a time.</p><div class="home-proof"><span>No account</span><span>No uploads</span><span>Download to work offline</span></div></div>
+      <div class="deck-art" aria-hidden="true"><figure><span class="art-label">From a few notes to a clear story</span><figcaption>Make the next<br>decision easier.</figcaption><i class="art-line"></i><i class="art-line"></i><i class="art-line"></i></figure></div>
+    </div>
+    <div class="path-grid">
+      <button class="path-card primary" id="start-guided" type="button"><span class="tag">A little guidance · 4 short steps</span><h2>Help me shape my deck</h2><p>Start with your audience and goal. Add your notes, choose a style, then check your outline.</p><span class="go">Start with a few questions →</span></button>
+      <button class="path-card" id="start-direct" type="button"><span class="tag neutral">Have a brief ready?</span><h2>I know what I want to say</h2><p>Paste your notes or key messages into one form and go straight to an editable first draft.</p><span class="go">Open the brief form →</span></button>
+    </div>
+    <div class="home-alternatives"><button class="btn btn-quiet" id="open-project" type="button">↑ Open a saved deck</button><span class="field-help">An editable HTML copy or a Hands on Deck project file.</span></div>
+    <div class="example-row"><p>Want to see how it works?<br><strong>Try a fictional example.</strong></p><button class="chip" data-example="decision" type="button">Get a decision ↗</button><button class="chip" data-example="update" type="button">Share an update ↗</button><button class="chip" data-example="workshop" type="button">Start a discussion ↗</button></div>
+    <p class="field-help" style="margin-top:22px">Standard mode organises your words with local rules. You stay in control of the wording and the final story.</p>
+  </div>
+</main>
+
+<main class="flow-page hidden" id="guide-page" aria-labelledby="guide-title-0">
+  <div class="flow-wrap guide-wrap">
+    <div class="guide-top"><span class="eyebrow">Shape your deck</span><button class="text-button" id="guide-to-direct" type="button">Prefer one form? Open the brief</button></div>
+    <nav class="guide-progress" aria-label="Brief steps"><button type="button" data-guide-step="0">1. Your goal</button><button type="button" data-guide-step="1">2. Your content</button><button type="button" data-guide-step="2">3. Your style</button><button type="button" data-guide-step="3">4. Your outline</button></nav>
+    <div class="guide-card">
+      <section data-guide-panel="0"><h1 id="guide-title-0" tabindex="-1">What should this deck achieve?</h1><p class="lead">A useful deck gives its audience something to understand, decide or do.</p>
+        <div class="form-field"><label for="guide-purpose">By the end, I want them to…</label><input id="guide-purpose" maxlength="1000" placeholder="e.g. Approve a four-week pilot for the new booking process" aria-describedby="guide-purpose-help"><p class="field-help" id="guide-purpose-help">Write one clear outcome. This also helps shape your closing slide.</p></div>
+        <div class="home-alternatives"><button class="chip" data-goal="Approve " type="button">Approve something</button><button class="chip" data-goal="Understand " type="button">Understand an update</button><button class="chip" data-goal="Give feedback on " type="button">Give their input</button></div>
+        <div class="form-field"><label for="guide-audience">Who is it for? <small>Optional</small></label><input id="guide-audience" maxlength="1000" placeholder="e.g. My team, senior leaders or project partners"><p class="field-help">Keep their level of knowledge in mind as you write.</p></div>
+      </section>
+      <section data-guide-panel="1" hidden><h1 id="guide-title-1" tabindex="-1">What do they need to know?</h1><p class="lead">Paste your notes, or give each key message a heading and a few supporting points.</p>
+        <div class="form-field"><label for="guide-mode">How are your notes written?</label><select id="guide-mode"><option value="free">Free text — paragraphs or rough notes</option><option value="structured">Structured — headings and supporting points</option></select></div>
+        <div class="form-field"><label for="guide-notes">Your content</label><textarea id="guide-notes" rows="9" maxlength="20000" placeholder="What is happening? Why does it matter? What should happen next?" aria-describedby="guide-notes-help"></textarea><p class="field-help" id="guide-notes-help">Use a new paragraph for each main idea. Your sentences are kept as written; Standard mode does not rewrite or fact-check them.</p><p class="field-help" id="guide-char-count">0 / 20,000 characters</p></div>
+        <button class="text-button" id="guide-example" type="button">Fill in a short example</button>
+      </section>
+      <section data-guide-panel="2" hidden><h1 id="guide-title-2" tabindex="-1">Give your story some space.</h1><p class="lead">Pick a starting style. You can change it while editing.</p>
+        <fieldset style="border:0;padding:0;margin:0"><legend class="field-label">Presentation style</legend><div class="style-options">
+          <label class="style-option"><input type="radio" name="guide-style" value="executive" checked><div class="style-mini" aria-hidden="true"><i></i><i></i><i></i></div><strong>Executive</strong><small>A concise story for decisions and proposals.</small></label>
+          <label class="style-option"><input type="radio" name="guide-style" value="operational"><div class="style-mini dense" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><strong>Operational</strong><small>More supporting detail for working reviews.</small></label>
+          <label class="style-option"><input type="radio" name="guide-style" value="minimal"><div class="style-mini minimal" aria-hidden="true"><i></i><i></i></div><strong>Minimal</strong><small>Simple slides with fewer distractions.</small></label>
+        </div></fieldset>
+        <div class="form-field"><label for="guide-count">How many slides?</label><select id="guide-count"><option value="auto">Let the content decide · 3–6 slides</option><option value="3">3 slides</option><option value="4">4 slides</option><option value="5">5 slides</option><option value="6">6 slides</option></select><p class="field-help">A short deck may group points together. More slides will not create extra facts.</p></div>
+      </section>
+      <section data-guide-panel="3" hidden><h1 id="guide-title-3" tabindex="-1">Does this tell the right story?</h1><p class="lead">Here is your first outline. Go back to change your brief, or build it and edit any slide.</p><dl class="review-brief" id="guide-summary"></dl><p class="field-help" id="outline-note"></p><ol class="outline-list" id="guide-outline"></ol></section>
+      <p class="guide-error" id="guide-error" role="alert" hidden></p>
+      <div class="guide-bottom"><button class="btn btn-quiet" id="guide-back" type="button">Back to start</button><button class="btn btn-primary" id="guide-next" type="button">Next: your content →</button></div>
+    </div>
+    <p class="field-help" style="text-align:center;margin-top:18px">Your notes stay on this device. You can go back without losing your answers.</p>
+  </div>
+</main>
+
+<main class="flow-page hidden" id="review-page" aria-labelledby="review-title"><div class="flow-wrap">
+  <div class="eyebrow">One last look</div><h1 id="review-title" tabindex="-1">Make it ready for the room.</h1><p class="lead">These checks catch common issues. You know the facts and your audience best.</p>
+  <div class="review-grid"><section class="offline-card"><h2 id="review-result">Checking your deck…</h2><p>Choose an issue to return to that slide.</p><div id="review-warnings"></div></section>
+    <section class="offline-card"><h2>Your final read-through</h2><label class="review-check"><input type="checkbox">The facts, numbers and sources are correct.</label><label class="review-check"><input type="checkbox">Each slide makes a clear point for this audience.</label><label class="review-check"><input type="checkbox">The closing slide says what happens next.</label><label class="review-check"><input type="checkbox">I have checked every slide at presentation size.</label><button class="btn btn-quiet" id="review-present" type="button">Preview the presentation</button></section>
+  </div><div class="review-actions"><button class="btn btn-quiet" id="review-back" type="button">← Keep editing</button><button class="btn btn-primary" id="review-save" type="button">Save &amp; share →</button></div>
+</div></main>
+
+<main class="flow-page hidden" id="ai-page" aria-labelledby="ai-title"><div class="flow-wrap">
+  <div class="eyebrow">Optional AI support</div><h1 id="ai-title" tabindex="-1">Supercharged, explained.</h1><p class="lead">AI can help rewrite and organise your notes. This editor currently runs in Standard mode; no AI model is connected or downloaded.</p>
+  <div class="resume-card"><div><strong>Standard is ready now.</strong><p>Arrange your notes, edit slides and save a deck entirely on your device.</p></div><button class="btn btn-primary" id="ai-standard" type="button">Continue in Standard →</button></div>
+  <div class="model-grid">
+    <article class="model-card"><span class="tag neutral">Model not connected</span><h2>Supercharged</h2><p><strong>Qwen2.5 0.5B Instruct</strong><br>Example task: turn a short, wordy sentence into a slide headline.</p><div class="model-example"><span>Your note</span><p>“The team reduced the time it takes to prepare the weekly report from 3 hours to 1 hour.”</p><span>A suggested headline to aim for</span><p>“Weekly reporting time fell from 3 hours to 1.”</p></div><p>Check that every number and qualification survives the rewrite.</p></article>
+    <article class="model-card"><span class="tag neutral">Model not connected</span><h2>Supercharged Pro</h2><p><strong>Ministral 3 3B Instruct</strong><br>Example task: separate progress, concerns and next steps in a longer update.</p><div class="model-example"><span>Your note</span><p>“The pilot finished on time. Staff still need training, so we should delay the wider rollout.”</p><span>A suggested structure to aim for</span><p>Progress: pilot complete.<br>Concern: training incomplete.<br>Recommendation: delay expansion.</p></div><p>Check the meaning and recommendation, especially where notes contain caveats.</p></article>
+  </div>
+  <p class="field-help" style="margin:18px 0">These are illustrative examples, not tested outputs or guarantees. Model downloads are not available in this editor.</p>
+  <section class="save-help"><h2>Use your own AI app or agent</h2><p>You can use the prompt below in your chosen AI app, then paste its draft into the brief. If it runs in the cloud, that app will receive whatever you send to it.</p><textarea class="prompt-copy" id="ai-prompt" readonly aria-label="Prompt for your AI app">Turn my notes into a presentation outline. Use one clear headline per slide, followed by supporting points starting with a hyphen. Keep every fact, number and caveat accurate. Do not invent evidence. Flag missing information as a question. Finish with the decision or next step the audience needs to take.
+
+Audience: [who will see this]
+Outcome: [what they should understand, decide or do]
+Notes: [paste your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" type="button">Copy example prompt</button><details style="margin-top:20px"><summary>Connect an agent with MCP</summary><p>A compatible AI app or agent can use the project’s deck tools to review and render a plan. Set up the connection in that app. It does not control this open editor automatically.</p><a href="https://github.com/Thousands-maker/handsondeck-chatgpt/blob/main/docs/MCP.md" target="_blank" rel="noopener noreferrer">Open connection instructions on GitHub ↗</a></details></section>
+</div></main>
+
+<dialog class="help-dialog" id="help-dialog" aria-labelledby="help-title"><div class="help-head"><h2 id="help-title">A little help at every step.</h2><button class="btn btn-quiet" id="close-help" type="button" aria-label="Close help">×</button></div><ol><li><strong>Brief.</strong> Say who the deck is for, the outcome you need and the key information. Try an example if you are unsure.</li><li><strong>Edit.</strong> Click any text on the slide. Use Add element for a chart, image, table or callout. Select a slide in the left rail to move, duplicate or delete it.</li><li><strong>Review.</strong> Follow the suggested checks, then use Present to check the whole story. Use the arrow buttons or <kbd>←</kbd> <kbd>→</kbd>; press <kbd>Esc</kbd> to leave presentation mode.</li><li><strong>Save &amp; share.</strong> An editable copy keeps your deck and the editor together. A presentation copy is for viewing. Download again after making changes.</li></ol><p class="field-help">Your notes and images are not uploaded. Browser recovery is a convenience; keep an editable download as your backup.</p></dialog>
+<input id="project-input" type="file" accept=".html,.json,text/html,application/json" hidden>

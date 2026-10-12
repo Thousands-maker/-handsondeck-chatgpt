@@ -70,14 +70,43 @@ test('downloaded editable copies retain the full project without corrupting exec
   assert.ok(new Blob([copy]).size < 10 * 1024 * 1024);
 });
 
-test('standalone builds match and both inline scripts parse', () => {
+test('standalone builds match and all inline scripts parse', () => {
   assert.equal(html, read('dist/index.html'));
-  assert.equal(scripts.length, 2);
+  assert.equal(scripts.length, 3);
   scripts.forEach(script => new vm.Script(script));
   assert.equal(scripts[0].trim(), read('core/deck-core.cjs').trim());
   assert.ok(html.includes("connect-src 'none'"));
   assert.doesNotMatch(html, /<(?:script|img|link)[^>]+(?:src|href)=["']https?:/i);
   assert.doesNotMatch(html, /\b(?:fetch|XMLHttpRequest|WebSocket)\s*\(/);
+});
+
+test('editable HTML and project JSON round-trip through safe import with all element types', () => {
+  const plan = samplePlan();
+  plan.slides[0].blocks = ['paragraph', 'bullets', 'quote', 'callout', 'stat', 'columns', 'cards', 'chart', 'table', 'image', 'divider'].map(type => core.newBlock(type));
+  plan.slides[0].title = 'Numbers 3 → 1; <script> is just text';
+  const project = { version: 1, ...plan, current: 1, logo: core.DEFAULT_LOGO, brief: { purpose: sample.purpose, messagesText: sample.messages, inputMode: 'structured' } };
+  const imported = core.parseSavedProject(core.embedEditorProject(html, project));
+  assert.equal(core.renderDeckHtml(imported), core.renderDeckHtml(project));
+  const fromJson = core.parseSavedProject(JSON.stringify(project));
+  assert.equal(fromJson.slides[0].title, project.slides[0].title);
+  assert.notEqual(fromJson.slides[0].id, project.slides[0].id);
+  assert.equal(fromJson.current, 1);
+  assert.equal(fromJson.brief.messagesText, sample.messages);
+  assert.equal(core.normaliseProject({ ...project, slides: [], current: 8 }).current, 0);
+});
+
+test('project import rejects external images, unsafe SVG, invalid tables and oversized projects', () => {
+  const project = { version: 1, ...samplePlan(), brief: {} };
+  const bad = patch => JSON.stringify({ ...project, ...patch });
+  assert.throws(() => core.parseSavedProject(core.renderDeckHtml(project)), /presentation copy/);
+  assert.throws(() => core.parseSavedProject(bad({ logo: { src: 'https://example.com/tracker.png' } })), /unsupported/);
+  assert.throws(() => core.parseSavedProject(bad({ logo: { src: 'data:image/svg+xml;base64,PHN2Zy8+' } })), /unsupported/);
+  const slide = { ...project.slides[0], blocks: [{ type: 'image', src: 'javascript:alert(1)', alt: '', caption: '' }] };
+  assert.throws(() => core.parseSavedProject(bad({ slides: [slide] })), /unsupported/);
+  slide.blocks = [{ type: 'table', headers: ['A'], rows: [['A', 'B']] }];
+  assert.throws(() => core.parseSavedProject(bad({ slides: [slide] })), /unsupported/);
+  assert.throws(() => core.parseSavedProject(bad({ slides: Array(101).fill(project.slides[0]) })), /unsupported/);
+  assert.throws(() => core.parseSavedProject('x'.repeat(10 * 1024 * 1024 + 1)), /10 MiB/);
 });
 
 test('browser and server use the same callable core', () => {

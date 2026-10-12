@@ -7,7 +7,7 @@ Help people turn a briefing into a clear presentation without spending hours on 
 - People who regularly prepare updates, proposals or decision papers and already know their argument.
 - Occasional presenters who know their subject but benefit from structure and examples.
 
-Both groups use the same brief, with structured and free-text input formats. The slide canvas is the main editing surface, with direct text editing and an element picker. Brief inputs, logo settings and quality checks live in temporary drawers. Offline downloads have a separate screen.
+Both groups use the same brief, with structured and free-text input formats. First-time users can follow a four-step guided journey and inspect an outline before building. A one-page brief form serves people ready to write. The editor, review and save screens have persistent navigation and contextual guidance. Fictional examples and help remain available. The slide canvas is the main editing surface, with direct text editing and an element picker.
 
 ## Core requirements
 
@@ -19,7 +19,10 @@ Both groups use the same brief, with structured and free-text input formats. The
 - Confirmation before regeneration replaces on-slide edits.
 - Text rendered safely and local images embedded in exports.
 - Replaceable embedded logo; title/front and cover slides excluded from page numbering.
-- Explicit offline-editor download with the current editable deck and a 10 MiB size cap.
+- Distinct editable, presentation and project downloads, each capped at 10 MiB.
+- Browser recovery with a visible failure state and a control to remove it.
+- Safe import of editable HTML or JSON without executing the imported file.
+- Undo for the most recent slide or element deletion.
 - The standalone editor needs no runtime CDNs, remote fonts, analytics, accounts or model calls.
 - Optional MCP tools let a connected AI application or agent synthesise a brief, propose a deck, review it and render a presentation.
 - Model selection and agent orchestration belong to the connected host; the manual offline editor remains usable independently.
@@ -30,15 +33,17 @@ MCP is the integration interface for an AI application or agent to use Hands on 
 
 The current interface is a local stdio server. It accepts explicitly supplied data and returns results. A live connection to the browser's current deck, an in-editor model selector and a remote HTTP MCP endpoint are not implemented.
 
+The **Supercharged** screen explains Qwen2.5 0.5B and Ministral 3 3B using illustrative tasks and a reusable prompt. Both are explicitly marked unconnected. This release does not download or run either model.
+
 ## Current limits
 
-The editor has no autosave, cloud storage, collaboration, PowerPoint export or factual verification. Checks flag basic content issues; people remain responsible for the content and final review. Exported presentation HTML is for viewing; offline-editor HTML carries an editable snapshot. The free-text organiser preserves supplied sentences and is not an AI synthesiser.
+The editor has no cloud storage, collaboration, PowerPoint export or factual verification. Browser recovery may be unavailable, full or cleared; it does not replace a downloaded backup. Checks flag basic content issues; people remain responsible for the content and final review. Exported presentation HTML is for viewing; offline-editor HTML carries an editable snapshot. The free-text organiser preserves supplied sentences and is not an AI synthesiser.
 
 ## Next improvements
 
 1. Verify real desktop and mobile interaction, including touch editing and exported presentations.
-2. Add local recovery and version naming for editable snapshots.
-3. Improve prompts, empty states and content-fitting feedback.
+2. Add user-defined version names for editable snapshots.
+3. Refine guidance from user testing and improve content-fitting feedback.
 4. Evaluate additional export formats through real usage.
 5. Evaluate an optional browser-local AI download with explicit consent, a verified complete asset manifest, size limits and device testing before describing it as ready offline.
 6. Add a connection for a configured AI host or agent to read and update the current editor deck, with visible connection state and a way to disconnect.

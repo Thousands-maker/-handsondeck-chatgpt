@@ -4,15 +4,15 @@ Hands on Deck runs from a single HTML file. Its scripts, styles, placeholder log
 
 ## Save an editable copy
 
-1. Open the Offline screen.
-2. Review the file size and choose **Download offline editor**.
+1. Open **Save & share**.
+2. Review the file size and choose **Download editable copy**.
 3. Open the downloaded HTML file in a browser that supports local HTML.
 
 The download includes the editor and the current deck, brief, style and embedded images. It is limited to **10 MiB**. The editor refuses larger downloads and asks you to remove or reduce images. Nothing downloads until you select the button. A SHA-256 checksum is displayed when supported; it helps compare file bytes but is not a publisher signature.
 
 A downloaded file is a snapshot. Download a new copy after making further changes. Refreshing or closing the editor without saving loses unsaved work. Mobile file preview apps may show the file without running its editor; use a compatible browser.
 
-**Export deck** creates a presentation for viewing. **Download offline editor** creates a copy for continued editing.
+**Download presentation** creates a presentation for viewing. **Download editable copy** creates a copy for continued editing.
 
 ## Free-text capability in this version
 
