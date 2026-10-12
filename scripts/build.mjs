@@ -1,0 +1,11 @@
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+const root = new URL('../', import.meta.url);
+const core = await readFile(new URL('core/deck-core.cjs', root), 'utf8');
+let html = await readFile(new URL('index.html', root), 'utf8');
+const marker = /<script id="deck-core">[\s\S]*?<\/script>/;
+if (!marker.test(html)) throw new Error('Missing inline deck engine.');
+html = html.replace(marker, () => '<script id="deck-core">\n' + core + '  </script>');
+await writeFile(new URL('index.html', root), html);
+await mkdir(new URL('dist/', root), { recursive: true });
+await writeFile(new URL('dist/index.html', root), html);
+console.log('Built the standalone offline editor.');

@@ -1,0 +1,1715 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Turn a structured brief into an editable, self-contained HTML presentation.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data: blob:; font-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23311b5b'/%3E%3Crect x='12' y='14' width='40' height='29' rx='4' fill='%23fff'/%3E%3Cpath d='M19 50h26M24 43v7M40 43v7' stroke='%235bd4ce' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M20 23h24M20 30h17' stroke='%23007f87' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <title>Hands on Deck | Offline slide editor</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --purple-950: #24113f;
+      --purple-900: #32165c;
+      --purple-800: #4a2a77;
+      --teal-700: #007880;
+      --teal-600: #008f96;
+      --teal-500: #13aab0;
+      --teal-100: #dff6f4;
+      --ink: #232333;
+      --muted: #686b78;
+      --muted-2: #878995;
+      --line: #dedee5;
+      --line-strong: #c5c6d0;
+      --surface: #ffffff;
+      --surface-soft: #f7f7f9;
+      --workspace: #e9ebf0;
+      --amber: #b86a00;
+      --amber-bg: #fff7e8;
+      --red: #b33b36;
+      --green: #16745e;
+      --shadow: 0 18px 48px rgba(39, 25, 67, .16);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      color: var(--ink);
+      background: var(--workspace);
+      font: 16px/1.45 Arial, Helvetica, sans-serif;
+    }
+    button, input, select, textarea { font: inherit; }
+    button, select { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible,
+    [contenteditable]:focus-visible {
+      outline: 3px solid rgba(0, 143, 150, .25);
+      outline-offset: 2px;
+    }
+    button:disabled { cursor: not-allowed; opacity: .42; }
+    .hidden { display: none !important; }
+
+    .appbar {
+      height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 0 18px;
+      color: var(--purple-950);
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 2px 12px rgba(36, 17, 63, .06);
+      position: relative;
+      z-index: 50;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .brand-mark {
+      width: 39px;
+      height: 39px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 10px;
+      color: #fff;
+      background: linear-gradient(145deg, var(--purple-800), var(--teal-500));
+      font-weight: 900;
+      letter-spacing: -.08em;
+    }
+    .brand-name { font-size: 1.03rem; font-weight: 850; line-height: 1.15; }
+    .brand-note { margin-top: 2px; color: var(--muted); font-size: .77rem; white-space: nowrap; }
+    .app-actions { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
+    .local-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid #c7e4e2;
+      border-radius: 999px;
+      color: #315b5f;
+      background: #f2fbfa;
+      font-size: .76rem;
+      white-space: nowrap;
+    }
+    .local-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--teal-500); }
+
+    .btn {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      padding: 8px 12px;
+      color: #373344;
+      background: #fff;
+      font-size: .875rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: background .15s ease, border-color .15s ease, transform .1s ease;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-quiet { border-color: var(--line-strong); }
+    .btn-quiet:hover { border-color: #9295a2; background: #f7f8fa; }
+    .btn-primary { color: #fff; background: var(--teal-700); }
+    .btn-primary:hover { background: #00636a; }
+    .btn-dark { color: #fff; background: var(--purple-900); }
+    .btn-dark:hover { background: var(--purple-950); }
+    .btn-small { min-height: 34px; padding: 6px 9px; font-size: .82rem; }
+    .btn-icon { min-width: 34px; padding: 6px 8px; }
+    .badge {
+      min-width: 19px;
+      height: 19px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0 5px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--purple-800);
+      font-size: .68rem;
+      font-weight: 900;
+    }
+    .badge.clear { color: #356159; background: #dcefeb; }
+
+    .app-shell {
+      height: calc(100vh - 66px);
+      display: grid;
+      grid-template-columns: 228px minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    .slide-rail {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: #f8f8fa;
+      border-right: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .rail-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 13px 12px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    .rail-head strong { color: var(--purple-950); font-size: .86rem; }
+    .slide-list { flex: 1 1 auto; overflow: auto; padding: 10px 10px 18px; }
+    .thumb-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: 7px;
+      align-items: start;
+      margin-bottom: 10px;
+      border: 0;
+      padding: 0;
+      color: inherit;
+      background: transparent;
+      text-align: left;
+    }
+    .thumb-number { padding-top: 4px; color: #777987; font-size: .72rem; font-weight: 800; text-align: right; }
+    .thumb-card {
+      aspect-ratio: 16 / 9;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      background: #fff;
+      box-shadow: 0 3px 10px rgba(36, 17, 63, .08);
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .thumb-row:hover .thumb-card { border-color: #a8a9b4; }
+    .thumb-row.current .thumb-card { border-color: var(--teal-600); box-shadow: 0 0 0 2px rgba(0,143,150,.12); }
+    .thumb-inner { position: absolute; inset: 0; padding: 8% 8%; color: #1e293b; background: #fff; }
+    .thumb-inner.kind-title, .thumb-inner.kind-cover { color: var(--purple-950); background: linear-gradient(135deg, #fff 0 66%, #eeebf7 66% 82%, #dff5f3 82%); }
+    .thumb-inner.kind-statement { border-left: 4px solid var(--teal-600); }
+    .thumb-eyebrow { color: var(--teal-700); font-size: 5px; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+    .thumb-title { max-width: 90%; margin-top: 7%; font-size: 9px; line-height: 1.05; font-weight: 900; }
+    .thumb-lines { width: 74%; margin-top: 7%; display: grid; gap: 3px; }
+    .thumb-lines i { display: block; height: 2px; border-radius: 2px; background: #bec6d1; }
+    .rail-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 10px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .editor-area { min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+    .editor-toolbar {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 14px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      position: relative;
+      z-index: 30;
+    }
+    .toolbar-group { display: flex; align-items: center; gap: 6px; }
+    .toolbar-divider { width: 1px; height: 27px; margin: 0 3px; background: var(--line); }
+    .toolbar-spacer { flex: 1 1 auto; }
+    .toolbar-select {
+      min-height: 36px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      padding: 6px 28px 6px 9px;
+      color: #3c3748;
+      background: #fff;
+      font-size: .82rem;
+      font-weight: 700;
+    }
+    .selection-label {
+      max-width: 180px;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .element-menu {
+      width: min(650px, calc(100vw - 270px));
+      max-height: min(620px, calc(100vh - 145px));
+      position: absolute;
+      top: 52px;
+      left: 14px;
+      overflow: auto;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 22px 60px rgba(36, 17, 63, .2);
+      z-index: 60;
+    }
+    .element-search {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line-strong);
+      border-radius: 9px;
+      padding: 9px 11px;
+      color: var(--ink);
+      background: #fff;
+    }
+    .element-category { margin-top: 14px; }
+    .element-category h3 { margin: 0 0 7px; color: var(--muted); font-size: .7rem; letter-spacing: .09em; text-transform: uppercase; }
+    .element-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+    .element-option {
+      min-height: 74px;
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 9px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 9px;
+      color: #393442;
+      background: #fff;
+      text-align: left;
+    }
+    .element-option:hover { border-color: var(--teal-600); background: #f2fbfa; }
+    .element-glyph {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: var(--purple-800);
+      background: #f0edf7;
+      font-size: 1rem;
+      font-weight: 900;
+    }
+    .element-option strong { display: block; font-size: .8rem; }
+    .element-option small { display: block; margin-top: 2px; color: var(--muted); font-size: .67rem; line-height: 1.25; }
+
+    .stage-shell {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      overflow: auto;
+      padding: clamp(18px, 3vw, 42px);
+      background:
+        radial-gradient(circle at 18% 14%, rgba(255,255,255,.78), transparent 28%),
+        linear-gradient(145deg, #e3e5eb, #f1f2f5 62%);
+    }
+    .slide-frame {
+      width: min(1120px, 100%);
+      aspect-ratio: 16 / 9;
+      position: relative;
+      flex: 0 0 auto;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: var(--shadow);
+      container-type: inline-size;
+    }
+    .slide-frame:fullscreen { width: 100vw; height: 100vh; max-width: none; aspect-ratio: auto; }
+    .slide-empty { height: 100%; display: grid; place-items: center; padding: 40px; color: var(--muted); background: #fff; text-align: center; }
+    .slide-canvas {
+      --pad-x: 7.2%;
+      --title-size: clamp(1.35rem, 4.5cqw, 3.35rem);
+      --body-size: clamp(.72rem, 1.72cqw, 1.28rem);
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      color: #17243a;
+      background: #fff;
+    }
+    .slide-canvas::after { content: ""; position: absolute; right: 0; bottom: 0; width: 14%; height: 5px; background: var(--teal-500); }
+    .slide-canvas.kind-title, .slide-canvas.kind-cover { color: var(--purple-950); background: linear-gradient(114deg, transparent 0 70%, rgba(19,170,176,.13) 70% 71%, transparent 71%), linear-gradient(135deg, #fff 0 64%, #f0ecf8 64% 82%, #e1f6f4 82%); }
+    .slide-canvas.kind-title::after, .slide-canvas.kind-cover::after { width: 24%; height: 7px; }
+    .slide-canvas.kind-statement { border-left: clamp(8px, 1.1cqw, 15px) solid var(--teal-600); }
+    .slide-eyebrow {
+      position: absolute;
+      top: 6.4%;
+      left: var(--pad-x);
+      max-width: 74%;
+      color: var(--teal-700);
+      font-size: clamp(.48rem, .82cqw, .75rem);
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .slide-content {
+      position: absolute;
+      top: 13%;
+      right: var(--pad-x);
+      bottom: 8.5%;
+      left: var(--pad-x);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2.4cqw;
+      min-width: 0;
+      min-height: 0;
+      transform-origin: top left;
+    }
+    .slide-title {
+      flex: 0 0 auto;
+      max-width: 91%;
+      margin: 0;
+      border-radius: 4px;
+      font-size: var(--title-size);
+      line-height: 1.03;
+      letter-spacing: -.037em;
+      overflow-wrap: anywhere;
+      text-wrap: balance;
+    }
+    .kind-title .slide-title, .kind-cover .slide-title { max-width: 82%; }
+    .kind-statement .slide-title { max-width: 78%; }
+    .block-stack { display: grid; gap: clamp(7px, 1.18cqw, 16px); max-width: 94%; font-size: var(--body-size); line-height: 1.34; }
+    .slide-number { position: absolute; right: 4%; bottom: 4.2%; color: #718199; font-size: clamp(.48rem, .75cqw, .7rem); font-weight: 800; }
+    .slide-logo { position: absolute; right: 4%; top: 3%; width: 8%; height: 12%; object-fit: contain; object-position: right top; }
+    .slide-eyebrow { max-width: 70%; }
+    .slide-number { font-size: clamp(.55rem, 1.15cqw, .95rem); }
+    .thumb-logo { position: absolute; right: 5%; top: 4%; width: 9%; height: 16%; object-fit: contain; }
+    .thumb-page { position: absolute; right: 6%; bottom: 5%; font-size: 6px; color: #718199; }
+    .editable-text { min-width: 1ch; cursor: text; }
+    .editable-text:empty::before { content: attr(data-placeholder); color: #97a0ae; }
+    .editable-text:hover { box-shadow: 0 0 0 1px rgba(0,143,150,.28); }
+    .editable-text:focus { box-shadow: 0 0 0 2px rgba(0,143,150,.35); outline: 0; }
+
+    .slide-block {
+      min-width: 0;
+      position: relative;
+      border-radius: 6px;
+      color: #394b62;
+      transition: box-shadow .12s ease, background .12s ease;
+    }
+    .slide-block:hover { box-shadow: 0 0 0 1px rgba(0,143,150,.25); }
+    .slide-block.selected { box-shadow: 0 0 0 2px var(--teal-600), 0 0 0 5px rgba(0,143,150,.11); }
+    .slide-block p { margin: 0; }
+    .block-paragraph { max-width: 88%; }
+    .block-bullets ul { margin: 0; padding-left: 1.15em; }
+    .block-bullets li { margin: .28em 0; padding-left: .12em; }
+    .block-bullets li::marker { color: var(--teal-600); }
+    .block-callout { padding: .72em .9em; border-left: .28em solid var(--teal-500); background: #ecf8f7; }
+    .block-label { margin-bottom: .22em; color: var(--teal-700); font-size: .66em; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .block-quote { max-width: 86%; padding: .15em 0 .15em 1em; border-left: .18em solid #b9a7d7; color: var(--purple-800); font-size: 1.14em; font-weight: 700; }
+    .block-quote footer { margin-top: .4em; color: #737687; font-size: .65em; font-weight: 600; }
+    .block-stat { display: inline-flex; align-items: baseline; gap: .75em; max-width: 85%; }
+    .stat-value { color: var(--purple-900); font-size: 2.3em; font-weight: 900; line-height: .95; letter-spacing: -.05em; }
+    .stat-label { max-width: 22em; color: #506178; font-size: .82em; }
+    .block-columns, .block-cards { display: grid; gap: .72em; }
+    .block-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .block-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .column-item { min-width: 0; padding: .72em .78em; border-top: .18em solid var(--teal-500); background: #f5f7fa; }
+    .card-item { min-width: 0; padding: .74em; border: 1px solid #d9dee7; border-radius: .45em; background: #fff; }
+    .item-title { margin-bottom: .32em; color: #17243a; font-size: .86em; font-weight: 850; line-height: 1.15; }
+    .item-text { color: #536378; font-size: .72em; line-height: 1.3; }
+    .block-divider { display: flex; align-items: center; gap: .65em; color: #707687; font-size: .68em; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .block-divider::before, .block-divider::after { content: ""; flex: 1 1 auto; height: 1px; background: #cfd5df; }
+    .block-chart { display: grid; gap: .42em; max-width: 92%; }
+    .chart-row { display: grid; grid-template-columns: minmax(4.8em, .8fr) minmax(8em, 3fr) 3.2em; gap: .55em; align-items: center; }
+    .chart-label { color: #4d5d73; font-size: .72em; font-weight: 700; }
+    .chart-track { height: .74em; overflow: hidden; border-radius: 999px; background: #e8ebf0; }
+    .chart-bar { height: 100%; min-width: 3%; border-radius: inherit; background: linear-gradient(90deg, var(--teal-600), #4e71d7); }
+    .chart-value { color: var(--purple-800); font-size: .7em; font-weight: 900; text-align: right; }
+    .block-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: .68em; }
+    .block-table th, .block-table td { border: 1px solid #cfd5df; padding: .45em .52em; vertical-align: top; }
+    .block-table th { color: #23314a; background: #edf4f5; text-align: left; }
+    .block-image { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(7em, .55fr); gap: .75em; align-items: center; }
+    .block-image img { display: block; width: 100%; max-height: 10.5em; object-fit: contain; border-radius: .45em; background: #f0f1f4; }
+    .image-placeholder { min-height: 7em; display: grid; place-items: center; border: 1px dashed #adb4c0; border-radius: .45em; color: #7b8190; background: #f7f8fa; font-size: .75em; text-align: center; }
+    .image-caption { color: #697386; font-size: .67em; line-height: 1.35; }
+
+    .style-operational .slide-canvas { --pad-x: 6.2%; background: #f8fbfd; border-top: clamp(7px, .9cqw, 12px) solid #00a699; }
+    .style-operational .slide-canvas::before { content: "OPERATIONAL BRIEF"; position: absolute; top: 4.1%; right: 14%; color: #65768a; font-size: clamp(.42rem, .65cqw, .62rem); font-weight: 900; letter-spacing: .12em; }
+    .style-operational .slide-eyebrow { top: 7%; }
+    .style-operational .slide-content { top: 14%; justify-content: flex-start; }
+    .style-operational .slide-canvas.kind-title, .style-operational .slide-canvas.kind-cover { color: var(--purple-950); background: #f0fbfa; }
+    .style-minimal .slide-canvas { --pad-x: 8.4%; color: #111; background: #fff; }
+    .style-minimal .slide-canvas::after { left: 0; right: auto; width: 100%; height: 2px; background: #111; }
+    .style-minimal .slide-eyebrow { color: #111; }
+    .style-minimal .slide-canvas.kind-title, .style-minimal .slide-canvas.kind-cover { color: #111; background: #fff; }
+    .style-minimal .slide-canvas.kind-statement { border-left-color: #111; }
+    .style-minimal .block-callout { border-left-color: #111; background: #f2f2f2; }
+    .style-minimal .block-label, .style-minimal .stat-value { color: #111; }
+
+    .stage-footer {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 8px 14px;
+      background: #fff;
+      border-top: 1px solid var(--line);
+    }
+    .counter { min-width: 72px; color: #5f6170; font-size: .8rem; font-weight: 800; text-align: center; }
+    .edit-hint { margin-left: 8px; color: var(--muted-2); font-size: .75rem; }
+
+    .drawer-dialog {
+      width: min(470px, 94vw);
+      height: 100vh;
+      max-height: none;
+      margin: 0 0 0 auto;
+      padding: 0;
+      border: 0;
+      color: var(--ink);
+      background: #fff;
+      box-shadow: -20px 0 60px rgba(36,17,63,.18);
+    }
+    .drawer-dialog::backdrop { background: rgba(20, 15, 31, .35); }
+    .drawer { height: 100%; display: flex; flex-direction: column; }
+    .drawer-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 18px 19px 14px; border-bottom: 1px solid var(--line); }
+    .drawer-head h2 { margin: 0; color: var(--purple-950); font-size: 1.05rem; }
+    .drawer-head p { margin: 4px 0 0; color: var(--muted); font-size: .78rem; }
+    .drawer-body { flex: 1 1 auto; overflow: auto; padding: 6px 19px 22px; }
+    .drawer-body label { display: block; margin: 13px 0 6px; color: #3c3748; font-size: .82rem; font-weight: 850; }
+    .drawer-body input, .drawer-body select, .drawer-body textarea {
+      width: 100%;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      padding: 9px 10px;
+      color: var(--ink);
+      background: #fff;
+      font-size: .875rem;
+      line-height: 1.42;
+    }
+    .drawer-body textarea { min-height: 80px; resize: vertical; }
+    #messages { min-height: 210px; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .syntax-hint { margin: 6px 0 0; color: var(--muted); font-size: .72rem; }
+    .drawer-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    .mvp-note { margin-top: 14px; padding: 10px 11px; border-left: 3px solid var(--teal-500); color: #4e6076; background: #f3f8f8; font-size: .77rem; }
+    .quality-summary { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 13px; align-items: center; margin: 12px 0 16px; padding: 13px; border: 1px solid var(--line); border-radius: 10px; background: #f8f9fb; }
+    .quality-score { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; color: var(--green); background: #e6f4f0; font-size: 1.5rem; font-weight: 900; }
+    .quality-score.attention { color: var(--amber); background: #fff0d6; }
+    .quality-summary strong { display: block; color: var(--purple-950); }
+    .quality-summary span { display: block; margin-top: 2px; color: var(--muted); font-size: .75rem; }
+    .warnings { display: grid; gap: 8px; }
+    .warning { width: 100%; border: 1px solid #edd7ad; border-radius: 9px; padding: 10px 11px; color: #744c0b; background: var(--amber-bg); font-size: .78rem; line-height: 1.38; text-align: left; }
+    .warning.note { border-color: #cfe3e1; color: #3f6063; background: #f1f8f7; }
+    .warning-empty { margin: 0; color: var(--muted); font-size: .8rem; }
+    .logo-preview { height: 110px; width: 100%; padding: 12px; object-fit: contain; border: 1px solid var(--line); border-radius: 10px; background: white; }
+    .offline-page { height: calc(100vh - 66px); overflow: auto; padding: 30px 22px 60px; background: #f7f8fb; }
+    .offline-wrap { max-width: 880px; margin: auto; }
+    .offline-page h1 { margin: 20px 0 8px; font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.12; color: var(--purple-950); }
+    .offline-page .intro { max-width: 640px; color: var(--muted); }
+    .offline-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; margin: 24px 0; }
+    .offline-card { padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .offline-card h2 { font-size: 1.12rem; margin: 12px 0; color: var(--purple-950); }
+    .offline-card p, .offline-card li { font-size: .9rem; color: #536378; }
+    .offline-card ol { padding-left: 20px; }
+    .offline-card li { margin-bottom: 10px; }
+    .download-size { margin: 16px 0; font-size: 1.5rem; font-weight: 850; color: var(--purple-900); }
+    .download-size small { display: block; font-size: .76rem; color: var(--muted); font-weight: 400; }
+    .download-checksum { display: block; overflow-wrap: anywhere; margin-top: 8px; font-size: .7rem; color: var(--muted); }
+    @media (max-width: 650px) { .offline-grid { grid-template-columns: 1fr; } .offline-page { height: auto; min-height: 85vh; padding: 20px 14px 40px; } }
+
+    .toast {
+      max-width: min(520px, calc(100vw - 28px));
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      z-index: 100;
+      transform: translate(-50%, 20px);
+      padding: 10px 13px;
+      border: 1px solid #beddd8;
+      border-radius: 9px;
+      color: #285d50;
+      background: #eef9f7;
+      box-shadow: 0 12px 34px rgba(20,30,45,.16);
+      font-size: .82rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.error { border-color: #efc1bd; color: #8c322d; background: #fff0ef; }
+
+    @media (max-width: 980px) {
+      body { overflow: auto; }
+      .appbar { height: auto; min-height: 66px; align-items: flex-start; padding: 12px 14px; }
+      .local-badge, .brand-note { display: none; }
+      .app-shell { height: auto; min-height: calc(100vh - 66px); grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); overflow: visible; }
+      .slide-rail { max-height: 190px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .slide-list { display: flex; gap: 8px; overflow-x: auto; padding: 8px 10px; }
+      .thumb-row { min-width: 160px; margin: 0; grid-template-columns: 18px minmax(0, 1fr); }
+      .rail-actions { display: none; }
+      .editor-area { min-height: 620px; }
+      .element-menu { width: calc(100vw - 28px); }
+      .selection-label, .toolbar-divider.secondary { display: none; }
+    }
+    @media (max-width: 650px) {
+      .brand-name { font-size: .92rem; }
+      .app-actions .btn span.label { display: none; }
+      .editor-toolbar { overflow-x: auto; }
+      .toolbar-select { max-width: 118px; }
+      .element-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stage-shell { padding: 10px; }
+      .edit-hint { display: none; }
+      .field-grid { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <header class="appbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">HD</div>
+      <div>
+        <div class="brand-name">Hands on Deck <span style="color:var(--teal-700);font-size:.68em;letter-spacing:.06em;text-transform:uppercase">Offline editor</span></div>
+        <div class="brand-note">Edit where you see it. Export one self-contained HTML deck.</div>
+      </div>
+    </div>
+    <div class="app-actions">
+      <span class="local-badge">Works offline</span>
+      <button class="btn btn-quiet" id="open-brief" type="button"><span aria-hidden="true">☷</span><span class="label">Brief</span></button>
+      <button class="btn btn-quiet" id="open-checks" type="button"><span aria-hidden="true">✓</span><span class="label">Checks</span><span class="badge clear" id="checks-badge">0</span></button>
+      <button class="btn btn-quiet" id="open-offline" type="button" aria-label="Offline download"><span aria-hidden="true">⇩</span><span class="label">Offline</span></button>
+      <button class="btn btn-quiet" id="present" type="button"><span aria-hidden="true">▶</span><span class="label">Present</span></button>
+      <button class="btn btn-dark" id="download" type="button" aria-label="Export presentation"><span aria-hidden="true">↓</span><span class="label">Export deck</span></button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <aside class="slide-rail" aria-label="Slides">
+      <div class="rail-head">
+        <strong>Slides</strong>
+        <button class="btn btn-quiet btn-small" id="add-slide" type="button">+ Add</button>
+      </div>
+      <div class="slide-list" id="slide-list"></div>
+      <div class="rail-actions" aria-label="Slide actions">
+        <button class="btn btn-quiet btn-small btn-icon" id="slide-up" type="button" title="Move slide up" aria-label="Move slide up">↑</button>
+        <button class="btn btn-quiet btn-small btn-icon" id="slide-down" type="button" title="Move slide down" aria-label="Move slide down">↓</button>
+        <button class="btn btn-quiet btn-small btn-icon" id="duplicate-slide" type="button" title="Duplicate slide" aria-label="Duplicate slide">⧉</button>
+        <button class="btn btn-quiet btn-small btn-icon" id="delete-slide" type="button" title="Delete slide" aria-label="Delete slide">⌫</button>
+      </div>
+    </aside>
+
+    <section class="editor-area" aria-label="Slide editor">
+      <div class="editor-toolbar">
+        <div class="toolbar-group">
+          <button class="btn btn-primary btn-small" id="add-element" type="button" aria-haspopup="true" aria-expanded="false">+ Add element</button>
+          <select class="toolbar-select" id="layout-select" aria-label="Slide layout">
+            <option value="title">Title / front</option>
+            <option value="cover">Cover</option>
+            <option value="content">Content</option>
+            <option value="statement">Statement</option>
+          </select>
+          <button class="btn btn-quiet btn-small" id="open-branding" type="button">Logo</button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-group" aria-label="Selected element actions">
+          <button class="btn btn-quiet btn-small btn-icon" id="element-up" type="button" title="Move selected element up" aria-label="Move selected element up">↑</button>
+          <button class="btn btn-quiet btn-small btn-icon" id="element-down" type="button" title="Move selected element down" aria-label="Move selected element down">↓</button>
+          <button class="btn btn-quiet btn-small btn-icon" id="duplicate-element" type="button" title="Duplicate selected element" aria-label="Duplicate selected element">⧉</button>
+          <button class="btn btn-quiet btn-small btn-icon" id="delete-element" type="button" title="Delete selected element" aria-label="Delete selected element">⌫</button>
+        </div>
+        <span class="selection-label" id="selection-label">Select an element to arrange it</span>
+        <div class="toolbar-spacer"></div>
+        <div class="toolbar-divider secondary"></div>
+        <select class="toolbar-select" id="style-select" aria-label="Deck style">
+          <option value="executive">Executive style</option>
+          <option value="operational">Operational style</option>
+          <option value="minimal">Minimal style</option>
+        </select>
+
+        <div class="element-menu hidden" id="element-menu" role="dialog" aria-label="Add an element">
+          <input class="element-search" id="element-search" type="search" placeholder="Search elements" autocomplete="off">
+          <div id="element-options"></div>
+        </div>
+      </div>
+
+      <div class="stage-shell" id="stage-shell">
+        <div class="slide-frame style-executive" id="slide-frame" aria-live="polite"></div>
+      </div>
+      <div class="stage-footer">
+        <button class="btn btn-quiet btn-small btn-icon" id="previous" type="button" aria-label="Previous slide">←</button>
+        <span class="counter" id="counter">0 / 0</span>
+        <button class="btn btn-quiet btn-small btn-icon" id="next" type="button" aria-label="Next slide">→</button>
+        <span class="edit-hint">Click any text on the slide to edit it directly.</span>
+      </div>
+    </section>
+  </main>
+
+  <section class="offline-page hidden" id="offline-page" aria-labelledby="offline-title">
+    <div class="offline-wrap">
+      <button class="btn btn-quiet" id="back-to-editor" type="button">← Back to editor</button>
+      <h1 id="offline-title" tabindex="-1">Take your editor offline.</h1>
+      <p class="intro">Download a self-contained copy with your current deck, logo and images. Reopen the saved file to keep editing without an internet connection.</p>
+      <div class="offline-grid">
+        <article class="offline-card">
+          <span class="local-badge">Single HTML file</span>
+          <h2>Editor + current deck</h2>
+          <p>The first visit to this website needs internet. After saving this file, open it directly in your browser. A download starts only when you choose the button below.</p>
+          <div class="download-size"><span id="editor-download-size">Calculating…</span><small>Maximum download: 10 MiB, including your images</small></div>
+          <button class="btn btn-primary" id="download-editor" type="button">Download offline editor</button>
+          <p id="download-status" role="status" aria-live="polite">Your content stays on this device. No account or additional installation is required.</p>
+          <code id="download-checksum" class="download-checksum"></code>
+        </article>
+        <article class="offline-card">
+          <h2>Before you go offline</h2>
+          <ol><li>Download the editor and open the saved <strong>.html</strong> file in a browser.</li><li>Turn off Wi-Fi or mobile data and check that you can edit, generate and export a deck.</li><li>After making changes, download a fresh editor copy to keep them. The file on disk does not update automatically.</li></ol>
+          <p>On phones and tablets, a file preview may not run the editor. Open it in a browser that supports local HTML.</p>
+        </article>
+      </div>
+      <article class="offline-card">
+        <h2>What works without internet?</h2>
+        <p>Edit slides, change the logo, add local images, organise free text into a starting deck, present and export. Fonts, the placeholder logo and all code are included in the file.</p>
+        <p><strong>Text organisation uses local rules.</strong> It keeps your sentences and suggests headings and layouts. It does not understand or rewrite your meaning like an AI model. No AI model is installed or downloaded in this version.</p>
+      </article>
+    </div>
+  </section>
+
+  <dialog class="drawer-dialog" id="drawer-dialog">
+    <div class="drawer">
+      <div class="drawer-head">
+        <div>
+          <h2 id="drawer-title">Presentation brief</h2>
+          <p id="drawer-subtitle">Regenerate the deck from a structured argument.</p>
+        </div>
+        <button class="btn btn-quiet btn-small btn-icon" id="close-drawer" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="drawer-body" id="brief-panel">
+        <label for="purpose">Purpose</label>
+        <textarea id="purpose" rows="3"></textarea>
+        <label for="audience">Audience</label>
+        <input id="audience" type="text">
+        <label for="input-mode">Input format</label>
+        <select id="input-mode"><option value="structured">Structured messages</option><option value="free">Free text · basic offline organisation</option></select>
+        <label for="messages" id="messages-label">Key messages and supporting points</label>
+        <textarea id="messages" rows="10"></textarea>
+        <p class="syntax-hint" id="input-hint">Start each key message on a new line. Add supporting points beneath it with “-”.</p>
+        <div class="field-grid">
+          <div>
+            <label for="brief-style">Style</label>
+            <select id="brief-style">
+              <option value="executive">Executive</option>
+              <option value="operational">Operational</option>
+              <option value="minimal">Minimal</option>
+            </select>
+          </div>
+          <div>
+            <label for="count">Target length</label>
+            <select id="count">
+              <option value="auto">Auto · 3–6</option>
+              <option value="3">3 slides</option>
+              <option value="4">4 slides</option>
+              <option value="5">5 slides</option>
+              <option value="6">6 slides</option>
+            </select>
+          </div>
+        </div>
+        <div class="drawer-actions">
+          <button class="btn btn-primary" id="generate" type="button">Generate deck</button>
+          <button class="btn btn-quiet" id="reset" type="button">Reset sample</button>
+        </div>
+        <div class="mvp-note"><strong>Generated locally:</strong> your brief is arranged into slides using fixed rules. Review and edit the content before sharing.</div>
+      </div>
+      <div class="drawer-body hidden" id="branding-panel">
+        <h3>Logo on every slide</h3>
+        <img class="logo-preview" id="logo-preview" alt="Current presentation logo">
+        <p class="syntax-hint" id="logo-status">The Hands on Deck icon is a temporary placeholder. You can replace it with your own logo or remove it.</p>
+        <div class="drawer-actions"><button class="btn btn-primary" id="choose-logo" type="button">Upload logo</button><button class="btn btn-quiet" id="remove-logo" type="button">Remove</button><button class="btn btn-quiet" id="reset-logo" type="button">Use placeholder</button></div>
+        <p class="syntax-hint">PNG, JPEG or WebP, up to 1 MiB. Your logo is embedded into the editor copy and exported deck for offline use.</p>
+        <h3>Page numbers</h3><p class="syntax-hint">Title/front and Cover layouts have no page number. Content and Statement slides are numbered from 1. Numbers update when you reorder, add or delete slides.</p>
+      </div>
+      <div class="drawer-body hidden" id="checks-panel">
+        <div class="quality-summary">
+          <div class="quality-score" id="quality-score">0</div>
+          <div><strong id="quality-title">Ready to review</strong><span id="quality-note">No advisory issues detected</span></div>
+        </div>
+        <div class="warnings" id="warnings"></div>
+        <div class="mvp-note">Checks are advisory and do not replace human review, source verification or organisational approval.</div>
+      </div>
+    </div>
+  </dialog>
+
+  <input id="image-input" type="file" accept="image/*" hidden>
+  <input id="logo-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script id="deck-core">
+/* Shared local deck engine. Generated into index.html by scripts/build.mjs. */
+(function (root) {
+  'use strict';
+    const DEFAULT_LOGO = { src: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDQiIGhlaWdodD0iMTQ0IiB2aWV3Qm94PSIwIDAgMTQ0IDE0NCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjE0MCIgaGVpZ2h0PSIxNDAiIHJ4PSIyNCIgZmlsbD0iI2VmZjhmNiIgc3Ryb2tlPSIjMTY3NTZjIiBzdHJva2Utd2lkdGg9IjMiLz48cmVjdCB4PSIzNSIgeT0iMzUiIHdpZHRoPSI2MyIgaGVpZ2h0PSI1MSIgcng9IjciIGZpbGw9IiNjNWU4ZTEiLz48cmVjdCB4PSI0NiIgeT0iNDYiIHdpZHRoPSI2MyIgaGVpZ2h0PSI1MSIgcng9IjciIGZpbGw9IiMxNjc1NmMiLz48cGF0aCBkPSJNNTkgNjBoMzdNNTkgNzFoMjhNNTkgODJoMzIiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48dGV4dCB4PSI3MiIgeT0iMTIyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzE1NTM0ZCI+SEQ8L3RleHQ+PC9zdmc+', alt: 'Hands on Deck placeholder logo' };
+    const isEmbeddedImage = value => typeof value === 'string' && (value === DEFAULT_LOGO.src || /^data:image\/(?:png|jpeg|gif|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(value));
+    function deckLogo(deck) {
+      if (deck.logo === null) return null;
+      const logo = deck.logo === undefined ? DEFAULT_LOGO : deck.logo;
+      return logo && isEmbeddedImage(logo.src) ? { src: logo.src, alt: String(logo.alt || 'Presentation logo') } : null;
+    }
+    function slidePageNumber(slides, index) {
+      if (!slides[index] || ['title', 'cover'].includes(slides[index].kind)) return null;
+      return slides.slice(0, index + 1).filter(slide => !['title', 'cover'].includes(slide.kind)).length;
+    }
+    function embedEditorProject(template, project) {
+      const marker = /^[ \t]*<script id="saved-project" type="application\/json">[\s\S]*?<\/script>/m;
+      if (!marker.test(template)) throw new Error('The offline editor template is missing.');
+      const json = JSON.stringify(project).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+      return template.replace(marker, () => '<script id="saved-project" type="application/json">' + json + '<\/script>');
+    }
+    function organiseFreeText(text) {
+      const source = String(text).replace(/\r\n?/g, '\n').trim();
+      if (source.length > 20000) throw new Error('Keep free text to 20,000 characters or fewer.');
+      if (!source) return [];
+      const groups = [];
+      const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('en', { granularity: 'sentence' }) : null;
+      source.split(/\n\s*\n/).forEach(paragraph => {
+        const sentences = paragraph.split('\n').flatMap(line => {
+          const clean = line.replace(/^\s*[-*•]\s+/, '').trim();
+          if (!clean) return [];
+          return segmenter ? [...segmenter.segment(clean)].map(part => part.segment.trim()).filter(Boolean) : [clean];
+        });
+        for (let start = 0; start < sentences.length; start += 4) {
+          const points = sentences.slice(start, start + 4);
+          const heading = points[0].length <= 110 ? points[0].replace(/[.!?]+$/, '') : `Notes ${groups.length + 1}`;
+          groups.push({ heading, points });
+        }
+      });
+      return groups;
+    }
+    const uid = () => 'id-' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
+    const clone = value => typeof structuredClone === 'function' ? structuredClone(value) : JSON.parse(JSON.stringify(value));
+    function parseMessageGroups(text) {
+      const groups = [];
+      let current = null;
+      text.split(/\r?\n/).forEach(raw => {
+        const line = raw.trim();
+        if (!line) return;
+        const bullet = line.match(/^[-*•]\s+(.+)$/);
+        if (bullet) {
+          if (!current) { current = { heading: 'Supporting points', points: [] }; groups.push(current); }
+          current.points.push(bullet[1].trim());
+        } else {
+          current = { heading: line, points: [] };
+          groups.push(current);
+        }
+      });
+      return groups;
+    }
+
+    function distribute(items, bucketCount) {
+      const count = Math.max(1, Math.min(bucketCount, Math.max(1, items.length)));
+      const buckets = Array.from({ length: count }, () => []);
+      items.forEach((item, index) => buckets[Math.min(count - 1, Math.floor(index * count / items.length))].push(item));
+      return buckets;
+    }
+
+    function newBlock(type) {
+      const id = uid();
+      const templates = {
+        paragraph: { id, type, text: 'Add a short explanation.' },
+        bullets: { id, type, items: ['First supporting point', 'Second supporting point'] },
+        quote: { id, type, quote: 'Add a concise quotation.', attribution: 'Source or speaker' },
+        callout: { id, type, label: 'Key point', text: 'Add the message that deserves emphasis.' },
+        stat: { id, type, value: '42%', label: 'Explain what this value means and why it matters.' },
+        columns: { id, type, columns: [{ title: 'First idea', text: 'Add supporting detail.' }, { title: 'Second idea', text: 'Add supporting detail.' }] },
+        cards: { id, type, items: [{ title: 'One', text: 'Add detail.' }, { title: 'Two', text: 'Add detail.' }, { title: 'Three', text: 'Add detail.' }] },
+        chart: { id, type, items: [{ label: 'Option A', value: 72 }, { label: 'Option B', value: 54 }, { label: 'Option C', value: 38 }] },
+        table: { id, type, headers: ['Option', 'Benefit', 'Constraint'], rows: [['A', 'Add benefit', 'Add constraint'], ['B', 'Add benefit', 'Add constraint']] },
+        image: { id, type, src: '', alt: '', caption: 'Add a caption or source note.' },
+        divider: { id, type, label: 'New section' }
+      };
+      return clone(templates[type] || templates.paragraph);
+    }
+
+    function buildSlides(brief, groups) {
+      const autoCount = Math.min(6, Math.max(3, groups.length + 2));
+      const requested = brief.count === 'auto' ? autoCount : Number(brief.count);
+      const includeContext = requested >= 4;
+      const fixedSlides = includeContext ? 3 : 2;
+      const contentSlots = Math.max(1, requested - fixedSlides);
+      const buckets = distribute(groups, contentSlots);
+      const slides = [];
+
+      slides.push({
+        id: uid(), kind: 'title', eyebrow: 'Decision brief',
+        title: brief.purpose || 'Untitled presentation',
+        blocks: [{ id: uid(), type: 'paragraph', text: brief.audience ? `Prepared for ${brief.audience}` : 'Define the intended audience.' }]
+      });
+
+      if (includeContext) {
+        slides.push({
+          id: uid(), kind: 'content', eyebrow: 'Why this matters', title: 'Start from the intended outcome',
+          blocks: [{ id: uid(), type: 'callout', label: 'Purpose', text: brief.purpose || 'Clarify the decision or outcome this presentation should support.' }]
+        });
+      }
+
+      buckets.forEach((bucket, bucketIndex) => {
+        if (!bucket.length) return;
+        if (bucket.length === 1) {
+          const group = bucket[0];
+          const blocks = group.points.length
+            ? [{ id: uid(), type: 'bullets', items: group.points.slice() }]
+            : [{ id: uid(), type: 'paragraph', text: 'Add evidence or supporting detail for this message.' }];
+          slides.push({ id: uid(), kind: 'content', eyebrow: `Message ${bucketIndex + 1}`, title: group.heading, blocks });
+        } else {
+          slides.push({
+            id: uid(), kind: 'content', eyebrow: `Messages ${bucketIndex + 1}`, title: 'Bring the related points together',
+            blocks: [{ id: uid(), type: bucket.length === 2 ? 'columns' : 'cards',
+              ...(bucket.length === 2
+                ? { columns: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') || 'Add supporting detail.' })) }
+                : { items: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') || 'Add supporting detail.' })) })
+            }]
+          });
+        }
+      });
+
+      const decisionBrief = /\b(approve|approval|decision|recommend|endorse|authorise|authorize|fund)\b/i.test(brief.purpose);
+      slides.push({
+        id: uid(), kind: 'statement', eyebrow: decisionBrief ? 'Decision required' : 'Next step',
+        title: decisionBrief ? 'Confirm the next bounded step' : 'Agree what happens next',
+        blocks: [{ id: uid(), type: 'callout', label: decisionBrief ? 'Proposed ask' : 'Action', text: brief.purpose || 'Confirm the owner, timing and next action.' }]
+      });
+
+      return {
+        slides: slides.slice(0, requested),
+        metadata: { requested, grouped: Math.max(0, groups.length - contentSlots), underfilled: Math.max(0, requested - slides.length) }
+      };
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+    }
+    function blockToHtml(block) {
+      if (block.type === 'paragraph') return `<div class="block paragraph"><p>${escapeHtml(block.text)}</p></div>`;
+      if (block.type === 'bullets') return `<div class="block bullets"><ul>${block.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div>`;
+      if (block.type === 'callout') return `<div class="block callout"><div class="label">${escapeHtml(block.label)}</div><div>${escapeHtml(block.text)}</div></div>`;
+      if (block.type === 'quote') return `<blockquote class="block quote"><div>${escapeHtml(block.quote)}</div><footer>${escapeHtml(block.attribution)}</footer></blockquote>`;
+      if (block.type === 'stat') return `<div class="block stat"><div class="stat-value">${escapeHtml(block.value)}</div><div class="stat-label">${escapeHtml(block.label)}</div></div>`;
+      if (block.type === 'columns') return `<div class="block columns">${block.columns.map(item => `<div class="column"><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.text)}</span></div>`).join('')}</div>`;
+      if (block.type === 'cards') return `<div class="block cards">${block.items.map(item => `<div class="card"><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.text)}</span></div>`).join('')}</div>`;
+      if (block.type === 'chart') {
+        const max = Math.max(1, ...block.items.map(item => Number(item.value) || 0));
+        return `<div class="block chart">${block.items.map(item => `<div class="chart-row"><span>${escapeHtml(item.label)}</span><i><b style="width:${Math.max(3, Math.min(100, (Number(item.value) || 0) / max * 100))}%"></b></i><strong>${escapeHtml(item.value)}</strong></div>`).join('')}</div>`;
+      }
+      if (block.type === 'table') return `<table class="block table"><thead><tr>${block.headers.map(item => `<th>${escapeHtml(item)}</th>`).join('')}</tr></thead><tbody>${block.rows.map(row => `<tr>${row.map(item => `<td>${escapeHtml(item)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+      if (block.type === 'image') return `<div class="block image">${block.src ? `<img src="${escapeHtml(block.src)}" alt="${escapeHtml(block.alt)}">` : '<div class="image-empty">Image not supplied</div>'}<div><p>${escapeHtml(block.caption)}</p><small>${escapeHtml(block.alt)}</small></div></div>`;
+      return `<div class="block divider"><span>${escapeHtml(block.label)}</span></div>`;
+    }
+
+    function renderDeckHtml(deck) {
+      const title = deck.slides[0]?.title || 'Generated deck';
+      const logo = deckLogo(deck);
+      const slides = deck.slides.map((slide, index) => {
+        const pageNumber = slidePageNumber(deck.slides, index);
+        return `<section class="slide kind-${slide.kind}${index === 0 ? ' active' : ''}" aria-label="Slide ${index + 1} of ${deck.slides.length}">${logo ? `<img class="slide-logo" src="${escapeHtml(logo.src)}" alt="${escapeHtml(logo.alt)}">` : ''}<div class="eyebrow">${escapeHtml(slide.eyebrow)}</div><div class="content"><h1>${escapeHtml(slide.title)}</h1><div class="blocks">${slide.blocks.map(blockToHtml).join('')}</div></div>${pageNumber === null ? '' : `<div class="number" aria-label="Page ${pageNumber}">${pageNumber}</div>`}</section>`;
+      }).join('');
+      return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none';style-src 'unsafe-inline';script-src 'unsafe-inline';img-src data:;font-src 'none';connect-src 'none';object-src 'none';base-uri 'none';form-action 'none'"><title>${escapeHtml(title)}</title><style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#e7e9ee;font-family:Arial,Helvetica,sans-serif}.deck{width:100%;height:100%}.slide{--x:7.2%;position:absolute;inset:0;display:none;overflow:hidden;color:#17243a;background:#fff}.slide.active{display:block}.slide:after{content:"";position:absolute;right:0;bottom:0;width:14%;height:.6vh;background:#13aab0}.eyebrow{position:absolute;top:6%;left:var(--x);color:#007880;font-size:min(1.02vw,1.82vh);font-weight:900;letter-spacing:.14em;text-transform:uppercase}.content{position:absolute;top:13%;right:var(--x);bottom:8.5%;left:var(--x);display:flex;flex-direction:column;justify-content:center;gap:2.4vh;transform-origin:center left}.content h1{max-width:91%;margin:0;font-size:min(4.5vw,8vh);line-height:1.03;letter-spacing:-.037em;overflow-wrap:anywhere;text-wrap:balance}.blocks{display:grid;gap:1.6vh;max-width:94%;font-size:min(1.72vw,3.06vh);line-height:1.34}.block{min-width:0;color:#394b62}.block p{margin:0}.bullets ul{margin:0;padding-left:1.15em}.bullets li{margin:.28em 0}.callout{padding:.72em .9em;border-left:.28em solid #13aab0;background:#ecf8f7}.label{margin-bottom:.22em;color:#007880;font-size:.66em;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.quote{max-width:86%;margin:0;padding:.15em 0 .15em 1em;border-left:.18em solid #b9a7d7;color:#4a2a77;font-size:1.14em;font-weight:700}.quote footer{margin-top:.4em;color:#737687;font-size:.65em}.stat{display:flex;align-items:baseline;gap:.75em}.stat-value{color:#32165c;font-size:2.3em;font-weight:900;line-height:.95;letter-spacing:-.05em}.stat-label{max-width:22em;font-size:.82em}.columns,.cards{display:grid;gap:.72em}.columns{grid-template-columns:repeat(2,minmax(0,1fr))}.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.column,.card{padding:.72em .78em;background:#f5f7fa}.column{border-top:.18em solid #13aab0}.card{border:1px solid #d9dee7;border-radius:.45em;background:#fff}.column strong,.card strong{display:block;margin-bottom:.32em;color:#17243a;font-size:.86em}.column span,.card span{display:block;color:#536378;font-size:.72em}.chart{display:grid;gap:.42em}.chart-row{display:grid;grid-template-columns:minmax(4.8em,.8fr) minmax(8em,3fr) 3.2em;gap:.55em;align-items:center;font-size:.72em}.chart-row i{height:.74em;overflow:hidden;border-radius:999px;background:#e8ebf0}.chart-row b{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#008f96,#4e71d7)}.chart-row strong{text-align:right;color:#4a2a77}.table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:.68em}.table th,.table td{border:1px solid #cfd5df;padding:.45em .52em}.table th{background:#edf4f5;text-align:left}.image{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(7em,.55fr);gap:.75em;align-items:center}.image img{width:100%;max-height:10.5em;object-fit:contain;border-radius:.45em;background:#f0f1f4}.image p{font-size:.67em}.image small{font-size:.55em;color:#7b8190}.image-empty{min-height:7em;display:grid;place-items:center;border:1px dashed #adb4c0;border-radius:.45em}.divider{display:flex;align-items:center;gap:.65em;color:#707687;font-size:.68em;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.divider:before,.divider:after{content:"";flex:1;height:1px;background:#cfd5df}.slide-logo{position:absolute;right:4%;top:3%;width:8%;height:12%;object-fit:contain;object-position:right top}.eyebrow{max-width:70%}.number{position:absolute;right:4%;bottom:4%;color:#718199;font-size:min(1.15vw,2.04vh);font-weight:800}.kind-title,.kind-cover{color:#24113f;background:linear-gradient(114deg,transparent 0 70%,rgba(19,170,176,.13) 70% 71%,transparent 71%),linear-gradient(135deg,#fff 0 64%,#f0ecf8 64% 82%,#e1f6f4 82%)}.kind-title:after,.kind-cover:after{width:24%;height:.8vh}.kind-title h1,.kind-cover h1{max-width:82%}.kind-statement{border-left:min(1.1vw,1.96vh) solid #008f96}.kind-statement h1{max-width:78%}.style-operational .slide{--x:6.2%;border-top:1.2vh solid #00a699;background:#f8fbfd}.style-operational .slide:before{content:"OPERATIONAL BRIEF";position:absolute;top:4%;right:14%;color:#65768a;font-size:min(.86vw,1.53vh);font-weight:900;letter-spacing:.12em}.style-operational .content{top:14%;justify-content:flex-start}.style-operational .eyebrow{top:7%}.style-operational .kind-title,.style-operational .kind-cover{background:#f0fbfa}.style-minimal .slide{--x:8.4%;color:#111;background:#fff}.style-minimal .slide:after{left:0;right:auto;width:100%;height:2px;background:#111}.style-minimal .eyebrow{color:#111}.style-minimal .kind-title,.style-minimal .kind-cover{color:#111;background:#fff}.style-minimal .kind-statement{border-left-color:#111}.controls{position:fixed;left:50%;bottom:2.2vh;z-index:20;display:flex;align-items:center;gap:10px;transform:translateX(-50%);padding:8px 10px;border:1px solid rgba(255,255,255,.2);border-radius:999px;color:#fff;background:rgba(24,16,38,.9);box-shadow:0 10px 30px rgba(0,0,0,.25)}button{min-width:42px;min-height:34px;border:1px solid #6b6079;border-radius:999px;color:#fff;background:#32165c;font:700 15px Arial;cursor:pointer}button:disabled{opacity:.4}.count{min-width:70px;text-align:center;font-size:13px;font-weight:700}@media print{@page{size:13.333in 7.5in;margin:0}html,body{width:auto;height:auto;overflow:visible;background:#fff}.deck{height:auto}.slide,.slide.active{position:relative;display:block;width:13.333in;height:7.5in;page-break-after:always}.controls{display:none}}@media(max-aspect-ratio:16/9){.deck{position:absolute;top:50%;height:56.25vw;transform:translateY(-50%)}}@media(min-aspect-ratio:16/9){.deck{position:absolute;left:50%;width:177.7778vh;transform:translateX(-50%)}}
+</style></head><body class="style-${deck.style}"><main class="deck">${slides}</main><nav class="controls" aria-label="Slide navigation"><button id="prev" type="button" aria-label="Previous slide">←</button><span class="count" id="count">1 / ${deck.slides.length}</span><button id="next" type="button" aria-label="Next slide">→</button></nav><script>'use strict';const slides=[...document.querySelectorAll('.slide')];let current=0;const prev=document.getElementById('prev'),next=document.getElementById('next'),count=document.getElementById('count');function fit(slide){const content=slide.querySelector('.content');if(!content)return;content.style.transform='';content.style.width='';let low=.42,high=1,best=1;const fits=()=>content.scrollHeight<=content.clientHeight+1&&content.scrollWidth<=content.clientWidth+1;if(!fits()){for(let i=0;i<12;i++){const value=(low+high)/2;content.style.transform='scale('+value+')';content.style.width=(100/value)+'%';if(fits()){best=value;low=value}else high=value}content.style.transform='scale('+best+')';content.style.width=(100/best)+'%'}}function show(index){current=Math.max(0,Math.min(index,slides.length-1));slides.forEach((slide,i)=>slide.classList.toggle('active',i===current));count.textContent=(current+1)+' / '+slides.length;prev.disabled=current===0;next.disabled=current===slides.length-1;requestAnimationFrame(()=>fit(slides[current]))}prev.onclick=()=>show(current-1);next.onclick=()=>show(current+1);document.addEventListener('keydown',event=>{if(['ArrowRight','PageDown',' '].includes(event.key)){event.preventDefault();show(current+1)}if(['ArrowLeft','PageUp'].includes(event.key)){event.preventDefault();show(current-1)}if(event.key==='Home')show(0);if(event.key==='End')show(slides.length-1)});window.addEventListener('resize',()=>slides.forEach(fit));show(0);<\/script></body></html>`;
+    }
+
+
+  const api = { uid, clone, parseMessageGroups, organiseFreeText, embedEditorProject, distribute, newBlock, buildSlides, escapeHtml, blockToHtml, renderDeckHtml, DEFAULT_LOGO, isEmbeddedImage, deckLogo, slidePageNumber };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.DeckCore = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+  </script>
+
+  <script id="saved-project" type="application/json">{}</script>
+  <script>
+    'use strict';
+    const editorTemplate = '<!doctype html>\n' + document.documentElement.outerHTML;
+    const { uid, clone, parseMessageGroups, distribute, newBlock, buildSlides, escapeHtml, blockToHtml } = DeckCore;
+
+    const sampleBrief = {
+      purpose: 'Secure approval to pilot a shared operations dashboard before wider rollout.',
+      audience: 'Senior leadership and operational owners',
+      messages: `Current reporting is fragmented and slow
+- Teams reconcile the same information in different spreadsheets
+- Leaders receive an inconsistent picture of operational risk
+
+A shared view can improve decision speed
+- Begin with one representative workflow and a bounded user cohort
+- Use existing authoritative data before adding new sources
+
+Pilot before scaling
+- Measure preparation time, data quality and decision usefulness
+- Return with evidence, unresolved risks and the next investment decision`,
+      style: 'executive',
+      count: '5'
+    };
+
+    const elementCatalogue = [
+      { category: 'Text', type: 'paragraph', glyph: 'T', label: 'Body text', note: 'A short explanatory paragraph' },
+      { category: 'Text', type: 'bullets', glyph: '≡', label: 'Bullet list', note: 'Editable supporting points' },
+      { category: 'Text', type: 'quote', glyph: '“', label: 'Quote', note: 'A quotation and attribution' },
+      { category: 'Highlights', type: 'callout', glyph: '!', label: 'Callout', note: 'An emphasis box with a label' },
+      { category: 'Highlights', type: 'stat', glyph: '42', label: 'Key statistic', note: 'A large value and explanation' },
+      { category: 'Layouts', type: 'columns', glyph: 'Ⅱ', label: 'Two columns', note: 'Two parallel ideas' },
+      { category: 'Layouts', type: 'cards', glyph: '▦', label: 'Three cards', note: 'Three comparable ideas' },
+      { category: 'Data', type: 'chart', glyph: '▥', label: 'Bar chart', note: 'Three editable values' },
+      { category: 'Data', type: 'table', glyph: '▦', label: 'Table', note: 'A compact comparison table' },
+      { category: 'Media', type: 'image', glyph: '▧', label: 'Image', note: 'Choose a local image file' },
+      { category: 'Structure', type: 'divider', glyph: '—', label: 'Divider', note: 'A labelled visual separator' }
+    ];
+
+    const state = {
+      slides: [], current: 0, style: 'executive', dirty: false, logo: clone(DeckCore.DEFAULT_LOGO),
+      selectedBlockId: null, metadata: { requested: 0, grouped: 0, underfilled: 0 },
+      warnings: [], fitFrame: 0, thumbTimer: 0, checkTimer: 0
+    };
+
+    const byId = id => document.getElementById(id);
+    const make = (tag, className, text) => {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    };
+
+    function toast(message, error = false) {
+      const node = byId('toast');
+      node.textContent = message;
+      node.className = 'toast show' + (error ? ' error' : '');
+      window.clearTimeout(toast.timer);
+      toast.timer = window.setTimeout(() => { node.className = 'toast'; }, 3200);
+    }
+
+    function editable(tag, className, text, field, placeholder, blockId, index, subindex) {
+      const node = make(tag, className + ' editable-text', text || '');
+      node.contentEditable = 'plaintext-only';
+      node.spellcheck = true;
+      node.dataset.field = field;
+      node.dataset.placeholder = placeholder || 'Click to edit';
+      if (blockId) node.dataset.blockId = blockId;
+      if (Number.isInteger(index)) node.dataset.index = String(index);
+      if (Number.isInteger(subindex)) node.dataset.subindex = String(subindex);
+      return node;
+    }
+
+    function applySample() {
+      byId('input-mode').value = 'structured';
+      updateInputMode();
+      byId('purpose').value = sampleBrief.purpose;
+      byId('audience').value = sampleBrief.audience;
+      byId('messages').value = sampleBrief.messages;
+      byId('brief-style').value = sampleBrief.style;
+      byId('style-select').value = sampleBrief.style;
+      byId('count').value = sampleBrief.count;
+      state.style = sampleBrief.style;
+    }
+
+    function getBrief() {
+      return {
+        purpose: byId('purpose').value.trim(), audience: byId('audience').value.trim(),
+        messagesText: byId('messages').value.trim(), style: byId('brief-style').value,
+        count: byId('count').value, inputMode: byId('input-mode').value
+      };
+    }
+
+    function generateDeck(silent = false) {
+      if (state.dirty && !silent && !window.confirm('Regenerating from the brief will replace your on-slide edits. Continue?')) return;
+      const brief = getBrief();
+      if (!brief.purpose || !brief.messagesText) { toast('Add a purpose and at least one key message before generating.', true); return; }
+      let groups;
+      try { groups = brief.inputMode === 'free' ? DeckCore.organiseFreeText(brief.messagesText) : parseMessageGroups(brief.messagesText); }
+      catch (error) { toast(error.message, true); return; }
+      if (!groups.length) { toast('Add at least one key message before generating.', true); return; }
+      const built = buildSlides(brief, groups);
+      state.slides = built.slides;
+      state.metadata = built.metadata;
+      state.style = brief.style;
+      state.current = 0;
+      state.selectedBlockId = null;
+      state.dirty = false;
+      byId('style-select').value = state.style;
+      renderAll();
+      if (byId('drawer-dialog').open) byId('drawer-dialog').close();
+      if (!silent) toast(`Generated ${state.slides.length} slides. Edit any text directly on the canvas.`);
+    }
+
+    function currentSlide() { return state.slides[state.current] || null; }
+    function selectedBlock() {
+      const slide = currentSlide();
+      return slide ? slide.blocks.find(block => block.id === state.selectedBlockId) || null : null;
+    }
+    function markEdited() { state.dirty = true; }
+
+    function renderBlock(block, editMode = true) {
+      let node;
+      if (block.type === 'paragraph') {
+        node = make('div', 'slide-block block-paragraph');
+        node.appendChild(editMode ? editable('p', '', block.text, 'text', 'Add body text', block.id) : make('p', '', block.text));
+      } else if (block.type === 'bullets') {
+        node = make('div', 'slide-block block-bullets');
+        const list = make('ul');
+        block.items.forEach((item, index) => {
+          const li = editMode ? editable('li', '', item, 'items', 'Add a point', block.id, index) : make('li', '', item);
+          list.appendChild(li);
+        });
+        node.appendChild(list);
+      } else if (block.type === 'callout') {
+        node = make('div', 'slide-block block-callout');
+        node.append(
+          editMode ? editable('div', 'block-label', block.label, 'label', 'Label', block.id) : make('div', 'block-label', block.label),
+          editMode ? editable('div', '', block.text, 'text', 'Add the key point', block.id) : make('div', '', block.text)
+        );
+      } else if (block.type === 'quote') {
+        node = make('blockquote', 'slide-block block-quote');
+        node.append(
+          editMode ? editable('div', '', block.quote, 'quote', 'Add quotation', block.id) : make('div', '', block.quote),
+          editMode ? editable('footer', '', block.attribution, 'attribution', 'Source or speaker', block.id) : make('footer', '', block.attribution)
+        );
+      } else if (block.type === 'stat') {
+        node = make('div', 'slide-block block-stat');
+        node.append(
+          editMode ? editable('div', 'stat-value', block.value, 'value', '42%', block.id) : make('div', 'stat-value', block.value),
+          editMode ? editable('div', 'stat-label', block.label, 'label', 'Explain the value', block.id) : make('div', 'stat-label', block.label)
+        );
+      } else if (block.type === 'columns') {
+        node = make('div', 'slide-block block-columns');
+        block.columns.forEach((column, index) => {
+          const item = make('div', 'column-item');
+          item.append(
+            editMode ? editable('div', 'item-title', column.title, 'column-title', 'Column title', block.id, index) : make('div', 'item-title', column.title),
+            editMode ? editable('div', 'item-text', column.text, 'column-text', 'Add supporting detail', block.id, index) : make('div', 'item-text', column.text)
+          );
+          node.appendChild(item);
+        });
+      } else if (block.type === 'cards') {
+        node = make('div', 'slide-block block-cards');
+        block.items.forEach((itemData, index) => {
+          const item = make('div', 'card-item');
+          item.append(
+            editMode ? editable('div', 'item-title', itemData.title, 'item-title', 'Card title', block.id, index) : make('div', 'item-title', itemData.title),
+            editMode ? editable('div', 'item-text', itemData.text, 'item-text', 'Add supporting detail', block.id, index) : make('div', 'item-text', itemData.text)
+          );
+          node.appendChild(item);
+        });
+      } else if (block.type === 'chart') {
+        node = make('div', 'slide-block block-chart');
+        const max = Math.max(1, ...block.items.map(item => Number(item.value) || 0));
+        block.items.forEach((itemData, index) => {
+          const row = make('div', 'chart-row');
+          const label = editMode ? editable('div', 'chart-label', itemData.label, 'chart-label', 'Label', block.id, index) : make('div', 'chart-label', itemData.label);
+          const track = make('div', 'chart-track');
+          const bar = make('div', 'chart-bar');
+          bar.style.width = Math.max(3, Math.min(100, (Number(itemData.value) || 0) / max * 100)) + '%';
+          track.appendChild(bar);
+          const value = editMode ? editable('div', 'chart-value', String(itemData.value), 'chart-value', '0', block.id, index) : make('div', 'chart-value', String(itemData.value));
+          row.append(label, track, value);
+          node.appendChild(row);
+        });
+      } else if (block.type === 'table') {
+        node = make('table', 'slide-block block-table');
+        const head = make('thead');
+        const headRow = make('tr');
+        block.headers.forEach((text, index) => headRow.appendChild(editMode ? editable('th', '', text, 'header', 'Heading', block.id, index) : make('th', '', text)));
+        head.appendChild(headRow);
+        const body = make('tbody');
+        block.rows.forEach((row, rowIndex) => {
+          const tr = make('tr');
+          row.forEach((text, cellIndex) => tr.appendChild(editMode ? editable('td', '', text, 'cell', 'Cell', block.id, rowIndex, cellIndex) : make('td', '', text)));
+          body.appendChild(tr);
+        });
+        node.append(head, body);
+      } else if (block.type === 'image') {
+        node = make('div', 'slide-block block-image');
+        if (block.src) {
+          const img = document.createElement('img');
+          img.src = block.src;
+          img.alt = block.alt || '';
+          node.appendChild(img);
+        } else {
+          const placeholder = make('button', 'image-placeholder', 'Click to choose an image from this device');
+          placeholder.type = 'button';
+          placeholder.addEventListener('click', event => { event.stopPropagation(); state.selectedBlockId = block.id; byId('image-input').click(); });
+          node.appendChild(placeholder);
+        }
+        const captionWrap = make('div');
+        captionWrap.append(
+          editMode ? editable('div', 'image-caption', block.caption, 'caption', 'Caption or source', block.id) : make('div', 'image-caption', block.caption),
+          editMode ? editable('div', 'image-caption', block.alt, 'alt', 'Describe the image for accessibility', block.id) : make('div', 'image-caption', block.alt)
+        );
+        node.appendChild(captionWrap);
+      } else {
+        node = make('div', 'slide-block block-divider');
+        node.appendChild(editMode ? editable('span', '', block.label, 'label', 'Section label', block.id) : make('span', '', block.label));
+      }
+      node.dataset.blockId = block.id;
+      node.dataset.type = block.type;
+      if (editMode && state.selectedBlockId === block.id) node.classList.add('selected');
+      return node;
+    }
+
+    function renderSlide(slide, editMode = true) {
+      const canvas = make('article', 'slide-canvas kind-' + slide.kind);
+      canvas.dataset.slideId = slide.id;
+      canvas.setAttribute('aria-label', `Slide ${state.current + 1}: ${slide.title}`);
+      const eyebrow = editMode ? editable('div', 'slide-eyebrow', slide.eyebrow, 'slide-eyebrow', 'Section label') : make('div', 'slide-eyebrow', slide.eyebrow);
+      const content = make('div', 'slide-content');
+      const title = editMode ? editable('h1', 'slide-title', slide.title, 'slide-title', 'Add a headline') : make('h1', 'slide-title', slide.title);
+      const stack = make('div', 'block-stack');
+      slide.blocks.forEach(block => stack.appendChild(renderBlock(block, editMode)));
+      content.append(title, stack);
+      canvas.append(eyebrow, content);
+      const logo = DeckCore.deckLogo(state);
+      if (logo) { const image = make('img', 'slide-logo'); image.src = logo.src; image.alt = logo.alt; canvas.appendChild(image); }
+      const pageNumber = DeckCore.slidePageNumber(state.slides, state.current);
+      if (pageNumber !== null) { const number = make('div', 'slide-number', String(pageNumber)); number.setAttribute('aria-label', `Page ${pageNumber}`); canvas.appendChild(number); }
+      if (editMode) wireCanvas(canvas, slide);
+      return canvas;
+    }
+
+    function wireCanvas(canvas, slide) {
+      canvas.addEventListener('click', event => {
+        const blockNode = event.target.closest('.slide-block');
+        if (blockNode) selectBlock(blockNode.dataset.blockId, false);
+        else if (!event.target.closest('[contenteditable]')) selectBlock(null, false);
+      });
+      canvas.addEventListener('focusin', event => {
+        const blockNode = event.target.closest('.slide-block');
+        selectBlock(blockNode ? blockNode.dataset.blockId : null, false);
+      });
+      canvas.addEventListener('input', event => {
+        const target = event.target.closest('[data-field]');
+        if (!target) return;
+        updateFromEditable(slide, target);
+        markEdited();
+        scheduleFit();
+        scheduleSecondaryRenders();
+      });
+      canvas.addEventListener('blur', event => {
+        if (event.target.matches('[contenteditable]')) scheduleSecondaryRenders(true);
+      }, true);
+      canvas.addEventListener('paste', event => {
+        const target = event.target.closest('[contenteditable]');
+        if (!target) return;
+        event.preventDefault();
+        const text = event.clipboardData.getData('text/plain');
+        document.execCommand('insertText', false, text);
+      });
+      canvas.addEventListener('keydown', event => {
+        const target = event.target.closest('li[data-field="items"]');
+        if (!target) return;
+        const block = slide.blocks.find(item => item.id === target.dataset.blockId);
+        if (!block) return;
+        const index = Number(target.dataset.index);
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          block.items.splice(index + 1, 0, 'New point');
+          markEdited();
+          renderPreview();
+          focusEditable(block.id, 'items', index + 1);
+          scheduleSecondaryRenders(true);
+        } else if (event.key === 'Backspace' && !target.textContent.trim() && block.items.length > 1) {
+          event.preventDefault();
+          block.items.splice(index, 1);
+          markEdited();
+          renderPreview();
+          focusEditable(block.id, 'items', Math.max(0, index - 1));
+          scheduleSecondaryRenders(true);
+        }
+      });
+    }
+
+    function updateFromEditable(slide, target) {
+      const value = target.innerText.replace(/\u00a0/g, ' ').trim();
+      const field = target.dataset.field;
+      if (field === 'slide-title') { slide.title = value; return; }
+      if (field === 'slide-eyebrow') { slide.eyebrow = value; return; }
+      const block = slide.blocks.find(item => item.id === target.dataset.blockId);
+      if (!block) return;
+      const index = Number(target.dataset.index);
+      const subindex = Number(target.dataset.subindex);
+      if (field === 'items') block.items[index] = value;
+      else if (field === 'column-title') block.columns[index].title = value;
+      else if (field === 'column-text') block.columns[index].text = value;
+      else if (field === 'item-title') block.items[index].title = value;
+      else if (field === 'item-text') block.items[index].text = value;
+      else if (field === 'chart-label') block.items[index].label = value;
+      else if (field === 'chart-value') {
+        block.items[index].value = Number(value.replace(/[^0-9.-]/g, '')) || 0;
+        const max = Math.max(1, ...block.items.map(item => Number(item.value) || 0));
+        const rows = target.closest('.block-chart').querySelectorAll('.chart-row');
+        rows.forEach((row, rowIndex) => {
+          row.querySelector('.chart-bar').style.width = Math.max(3, Math.min(100, (Number(block.items[rowIndex].value) || 0) / max * 100)) + '%';
+        });
+      } else if (field === 'header') block.headers[index] = value;
+      else if (field === 'cell') block.rows[index][subindex] = value;
+      else block[field] = value;
+    }
+
+    function focusEditable(blockId, field, index) {
+      window.requestAnimationFrame(() => {
+        const selector = `[data-block-id="${blockId}"][data-field="${field}"]${Number.isInteger(index) ? `[data-index="${index}"]` : ''}`;
+        const node = byId('slide-frame').querySelector(selector);
+        if (!node) return;
+        node.focus();
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        range.collapse(false);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      });
+    }
+
+    function selectBlock(id, rerender = true) {
+      state.selectedBlockId = id;
+      if (rerender) renderPreview();
+      else {
+        byId('slide-frame').querySelectorAll('.slide-block').forEach(node => node.classList.toggle('selected', node.dataset.blockId === id));
+        updateToolbar();
+      }
+    }
+
+    function updateToolbar() {
+      const slide = currentSlide();
+      const block = selectedBlock();
+      byId('layout-select').disabled = !slide;
+      if (slide) byId('layout-select').value = slide.kind;
+      ['element-up', 'element-down', 'duplicate-element', 'delete-element'].forEach(id => { byId(id).disabled = !block; });
+      if (block) {
+        const index = slide.blocks.findIndex(item => item.id === block.id);
+        byId('element-up').disabled = index <= 0;
+        byId('element-down').disabled = index >= slide.blocks.length - 1;
+        const label = elementCatalogue.find(item => item.type === block.type)?.label || 'Element';
+        byId('selection-label').textContent = label + ' selected';
+      } else {
+        byId('selection-label').textContent = 'Select an element to arrange it';
+      }
+    }
+
+    function slideFits(content) {
+      const canvas = content.closest('.slide-canvas');
+      const title = content.querySelector('.slide-title');
+      const stack = content.querySelector('.block-stack');
+      if (!canvas || !title || !stack || !content.clientHeight) return true;
+      const canvasBounds = canvas.getBoundingClientRect();
+      const titleBounds = title.getBoundingClientRect();
+      const stackBounds = stack.getBoundingClientRect();
+      const safeBottom = canvasBounds.bottom - canvasBounds.height * .07;
+      const safeRight = canvasBounds.right - canvasBounds.width * .035;
+      return Math.min(titleBounds.top, stackBounds.top) >= canvasBounds.top + canvasBounds.height * .09
+        && Math.max(titleBounds.bottom, stackBounds.bottom) <= safeBottom
+        && Math.max(titleBounds.right, stackBounds.right) <= safeRight;
+    }
+    function fitSlide() {
+      const content = byId('slide-frame').querySelector('.slide-content');
+      if (!content) return;
+      content.style.transform = '';
+      content.style.width = '';
+      let best = 1;
+      if (!slideFits(content)) {
+        let low = .42, high = 1;
+        for (let i = 0; i < 12; i += 1) {
+          const candidate = (low + high) / 2;
+          content.style.transform = `scale(${candidate})`;
+          content.style.width = `${100 / candidate}%`;
+          if (slideFits(content)) { best = candidate; low = candidate; } else high = candidate;
+        }
+        content.style.transform = `scale(${best})`;
+        content.style.width = `${100 / best}%`;
+      }
+      content.dataset.fitScale = best.toFixed(3);
+    }
+    function scheduleFit() {
+      cancelAnimationFrame(state.fitFrame);
+      state.fitFrame = requestAnimationFrame(() => requestAnimationFrame(fitSlide));
+    }
+
+    function renderPreview() {
+      const frame = byId('slide-frame');
+      frame.className = 'slide-frame style-' + state.style;
+      frame.replaceChildren();
+      const slide = currentSlide();
+      if (!slide) frame.appendChild(make('div', 'slide-empty', 'Add or generate a slide to begin.'));
+      else frame.appendChild(renderSlide(slide, true));
+      byId('counter').textContent = state.slides.length ? `${state.current + 1} / ${state.slides.length}` : '0 / 0';
+      byId('previous').disabled = state.current <= 0;
+      byId('next').disabled = state.current >= state.slides.length - 1;
+      updateToolbar();
+      scheduleFit();
+    }
+
+    function renderThumbnails() {
+      const list = byId('slide-list');
+      list.replaceChildren();
+      state.slides.forEach((slide, index) => {
+        const row = make('button', 'thumb-row' + (index === state.current ? ' current' : ''));
+        row.type = 'button';
+        row.setAttribute('aria-label', `Open slide ${index + 1}: ${slide.title}`);
+        const card = make('div', 'thumb-card');
+        const inner = make('div', 'thumb-inner kind-' + slide.kind);
+        inner.append(make('div', 'thumb-eyebrow', slide.eyebrow), make('div', 'thumb-title', slide.title));
+        const lines = make('div', 'thumb-lines');
+        const lineCount = Math.max(1, Math.min(4, slide.blocks.length + 1));
+        for (let i = 0; i < lineCount; i += 1) { const line = make('i'); line.style.width = (94 - i * 11) + '%'; lines.appendChild(line); }
+        inner.appendChild(lines);
+        const logo = DeckCore.deckLogo(state);
+        if (logo) { const image = make('img', 'thumb-logo'); image.src = logo.src; image.alt = ''; inner.appendChild(image); }
+        const pageNumber = DeckCore.slidePageNumber(state.slides, index);
+        if (pageNumber !== null) inner.appendChild(make('span', 'thumb-page', String(pageNumber)));
+        card.appendChild(inner);
+        row.append(make('span', 'thumb-number', String(index + 1)), card);
+        row.addEventListener('click', () => selectSlide(index));
+        list.appendChild(row);
+      });
+      const hasSlides = state.slides.length > 0;
+      byId('slide-up').disabled = !hasSlides || state.current === 0;
+      byId('slide-down').disabled = !hasSlides || state.current === state.slides.length - 1;
+      byId('duplicate-slide').disabled = !hasSlides;
+      byId('delete-slide').disabled = !hasSlides;
+    }
+
+    function selectSlide(index) {
+      if (!state.slides.length) return;
+      state.current = Math.max(0, Math.min(index, state.slides.length - 1));
+      state.selectedBlockId = null;
+      renderPreview();
+      renderThumbnails();
+    }
+
+    function addSlide() {
+      state.slides.push({ id: uid(), kind: 'content', eyebrow: 'New section', title: 'New slide', blocks: [newBlock('paragraph')] });
+      state.current = state.slides.length - 1;
+      state.selectedBlockId = null;
+      markEdited();
+      renderAll();
+      toast('Blank slide added. Click the text to edit it.');
+    }
+    function moveSlide(delta) {
+      const target = state.current + delta;
+      if (target < 0 || target >= state.slides.length) return;
+      [state.slides[state.current], state.slides[target]] = [state.slides[target], state.slides[state.current]];
+      state.current = target;
+      markEdited(); renderAll();
+    }
+    function duplicateSlide() {
+      const slide = currentSlide(); if (!slide) return;
+      const copy = clone(slide); copy.id = uid(); copy.title += ' — copy'; copy.blocks.forEach(block => { block.id = uid(); });
+      state.slides.splice(state.current + 1, 0, copy); state.current += 1; state.selectedBlockId = null;
+      markEdited(); renderAll();
+    }
+    function deleteSlide() {
+      if (!currentSlide()) return;
+      state.slides.splice(state.current, 1);
+      state.current = Math.max(0, Math.min(state.current, state.slides.length - 1));
+      state.selectedBlockId = null; markEdited(); renderAll();
+    }
+
+    function insertBlock(block) {
+      let slide = currentSlide();
+      if (!slide) { addSlide(); slide = currentSlide(); }
+      const selectedIndex = slide.blocks.findIndex(item => item.id === state.selectedBlockId);
+      slide.blocks.splice(selectedIndex >= 0 ? selectedIndex + 1 : slide.blocks.length, 0, block);
+      state.selectedBlockId = block.id;
+      markEdited(); renderAll();
+      closeElementMenu();
+      if (block.type !== 'image' && block.type !== 'divider') {
+        const firstField = byId('slide-frame').querySelector(`[data-block-id="${block.id}"][data-field]`);
+        if (firstField) window.requestAnimationFrame(() => firstField.focus());
+      }
+    }
+    function addElement(type) {
+      const block = newBlock(type);
+      insertBlock(block);
+      if (type === 'image') byId('image-input').click();
+    }
+    function moveBlock(delta) {
+      const slide = currentSlide(), block = selectedBlock(); if (!slide || !block) return;
+      const index = slide.blocks.findIndex(item => item.id === block.id), target = index + delta;
+      if (target < 0 || target >= slide.blocks.length) return;
+      [slide.blocks[index], slide.blocks[target]] = [slide.blocks[target], slide.blocks[index]];
+      markEdited(); renderAll();
+    }
+    function duplicateBlock() {
+      const slide = currentSlide(), block = selectedBlock(); if (!slide || !block) return;
+      const index = slide.blocks.findIndex(item => item.id === block.id), copy = clone(block); copy.id = uid();
+      slide.blocks.splice(index + 1, 0, copy); state.selectedBlockId = copy.id; markEdited(); renderAll();
+    }
+    function deleteBlock() {
+      const slide = currentSlide(), block = selectedBlock(); if (!slide || !block) return;
+      slide.blocks = slide.blocks.filter(item => item.id !== block.id); state.selectedBlockId = null; markEdited(); renderAll();
+    }
+
+    function renderElementOptions(query = '') {
+      const container = byId('element-options');
+      container.replaceChildren();
+      const normalized = query.trim().toLowerCase();
+      const filtered = elementCatalogue.filter(item => !normalized || `${item.category} ${item.label} ${item.note}`.toLowerCase().includes(normalized));
+      [...new Set(filtered.map(item => item.category))].forEach(category => {
+        const section = make('section', 'element-category');
+        section.appendChild(make('h3', '', category));
+        const grid = make('div', 'element-grid');
+        filtered.filter(item => item.category === category).forEach(item => {
+          const button = make('button', 'element-option'); button.type = 'button'; button.dataset.type = item.type;
+          const copyWrap = make('div'); copyWrap.append(make('strong', '', item.label), make('small', '', item.note));
+          button.append(make('span', 'element-glyph', item.glyph), copyWrap);
+          button.addEventListener('click', () => addElement(item.type));
+          grid.appendChild(button);
+        });
+        section.appendChild(grid); container.appendChild(section);
+      });
+      if (!filtered.length) container.appendChild(make('p', 'warning-empty', 'No matching elements.'));
+    }
+    function openElementMenu() {
+      byId('element-menu').classList.remove('hidden');
+      byId('add-element').setAttribute('aria-expanded', 'true');
+      byId('element-search').value = '';
+      renderElementOptions();
+      window.requestAnimationFrame(() => byId('element-search').focus());
+    }
+    function closeElementMenu() {
+      byId('element-menu').classList.add('hidden');
+      byId('add-element').setAttribute('aria-expanded', 'false');
+    }
+
+    function blockPlainText(block) {
+      if (block.type === 'paragraph') return block.text;
+      if (block.type === 'bullets') return block.items.join(' ');
+      if (block.type === 'callout') return `${block.label} ${block.text}`;
+      if (block.type === 'quote') return `${block.quote} ${block.attribution}`;
+      if (block.type === 'stat') return `${block.value} ${block.label}`;
+      if (block.type === 'columns') return block.columns.map(item => `${item.title} ${item.text}`).join(' ');
+      if (block.type === 'cards') return block.items.map(item => `${item.title} ${item.text}`).join(' ');
+      if (block.type === 'chart') return block.items.map(item => `${item.label} ${item.value}`).join(' ');
+      if (block.type === 'table') return `${block.headers.join(' ')} ${block.rows.flat().join(' ')}`;
+      if (block.type === 'image') return `${block.alt} ${block.caption}`;
+      return block.label || '';
+    }
+
+    function collectWarnings() {
+      const warnings = [];
+      const brief = getBrief();
+      parseMessageGroups(brief.messagesText).forEach(group => {
+        if (!group.points.length) warnings.push({ type: 'attention', text: `No supporting points under “${excerpt(group.heading, 58)}”.` });
+      });
+      if (state.metadata.grouped > 0) warnings.push({ type: 'note', text: `${state.metadata.grouped} key message${state.metadata.grouped === 1 ? '' : 's'} were grouped to meet the selected length.` });
+      if (state.metadata.underfilled > 0) warnings.push({ type: 'note', text: `The brief did not contain enough distinct material for ${state.metadata.requested} slides; filler was not added.` });
+      state.slides.forEach((slide, index) => {
+        if (!slide.title.trim()) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} has no headline.` });
+        if (slide.title.length > 110) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} headline exceeds 110 characters.` });
+        const words = slide.blocks.map(blockPlainText).join(' ').trim().split(/\s+/).filter(Boolean).length;
+        const limit = state.style === 'minimal' ? 60 : state.style === 'operational' ? 100 : 78;
+        if (words > limit) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} has ${words} content words; the ${state.style} style is designed for about ${limit}.` });
+        if (slide.blocks.length > 6) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} has ${slide.blocks.length} elements and may feel crowded.` });
+        slide.blocks.forEach(block => {
+          if (block.type === 'image' && block.src && !block.alt.trim()) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} contains an image without an accessibility description.` });
+          if (!blockPlainText(block).trim() && block.type !== 'image') warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} contains an empty ${block.type} element.` });
+        });
+      });
+      const decisionBrief = /\b(approve|approval|decision|recommend|endorse|authorise|authorize|fund)\b/i.test(brief.purpose);
+      const close = state.slides[state.slides.length - 1];
+      if (decisionBrief && close && !/\b(decision|approve|approval|ask|recommend|endorse|authorise|authorize|fund)\b/i.test(close.title + ' ' + close.blocks.map(blockPlainText).join(' '))) {
+        warnings.push({ type: 'attention', slide: state.slides.length - 1, text: 'The brief seeks a decision, but the closing slide no longer states an ask.' });
+      }
+      return warnings;
+    }
+    function excerpt(text, limit) { const compact = text.replace(/\s+/g, ' ').trim(); return compact.length > limit ? compact.slice(0, limit - 1) + '…' : compact; }
+    function renderChecks() {
+      state.warnings = collectWarnings();
+      const count = state.warnings.length;
+      byId('checks-badge').textContent = String(count);
+      byId('checks-badge').classList.toggle('clear', count === 0);
+      byId('quality-score').textContent = String(count);
+      byId('quality-score').classList.toggle('attention', count > 0);
+      byId('quality-title').textContent = count ? 'Review suggested' : 'Ready to review';
+      byId('quality-note').textContent = count ? `${count} advisory check${count === 1 ? '' : 's'} · none block export` : 'No advisory issues detected';
+      const container = byId('warnings'); container.replaceChildren();
+      if (!count) { container.appendChild(make('p', 'warning-empty', 'The current brief and deck pass the basic checks. Review the content before sharing.')); return; }
+      state.warnings.forEach(item => {
+        const button = make('button', 'warning' + (item.type === 'note' ? ' note' : ''), item.text); button.type = 'button';
+        if (Number.isInteger(item.slide)) button.addEventListener('click', () => { selectSlide(item.slide); byId('drawer-dialog').close(); });
+        container.appendChild(button);
+      });
+    }
+    function scheduleSecondaryRenders(immediate = false) {
+      clearTimeout(state.thumbTimer); clearTimeout(state.checkTimer);
+      const delay = immediate ? 0 : 280;
+      state.thumbTimer = setTimeout(renderThumbnails, delay);
+      state.checkTimer = setTimeout(renderChecks, delay);
+    }
+    function renderAll() { renderPreview(); renderThumbnails(); renderChecks(); }
+
+    function openDrawer(mode) {
+      if (!byId('offline-page').classList.contains('hidden')) showOfflinePage(false);
+      ['brief', 'checks', 'branding'].forEach(panel => byId(panel + '-panel').classList.toggle('hidden', panel !== mode));
+      const titles = { brief: 'Presentation brief', checks: 'Quality checks', branding: 'Logo & page numbers' };
+      const subtitles = { brief: 'Create a starting deck from a structured brief or free text.', checks: 'Review density, completeness and basic accessibility.', branding: 'Keep your presentation consistent, online and offline.' };
+      byId('drawer-title').textContent = titles[mode];
+      byId('drawer-subtitle').textContent = subtitles[mode];
+      if (mode === 'branding') updateLogoPanel();
+      if (!byId('drawer-dialog').open) byId('drawer-dialog').showModal();
+    }
+
+    function updateInputMode() {
+      const free = byId('input-mode').value === 'free';
+      byId('messages-label').textContent = free ? 'Paste your notes or free text' : 'Key messages and supporting points';
+      byId('input-hint').textContent = free ? 'Up to 20,000 characters. Paragraphs and sentences become editable slide groups. This preserves your wording; it does not use an AI model.' : 'Start each key message on a new line. Add supporting points beneath it with “-”.';
+      if (free) byId('messages').maxLength = 20000; else byId('messages').removeAttribute('maxlength');
+    }
+
+    function updateLogoPanel() {
+      const logo = DeckCore.deckLogo(state);
+      const image = byId('logo-preview');
+      image.classList.toggle('hidden', !logo);
+      if (logo) { image.src = logo.src; image.alt = logo.alt; } else image.removeAttribute('src');
+      byId('logo-status').textContent = !logo ? 'No logo will appear on your slides.' : logo.src === DeckCore.DEFAULT_LOGO.src ? 'The Hands on Deck icon is a temporary placeholder. Replace it with your own logo or remove it.' : 'Your logo will appear on every slide and stay embedded for offline use.';
+      byId('remove-logo').disabled = !logo;
+    }
+
+    function setLogo(logo) {
+      state.logo = logo; markEdited(); renderAll(); updateLogoPanel();
+    }
+
+    function editorSnapshot() {
+      return { version: 1, slides: state.slides, current: state.current, style: state.style, logo: state.logo, metadata: state.metadata, brief: getBrief() };
+    }
+    function editorDownloadBlob() {
+      return new Blob([DeckCore.embedEditorProject(editorTemplate, editorSnapshot())], { type: 'text/html;charset=utf-8' });
+    }
+    function formatBytes(bytes) { return bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KiB` : `${(bytes / (1024 * 1024)).toFixed(2)} MiB`; }
+    const MAX_EDITOR_BYTES = 10 * 1024 * 1024;
+    function showOfflinePage(show) {
+      document.querySelector('.app-shell').classList.toggle('hidden', show);
+      byId('offline-page').classList.toggle('hidden', !show);
+      byId('open-offline').setAttribute('aria-pressed', String(show));
+      if (show) {
+        const blob = editorDownloadBlob();
+        const overLimit = blob.size > MAX_EDITOR_BYTES;
+        byId('editor-download-size').textContent = formatBytes(blob.size);
+        byId('download-editor').disabled = overLimit;
+        byId('download-status').textContent = overLimit ? 'This copy exceeds the 10 MiB limit. Reduce or remove large images, then try again.' : 'Your content stays on this device. No account or additional installation is required.';
+        byId('download-checksum').textContent = '';
+        byId('offline-title').focus();
+      } else { byId('open-offline').focus(); scheduleFit(); }
+    }
+    function saveBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a'); link.href = url; link.download = filename;
+      document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    async function downloadEditor() {
+      const blob = editorDownloadBlob();
+      if (blob.size > MAX_EDITOR_BYTES) { toast('This editor copy exceeds 10 MiB. Reduce large images first.', true); return; }
+      byId('download-editor').disabled = true;
+      try {
+        saveBlob(blob, 'handsondeck-offline.html');
+        byId('editor-download-size').textContent = formatBytes(blob.size);
+        byId('download-status').textContent = 'Download started. This copy contains your current deck. Reopen it in a browser to continue editing offline.';
+        let checksum = '';
+        if (globalThis.crypto?.subtle) {
+          const digest = await crypto.subtle.digest('SHA-256', await blob.arrayBuffer());
+          checksum = 'SHA-256: ' + [...new Uint8Array(digest)].map(value => value.toString(16).padStart(2, '0')).join('');
+        }
+        byId('download-checksum').textContent = checksum;
+      } catch (error) { toast('The browser could not complete the download or checksum. Check your downloads before trying again.', true); }
+      finally { byId('download-editor').disabled = false; }
+    }
+    function restoreSavedProject() {
+      try {
+        const saved = JSON.parse(byId('saved-project').textContent);
+        if (saved.version !== 1 || !Array.isArray(saved.slides) || !saved.slides.length) return false;
+        state.slides = saved.slides;
+        state.dirty = true;
+        state.style = ['executive', 'operational', 'minimal'].includes(saved.style) ? saved.style : 'executive';
+        state.logo = saved.logo === null ? null : DeckCore.deckLogo(saved);
+        state.current = Math.min(Math.max(0, saved.current || 0), saved.slides.length - 1);
+        state.metadata = saved.metadata || state.metadata;
+        const brief = saved.brief || {};
+        byId('purpose').value = brief.purpose || '';
+        byId('audience').value = brief.audience || '';
+        byId('messages').value = brief.messagesText || '';
+        byId('count').value = String(brief.count || 'auto');
+        byId('input-mode').value = brief.inputMode === 'free' ? 'free' : 'structured';
+        byId('brief-style').value = state.style;
+        byId('style-select').value = state.style;
+        updateInputMode(); renderAll();
+        return true;
+      } catch { toast('The saved deck could not be restored. The sample editor is available.', true); return false; }
+    }
+
+    function exportHtml() { return DeckCore.renderDeckHtml(state); }
+
+    function downloadDeck() {
+      if (!state.slides.length) { toast('Add or generate a deck before downloading.', true); return; }
+      const blob = new Blob([exportHtml()], { type: 'text/html;charset=utf-8' });
+      saveBlob(blob, 'handsondeck-presentation.html');
+      toast(`Downloaded one offline HTML deck with ${state.slides.length} slides.`);
+    }
+
+    byId('open-brief').addEventListener('click', () => openDrawer('brief'));
+    byId('open-checks').addEventListener('click', () => openDrawer('checks'));
+    byId('open-branding').addEventListener('click', () => openDrawer('branding'));
+    byId('input-mode').addEventListener('change', updateInputMode);
+    byId('open-offline').addEventListener('click', () => showOfflinePage(byId('offline-page').classList.contains('hidden')));
+    byId('back-to-editor').addEventListener('click', () => showOfflinePage(false));
+    byId('download-editor').addEventListener('click', downloadEditor);
+    byId('choose-logo').addEventListener('click', () => byId('logo-input').click());
+    byId('remove-logo').addEventListener('click', () => setLogo(null));
+    byId('reset-logo').addEventListener('click', () => setLogo(clone(DeckCore.DEFAULT_LOGO)));
+    byId('logo-input').addEventListener('change', event => {
+      const file = event.target.files[0]; event.target.value = '';
+      if (!file) return;
+      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 1024 * 1024) { toast('Choose a PNG, JPEG or WebP logo no larger than 1 MiB.', true); return; }
+      const reader = new FileReader();
+      reader.onerror = () => toast('The logo could not be read. Please try another file.', true);
+      reader.onload = () => {
+        const src = String(reader.result);
+        if (!DeckCore.isEmbeddedImage(src)) { toast('That logo format is not supported.', true); return; }
+        const image = new Image();
+        image.onerror = () => toast('That file could not be decoded as an image.', true);
+        image.onload = () => { setLogo({ src, alt: file.name.replace(/\.[^.]+$/, '') || 'Presentation logo' }); toast('Logo updated on every slide.'); };
+        image.src = src;
+      };
+      reader.readAsDataURL(file);
+    });
+    byId('close-drawer').addEventListener('click', () => byId('drawer-dialog').close());
+    byId('drawer-dialog').addEventListener('click', event => { if (event.target === byId('drawer-dialog')) byId('drawer-dialog').close(); });
+    byId('generate').addEventListener('click', () => generateDeck(false));
+    byId('reset').addEventListener('click', () => { if (state.dirty && !window.confirm('Resetting will replace your on-slide edits. Continue?')) return; applySample(); generateDeck(true); toast('Sample brief restored.'); });
+    byId('add-slide').addEventListener('click', addSlide);
+    byId('slide-up').addEventListener('click', () => moveSlide(-1));
+    byId('slide-down').addEventListener('click', () => moveSlide(1));
+    byId('duplicate-slide').addEventListener('click', duplicateSlide);
+    byId('delete-slide').addEventListener('click', deleteSlide);
+    byId('previous').addEventListener('click', () => selectSlide(state.current - 1));
+    byId('next').addEventListener('click', () => selectSlide(state.current + 1));
+    byId('layout-select').addEventListener('change', event => { const slide = currentSlide(); if (!slide) return; slide.kind = event.target.value; markEdited(); renderAll(); });
+    byId('style-select').addEventListener('change', event => { state.style = event.target.value; byId('brief-style').value = state.style; markEdited(); renderAll(); toast(`Changed the deck to ${state.style} style.`); });
+    byId('brief-style').addEventListener('change', event => { state.style = event.target.value; byId('style-select').value = state.style; renderAll(); });
+    byId('element-up').addEventListener('click', () => moveBlock(-1));
+    byId('element-down').addEventListener('click', () => moveBlock(1));
+    byId('duplicate-element').addEventListener('click', duplicateBlock);
+    byId('delete-element').addEventListener('click', deleteBlock);
+    byId('add-element').addEventListener('click', () => byId('element-menu').classList.contains('hidden') ? openElementMenu() : closeElementMenu());
+    byId('element-search').addEventListener('input', event => renderElementOptions(event.target.value));
+    document.addEventListener('click', event => { if (!byId('element-menu').contains(event.target) && !byId('add-element').contains(event.target)) closeElementMenu(); });
+    byId('image-input').addEventListener('change', event => {
+      const file = event.target.files[0], block = selectedBlock();
+      if (!file || !block || block.type !== 'image') return;
+      if (file.size > 8 * 1024 * 1024) { toast('Choose an image smaller than 8 MB for a portable offline deck.', true); event.target.value = ''; return; }
+      const reader = new FileReader();
+      reader.onload = () => { block.src = String(reader.result); block.alt = block.alt || file.name.replace(/\.[^.]+$/, ''); markEdited(); renderAll(); toast('Image added to the slide.'); };
+      reader.readAsDataURL(file); event.target.value = '';
+    });
+    byId('download').addEventListener('click', downloadDeck);
+    byId('present').addEventListener('click', () => {
+      if (!byId('offline-page').classList.contains('hidden')) showOfflinePage(false);
+      const frame = byId('slide-frame');
+      if (frame.requestFullscreen) frame.requestFullscreen().then(scheduleFit).catch(() => toast('Presentation mode could not be opened.', true));
+    });
+    document.addEventListener('keydown', event => {
+      const editing = event.target.closest('[contenteditable], input, textarea, select');
+      if (event.key === 'Escape') { closeElementMenu(); if (byId('drawer-dialog').open) byId('drawer-dialog').close(); }
+      if (!editing && ['ArrowRight', 'PageDown'].includes(event.key)) { event.preventDefault(); selectSlide(state.current + 1); }
+      if (!editing && ['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); selectSlide(state.current - 1); }
+    });
+    window.addEventListener('resize', scheduleFit);
+    document.addEventListener('fullscreenchange', scheduleFit);
+
+    applySample();
+    if (!restoreSavedProject()) generateDeck(true);
+    renderElementOptions();
+  </script>
+</body>
+</html>

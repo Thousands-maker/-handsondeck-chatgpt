@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "handsondeck": {
+      "command": "node",
+      "args": ["/absolute/path/to/hands-on-deck/mcp/server.mjs", "--enable"]
+    }
+  }
+}

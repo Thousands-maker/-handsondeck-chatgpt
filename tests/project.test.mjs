@@ -1,0 +1,169 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
+import vm from 'node:vm';
+import core from '../core/deck-core.cjs';
+import { callTool, validatePlan } from '../mcp/tools.mjs';
+
+const root = new URL('../', import.meta.url);
+const read = path => readFileSync(new URL(path, root), 'utf8');
+const html = read('index.html');
+const scripts = [...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)].filter(m => !m[1].includes('application/json')).map(m => m[2]);
+const sample = { purpose: 'Approve a small pilot', audience: 'Project team', messages: 'Clear ownership\n- One owner per task\nShort feedback cycles\n- Review weekly', count: 5 };
+const samplePlan = () => callTool('create_deck_plan', sample);
+
+test('page numbering excludes every title and cover and follows reorder and deletion', () => {
+  const slides = ['title', 'content', 'cover', 'statement', 'content', 'cover'].map(kind => ({ kind, title: kind, eyebrow: '', blocks: [] }));
+  const numbers = value => value.map((slide, index) => core.slidePageNumber(value, index));
+  assert.deepEqual(numbers(slides), [null, 1, null, 2, 3, null]);
+  const moved = [slides[5], slides[3], slides[0], slides[1], slides[4]];
+  assert.deepEqual(numbers(moved), [null, 1, null, 2, 3]);
+  moved.splice(1, 1);
+  assert.deepEqual(numbers(moved), [null, null, 1, 2]);
+  const output = core.renderDeckHtml({ style: 'executive', slides });
+  const sections = [...output.matchAll(/<section\b[^>]*>([\s\S]*?)<\/section>/g)].map(match => match[1]);
+  assert.equal(sections.length, 6);
+  assert.deepEqual(sections.map(section => section.match(/class="number"[^>]*>(\d+)</)?.[1] || null), [null, '1', null, '2', '3', null]);
+});
+
+test('logos are embedded, replaceable and removable in every exported slide', () => {
+  const plan = samplePlan();
+  const output = core.renderDeckHtml(plan);
+  assert.equal([...output.matchAll(/class="slide-logo"/g)].length, plan.slides.length);
+  assert.ok(output.includes(core.DEFAULT_LOGO.src));
+  assert.ok(callTool('render_deck', { plan: { ...plan, logo: core.DEFAULT_LOGO } }).html.includes(core.DEFAULT_LOGO.src));
+  assert.throws(() => callTool('render_deck', { plan: { ...plan, logo: { src: 'data:image/svg+xml,<svg onload="alert(1)"/>' } } }), /embedded/);
+  const custom = { src: 'data:image/png;base64,iVBORw0KGgo=', alt: 'Example <brand>' };
+  const replaced = callTool('render_deck', { plan: { ...plan, logo: custom } }).html;
+  assert.ok(replaced.includes('Example &lt;brand&gt;'));
+  assert.ok(!replaced.includes(core.DEFAULT_LOGO.src));
+  assert.doesNotMatch(core.renderDeckHtml({ ...plan, logo: null }), /class="slide-logo"/);
+  assert.throws(() => callTool('render_deck', { plan: { ...plan, logo: { src: 'https://example.com/logo.png' } } }), /embedded/);
+});
+
+test('free text organisation retains sentence wording, numbers, negation and paragraph order', () => {
+  const source = 'The pilot costs $1.25 million. Do not expand before review.\n\nWe need an owner. The deadline is 13 October.\n- Preserve this separate point.';
+  const groups = core.organiseFreeText(source);
+  assert.deepEqual(groups.flatMap(group => group.points), ['The pilot costs $1.25 million.', 'Do not expand before review.', 'We need an owner.', 'The deadline is 13 October.', 'Preserve this separate point.']);
+  const result = callTool('create_deck_plan', { ...sample, inputMode: 'free', messages: source });
+  const exported = core.renderDeckHtml(result);
+  for (const point of groups.flatMap(group => group.points)) assert.ok(exported.includes(core.escapeHtml(point)));
+  assert.deepEqual(core.organiseFreeText(' \n '), []);
+  assert.throws(() => core.organiseFreeText('x'.repeat(20001)), /20,000/);
+});
+
+test('downloaded editable copies retain the full project without corrupting executable scripts', () => {
+  const plan = samplePlan();
+  const snapshot = { version: 1, ...plan, logo: core.DEFAULT_LOGO, current: 2, brief: { purpose: '</script><script>alert(1)</script>', messagesText: 'A & B < C', inputMode: 'free' } };
+  const copy = core.embedEditorProject(html, snapshot);
+  const data = copy.match(/^<script id="saved-project" type="application\/json">([\s\S]*?)<\/script>/m);
+  assert.ok(data);
+  assert.deepEqual(JSON.parse(data[1]), snapshot);
+  assert.ok(!data[1].includes('<script>'));
+  const copyScripts = [...copy.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)].filter(m => !m[1].includes('application/json')).map(m => m[2]);
+  assert.deepEqual(copyScripts, scripts);
+  copyScripts.forEach(script => new vm.Script(script));
+  const again = core.embedEditorProject(copy, { ...snapshot, current: 1 });
+  assert.ok(again.length < copy.length + 10);
+  assert.ok(new Blob([copy]).size < 10 * 1024 * 1024);
+});
+
+test('standalone builds match and both inline scripts parse', () => {
+  assert.equal(html, read('dist/index.html'));
+  assert.equal(scripts.length, 2);
+  scripts.forEach(script => new vm.Script(script));
+  assert.equal(scripts[0].trim(), read('core/deck-core.cjs').trim());
+  assert.ok(html.includes("connect-src 'none'"));
+  assert.doesNotMatch(html, /<(?:script|img|link)[^>]+(?:src|href)=["']https?:/i);
+  assert.doesNotMatch(html, /\b(?:fetch|XMLHttpRequest|WebSocket)\s*\(/);
+});
+
+test('browser and server use the same callable core', () => {
+  const browserContext = vm.createContext({});
+  vm.runInContext(scripts[0], browserContext);
+  assert.deepEqual(Object.keys(browserContext.DeckCore), Object.keys(core));
+  const plan = samplePlan();
+  assert.equal(browserContext.DeckCore.renderDeckHtml(plan), core.renderDeckHtml(plan));
+});
+
+test('short decks retain every supplied message and point', () => {
+  const messages = Array.from({ length: 8 }, (_, i) => `Message ${i + 1}\n- Evidence ${i + 1}`).join('\n');
+  const plan = callTool('create_deck_plan', { ...sample, messages, count: 3 });
+  assert.equal(plan.slides.length, 3);
+  const output = callTool('render_deck', { plan }).html;
+  for (let i = 1; i <= 8; i++) {
+    assert.ok(output.includes(`Message ${i}`));
+    assert.ok(output.includes(`Evidence ${i}`));
+  }
+});
+
+test('every editor element exports with safe text', () => {
+  const types = ['paragraph', 'bullets', 'quote', 'callout', 'stat', 'columns', 'cards', 'chart', 'table', 'image', 'divider'];
+  const plan = samplePlan();
+  plan.slides[0].blocks = types.map(type => core.newBlock(type));
+  plan.slides[0].title = '</script><img src=x onerror=alert(1)>';
+  const output = callTool('render_deck', { plan }).html;
+  assert.ok(output.includes('&lt;/script&gt;&lt;img'));
+  assert.ok(!output.includes('<img src=x'));
+  assert.equal([...output.matchAll(/<script>/g)].length, 1);
+  assert.equal([...output.matchAll(/<\/script>/g)].length, 1);
+  new vm.Script(output.match(/<script>([\s\S]*?)<\/script>/)[1]);
+});
+
+test('MCP rejects unsafe image sources and invalid layout metadata', () => {
+  const plan = samplePlan();
+  const image = core.newBlock('image');
+  image.src = 'https://example.com/image.png';
+  plan.slides[0].blocks = [image];
+  assert.throws(() => validatePlan(plan), /embedded/);
+  image.src = 'data:image/png;base64,iVBORw0KGgo=';
+  assert.equal(validatePlan(plan), plan);
+  plan.style = 'executive" onload="alert(1)';
+  assert.throws(() => validatePlan(plan), /Style/);
+});
+
+test('review reports content problems without changing the plan', () => {
+  const plan = samplePlan();
+  plan.slides[0].title = '';
+  plan.slides[0].blocks = [{ id: 'text', type: 'paragraph', text: 'word '.repeat(100) }];
+  const before = JSON.stringify(plan);
+  const result = callTool('review_deck', { plan });
+  assert.ok(result.warnings.some(v => v.message === 'Add a headline.'));
+  assert.ok(result.warnings.some(v => v.message.includes('100 content words')));
+  assert.equal(JSON.stringify(plan), before);
+});
+
+test('MCP remains off unless explicitly enabled', () => {
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('mcp/server.mjs', root))], { encoding: 'utf8', timeout: 5000 });
+  assert.equal(result.status, 2);
+  assert.equal(result.stdout, '');
+  assert.match(result.stderr, /MCP is off/);
+});
+
+test('MCP handshake, tools, validation, and EOF shutdown work', () => {
+  const requests = [
+    { jsonrpc: '2.0', id: 1, method: 'tools/list' },
+    { jsonrpc: '2.0', id: 2, method: 'initialize', params: { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'test', version: '1' } } },
+    { jsonrpc: '2.0', method: 'notifications/initialized' },
+    { jsonrpc: '2.0', id: 3, method: 'tools/list' },
+    { jsonrpc: '2.0', id: 4, method: 'tools/call', params: { name: 'create_deck_plan', arguments: sample } },
+    { jsonrpc: '2.0', id: 5, method: 'tools/call', params: { name: 'render_deck', arguments: { plan: samplePlan() } } },
+    { jsonrpc: '2.0', id: 6, method: 'tools/call', params: { name: 'create_deck_plan', arguments: { purpose: '', messages: '' } } },
+    { jsonrpc: '2.0', id: 7, method: 'tools/call', params: { name: 'publish', arguments: {} } }
+  ];
+  const input = requests.map(v => JSON.stringify(v)).join('\n') + '\n';
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('mcp/server.mjs', root)), '--enable'], { input, encoding: 'utf8', timeout: 5000, maxBuffer: 1024 * 1024 });
+  assert.equal(result.status, 0);
+  assert.equal(result.stderr, '');
+  const replies = result.stdout.trim().split('\n').map(v => JSON.parse(v));
+  assert.equal(replies.length, 7);
+  assert.equal(replies[0].error.code, -32000);
+  assert.equal(replies[1].result.protocolVersion, '2025-11-25');
+  assert.equal(replies[2].result.tools.length, 3);
+  assert.equal(replies[3].result.structuredContent.slides.length, 5);
+  assert.match(replies[4].result.structuredContent.html, /^<!doctype html>/);
+  assert.equal(replies[5].result.isError, true);
+  assert.equal(replies[6].error.code, -32602);
+});
