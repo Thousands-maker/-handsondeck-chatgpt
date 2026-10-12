@@ -14,12 +14,13 @@ Open **index.html** in your browser. No installation, account, server or interne
 
 The editor includes text, bullets, quotes, callouts, statistics, columns, cards, tables, bar charts, local images and dividers. You can reorder, duplicate and remove slides and elements, and choose Executive, Operational or Minimal styling.
 
-Generation uses fixed local rules. Free text organisation preserves sentence wording; it does not perform AI rewriting or factual verification. No AI model is connected or downloaded. Briefs and edits remain in browser memory; **download your work before closing or refreshing the page**. An exported presentation is for viewing. An offline editor copy includes a snapshot you can reopen and edit. Save a fresh copy after further edits; the file on disk does not update itself.
+The standalone editor's built-in generation uses fixed local rules. Free text organisation preserves sentence wording; it does not perform AI rewriting or factual verification. The optional MCP integration lets a separately configured AI application or agent supply intelligent synthesis and use the deck tools. No model is bundled with or automatically connected to the editor.
+
+Briefs and edits remain in browser memory; **download your work before closing or refreshing the page**. An exported presentation is for viewing. An offline editor copy includes a snapshot you can reopen and edit. Save a fresh copy after further edits; the file on disk does not update itself.
 
 ## Logo and page numbers
 
 The **Logo** control replaces or removes the neutral Hands on Deck placeholder. All logos are embedded for offline use. Title/front and Cover layouts have no page number; Content and Statement slides count from 1 and renumber after reordering or deletion. Select **Cover** for an unnumbered closing slide.
-
 
 ## Offline downloads
 
@@ -27,9 +28,13 @@ The **Offline** screen shows the actual editor-copy size before downloading. Cop
 
 See [offline behaviour and optional local AI design](docs/OFFLINE.md) for capabilities and limitations. A local AI model is a future option, not an implemented feature in this version.
 
-## Optional MCP server — off by default
+## Connect an AI model or agent through MCP
 
-The separate local server in `mcp/` lets a compatible MCP client create a deck plan, render it to offline HTML or review it. It is never started by the editor or the published site. No network port is opened and no client configuration is installed automatically.
+The purpose of `mcp/` is to expose Hands on Deck's tools to an AI application or agent. The host runs the chosen model, turns free text into a proposed deck and can iterate through review and revision before rendering. MCP provides the tool connection; it does not itself supply the model.
+
+A compatible host can call `create_deck_plan` for an optional basic starting structure, or author a plan directly using the published slide and block schemas. It can then call `review_deck` and `render_deck`. Model selection, provider credentials and agent orchestration are configured in that host. Cloud inference needs internet; a fully local host and preinstalled model can use the local tools offline.
+
+The server is **off by default** and uses local stdio. It is never started by the editor or the published site. No network port is opened and no client configuration is installed automatically. The current integration returns plans and standalone presentation HTML; it does not yet read or edit the open browser deck live.
 
 See [MCP setup](docs/MCP.md) to enable it deliberately, then stop it when finished. The editor itself still requires no Node.js installation.
 

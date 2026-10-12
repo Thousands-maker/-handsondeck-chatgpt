@@ -20,7 +20,17 @@ Choose **Free text** in the Brief drawer to organise up to 20,000 characters int
 
 This is a basic rule-based starting point. It does not infer the main argument, rewrite or summarise it intelligently, fact-check statements or use a language model. Review the structure and edit the wording before presenting.
 
-## Optional local AI: future design
+## AI and agents through MCP
+
+The optional local MCP server lets a compatible AI application or agent use the deck tools. The connected host supplies the model and can synthesise the user's brief, author a plan, review it and render a standalone presentation. This is separate from the basic free-text organiser in the HTML editor.
+
+- A host using a cloud model needs internet while generating or revising content.
+- A fully local host with its model already installed can run inference and the local MCP tools without internet, provided the host has no other network dependencies.
+- The resulting self-contained presentation can be viewed offline regardless of where it was generated.
+
+MCP does not download a model for the user. Configure the host and model separately using [MCP setup](MCP.md). This version does not synchronise a connected agent's plan with an open browser editor.
+
+## Optional AI inside the browser: future design
 
 True offline synthesis is possible with a language model running on the device. A browser implementation could use WebLLM and WebGPU to turn free text into a structured deck plan. This version does **not** install, download or run such a model.
 

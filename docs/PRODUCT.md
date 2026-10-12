@@ -20,8 +20,15 @@ Both groups use the same brief, with structured and free-text input formats. The
 - Text rendered safely and local images embedded in exports.
 - Replaceable embedded logo; title/front and cover slides excluded from page numbering.
 - Explicit offline-editor download with the current editable deck and a 10 MiB size cap.
-- No runtime CDNs, remote fonts, analytics, accounts or model calls.
-- Optional automation kept separate from the everyday editing workflow.
+- The standalone editor needs no runtime CDNs, remote fonts, analytics, accounts or model calls.
+- Optional MCP tools let a connected AI application or agent synthesise a brief, propose a deck, review it and render a presentation.
+- Model selection and agent orchestration belong to the connected host; the manual offline editor remains usable independently.
+
+## AI and agent integration
+
+MCP is the integration interface for an AI application or agent to use Hands on Deck. The connected host runs a cloud or local model and supplies the reasoning and writing. The MCP server exposes deck planning, content review and HTML rendering. An agent can author its own plan, call review, revise the plan and render again; the fixed-rule planner is an optional starting point.
+
+The current interface is a local stdio server. It accepts explicitly supplied data and returns results. A live connection to the browser's current deck, an in-editor model selector and a remote HTTP MCP endpoint are not implemented.
 
 ## Current limits
 
@@ -34,6 +41,7 @@ The editor has no autosave, cloud storage, collaboration, PowerPoint export or f
 3. Improve prompts, empty states and content-fitting feedback.
 4. Evaluate additional export formats through real usage.
 5. Evaluate an optional browser-local AI download with explicit consent, a verified complete asset manifest, size limits and device testing before describing it as ready offline.
+6. Add a connection for a configured AI host or agent to read and update the current editor deck, with visible connection state and a way to disconnect.
 
 ## Useful measures
 

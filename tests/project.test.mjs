@@ -142,6 +142,36 @@ test('MCP remains off unless explicitly enabled', () => {
   assert.match(result.stderr, /MCP is off/);
 });
 
+test('MCP accepts a custom agent plan for review, revision and rendering without the rule-based planner', () => {
+  const initial = { style: 'minimal', logo: null, slides: [
+    { kind: 'title', eyebrow: 'Proposal', title: 'A bounded pilot', blocks: [{ type: 'paragraph', text: 'For the project team' }] },
+    { kind: 'content', eyebrow: 'Decision', title: '', blocks: [{ type: 'bullets', items: ['Confirm an owner', 'Review before expansion'] }] }
+  ] };
+  const revised = JSON.parse(JSON.stringify(initial));
+  revised.slides[1].title = 'Confirm ownership before starting';
+  const requests = [
+    { jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'agent-workflow-test', version: '1' } } },
+    { jsonrpc: '2.0', method: 'notifications/initialized' },
+    { jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'review_deck', arguments: { plan: initial } } },
+    { jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'review_deck', arguments: { plan: revised } } },
+    { jsonrpc: '2.0', id: 4, method: 'tools/call', params: { name: 'render_deck', arguments: { plan: revised } } }
+  ];
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('mcp/server.mjs', root)), '--enable'], {
+    input: requests.map(value => JSON.stringify(value)).join('\n') + '\n', encoding: 'utf8', timeout: 5000, maxBuffer: 1024 * 1024
+  });
+  assert.equal(result.status, 0);
+  assert.equal(result.stderr, '');
+  const replies = result.stdout.trim().split('\n').map(value => JSON.parse(value));
+  assert.equal(replies.length, 4);
+  assert.deepEqual(replies[1].result.structuredContent.warnings, [{ slide: 2, message: 'Add a headline.' }]);
+  assert.deepEqual(replies[2].result.structuredContent.warnings, []);
+  const output = replies[3].result.structuredContent.html;
+  for (const text of ['A bounded pilot', 'Confirm ownership before starting', 'Confirm an owner', 'Review before expansion']) assert.ok(output.includes(text));
+  assert.equal([...output.matchAll(/<section class="slide /g)].length, 2);
+  assert.doesNotMatch(output, /class="slide-logo"/);
+  assert.match(output, /class="number" aria-label="Page 1">1</);
+});
+
 test('MCP handshake, tools, validation, and EOF shutdown work', () => {
   const requests = [
     { jsonrpc: '2.0', id: 1, method: 'tools/list' },

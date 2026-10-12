@@ -37,11 +37,11 @@ function receive(line) {
     }
     initialised = true;
     reply({ protocolVersion: version, capabilities: { tools: {} },
-      serverInfo: { name: 'handsondeck', version: '0.2.0' },
-      instructions: 'Local tools accept only explicitly supplied briefs and deck plans. They do not access the browser, save files or publish content.' });
+      serverInfo: { name: 'handsondeck', version: '0.3.0' },
+      instructions: 'Hands on Deck tools for connected AI hosts and agents. Use the host model to synthesise the user brief into a plan using the advertised slide and block schemas. create_deck_plan is an optional rule-based starting point. Call review_deck, revise the plan in the host, then call render_deck to obtain standalone offline HTML. Model selection, inference and agent orchestration belong to the host. These tools do not access an open browser, save files or publish content.' });
     return;
   }
-  // Modern clients can fall back to the supported legacy handshake.
+  // This server implements the 2025-11-25 handshake; the host must support it.
   if (request.method === 'server/discover') { fail(id, -32601, 'Use the MCP 2025-11-25 initialize handshake.'); return; }
   if (!ready) { fail(id, -32000, 'Initialise the connection before calling tools.'); return; }
   if (request.method === 'tools/list') { reply({ tools }); return; }
