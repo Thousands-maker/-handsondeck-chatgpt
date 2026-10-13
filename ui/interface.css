@@ -233,6 +233,11 @@ a { color:var(--accent); text-underline-offset:3px; }
 .ai-status.is-error { color:#9a352e; border-color:#edc8c5; background:#fff3f1; }
 .ai-small-actions { display:flex; flex-wrap:wrap; gap:10px 20px; margin-bottom:12px; }
 .ai-compose-bottom { display:flex; align-items:end; justify-content:space-between; gap:12px; margin-bottom:16px; }
+.ai-writing { border:1px solid #d5e1f3; border-radius:8px; background:#edf3fe; padding:14px 16px; margin:16px 0; color:#395d8f; }
+.ai-writing p { margin:0; font-size:13px; line-height:1.6; }
+.ai-writing progress { display:block; width:100%; height:8px; accent-color:var(--accent); margin:12px 0; }
+.ai-writing .text-button { min-height:44px; }
+.ai-writing [hidden] { display:none; }
 .ai-result { padding:28px; border:1px solid #b7ccec; border-radius:10px; background:white; margin-top:26px; }
 .ai-result > p { color:var(--muted); font-size:13px; line-height:1.7; }
 .ai-result details { font-size:13px; margin-top:20px; }

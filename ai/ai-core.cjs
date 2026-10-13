@@ -3,6 +3,24 @@
   'use strict';
   const MAX_INPUT = 2400;
   const MAX_DOWNLOAD = 1024 * 1024 * 1024;
+  // Conservative per-buffer gate, not a measurement of available graphics RAM.
+  const PRO_BUFFER_MIN = 1024 ** 3;
+  function devicePolicy(device = {}, limits) {
+    const ua = device.userAgent || '';
+    const mobile = device.userAgentData?.mobile === true || /Android|iPhone|iPad|iPod|Mobile|Tablet|Kindle|Silk|PlayBook/i.test(ua)
+      || (/Mac/i.test(device.platform || '') && device.maxTouchPoints > 1);
+    const lowMemory = Number(device.deviceMemory) > 0 && Number(device.deviceMemory) < 8;
+    const desktop = !mobile && /Windows NT|Macintosh|X11|CrOS|Linux (?:x86_64|i686)|Win32|MacIntel/i.test(ua + ' ' + (device.platform || ''));
+    const buffersFit = Number(limits?.maxBufferSize) >= PRO_BUFFER_MIN && Number(limits?.maxStorageBufferBindingSize) >= PRO_BUFFER_MIN;
+    const allowPro = desktop && !lowMemory && buffersFit;
+    const reason = mobile ? 'phone' : lowMemory ? 'memory' : !desktop ? 'unknown' : !buffersFit ? 'graphics' : 'desktop';
+    return { mobile, lowMemory, allowPro, compact: !allowPro, reason };
+  }
+  function generationSettings(compact = true) {
+    return compact
+      ? { context_window_size: 2048, max_tokens: 256 }
+      : { context_window_size: 4096, max_tokens: 320 };
+  }
   const hex = bytes => Array.from(new Uint8Array(bytes), b => b.toString(16).padStart(2, '0')).join('');
   async function verify(bytes, asset) {
     if (bytes.byteLength !== asset.bytes) throw new Error('The download is incomplete. Retry to resume verified files.');
@@ -57,7 +75,7 @@
       return { title: clean(slide.title, 180), points: slide.points.map(point => clean(point, 700)) };
     });
   }
-  const api = { MAX_INPUT, MAX_DOWNLOAD, verify, validateManifest, downloadAsset, parseProposal };
+  const api = { MAX_INPUT, MAX_DOWNLOAD, PRO_BUFFER_MIN, devicePolicy, generationSettings, verify, validateManifest, downloadAsset, parseProposal };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.HandsAI = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

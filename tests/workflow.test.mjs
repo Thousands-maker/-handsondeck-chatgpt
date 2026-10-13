@@ -7,7 +7,7 @@ import vm from 'node:vm';
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const scripts = [...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)].filter(m => !m[1].includes('application/json')).map(m => m[2]);
 
-function setup(seed, blocked = false) {
+function setup(seed, blocked = false, globals = {}) {
   const nodes = [], ids = new Map(), storage = new Map(seed ? [['hands-on-deck-recovery-v1', seed]] : []);
   class Node {
     constructor(tag, attributes = {}) { this.tagName = tag.toUpperCase(); this.attributes = attributes; this.dataset = {}; this.children = []; this.style = {}; this.listeners = {}; this.value = attributes.value || ''; this.checked = 'checked' in attributes; this.hidden = 'hidden' in attributes; this.disabled = 'disabled' in attributes; this.textContent = ''; this.className = attributes.class || ''; this.maxLength = Number(attributes.maxlength) || 524288; this.open = false; this.id = attributes.id;
@@ -51,8 +51,8 @@ function setup(seed, blocked = false) {
     addEventListener() {}, visibilityState:'visible' };
   const context = vm.createContext({ document, console, Blob, URL, TextEncoder, structuredClone,
     window:{ addEventListener() {}, confirm:() => true, clearTimeout() {}, setTimeout:() => 1, requestAnimationFrame:() => 1 },
-    navigator:{}, location:{ protocol:'file:' }, setTimeout:() => 1, clearTimeout() {}, requestAnimationFrame:() => 1, cancelAnimationFrame() {},
-    localStorage:{ getItem:k => { if (blocked) throw Error('blocked'); return storage.get(k) ?? null; }, setItem:(k,v) => { if (blocked) throw Error('blocked'); storage.set(k,v); }, removeItem:k => storage.delete(k) } });
+    navigator:{}, location:{ protocol:'file:' }, setTimeout:() => 1, clearTimeout() {}, setInterval:() => 1, clearInterval() {}, requestAnimationFrame:() => 1, cancelAnimationFrame() {},
+    localStorage:{ getItem:k => { if (blocked) throw Error('blocked'); return storage.get(k) ?? null; }, setItem:(k,v) => { if (blocked) throw Error('blocked'); storage.set(k,v); }, removeItem:k => storage.delete(k) }, ...globals });
   for (const script of scripts) vm.runInContext(script,context);
   return { get:id => ids.get(id), run:code => vm.runInContext(code,context), storage };
 }
@@ -217,4 +217,166 @@ test('guided notes show their ideas live, preserve typed follow-ups, and build f
   app.run('saveRecovery()');
   const reopened = setup(app.storage.get('hands-on-deck-recovery-v1'));
   assert.ok(reopened.get('messages').value.includes('not yet agreed'));
+});
+
+// Controllable workers and timers exercise recovery without requiring a GPU.
+function localAIApp({ desktop = false, memory = 4, limits = { maxBufferSize: 2 ** 30, maxStorageBufferBindingSize: 2 ** 30 }, dispose = true } = {}) {
+  const workers = [], downloads = [], warnings = [], timers = new Map(), stores = new Map(); let timerId = 0;
+  class Worker {
+    constructor() { this.messages = []; workers.push(this); }
+    postMessage(message) {
+      this.messages.push(message);
+      if (message.type === 'dispose' && dispose) queueMicrotask(() => this.emit({ type: 'disposed' }));
+    }
+    emit(data) { this.onmessage?.({ data }); }
+    terminate() { this.terminated = true; }
+  }
+  const cacheApi = { keys: async () => [...stores.keys()], delete: async name => stores.delete(name), open: async name => {
+    if (!stores.has(name)) stores.set(name, new Map());
+    const store = stores.get(name);
+    return { keys: async () => [...store.keys()].map(url => ({ url })), match: async url => store.get(url),
+      put: async (url, response) => store.set(url, response), delete: async url => store.delete(url) };
+  } };
+  const app = setup(undefined, false, { Worker, Response, AbortController, caches: cacheApi,
+    navigator: { userAgent: desktop ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' : 'Mozilla/5.0 (Linux; Android 14; Pixel 8) Mobile',
+      userAgentData: { mobile: !desktop }, deviceMemory: memory,
+      gpu: { requestAdapter: async () => ({ limits, features: new Set(['shader-f16']) }) }, serviceWorker: {} },
+    location: { protocol: 'https:', href: 'https://example.test/app/' },
+    console: { ...console, warn: (...args) => warnings.push(args.map(String).join(' ')) },
+    setTimeout: (fn, ms) => { timers.set(++timerId, { fn, ms }); return timerId; }, clearTimeout: id => timers.delete(id),
+    setInterval: (fn, ms) => { timers.set(++timerId, { fn, ms, interval: true }); return timerId; }, clearInterval: id => timers.delete(id),
+    download: async asset => { downloads.push(asset.url); return new Uint8Array([1]); }
+  });
+  app.run("loadExample('decision'); aiCopyBrief(); aiDeviceOptions(); aiState.model = aiSelected();");
+  app.run('aiPrepareShell = async () => {}; HandsAI.downloadAsset = download;');
+  return { ...app, workers, downloads, warnings, timers, stores,
+    boot() { app.run('aiBoot(aiState.model)'); workers.at(-1).emit({ type: 'ready' }); },
+    async settle() { await new Promise(resolve => setImmediate(resolve)); },
+    fire(ms) { const entry = [...timers.entries()].find(([, timer]) => timer.ms === ms); assert.ok(entry, `Expected ${ms}ms timer`); if (!entry[1].interval) timers.delete(entry[0]); entry[1].fn(); }
+  };
+}
+
+const lostGPU = { type: 'error', kind: 'gpu', detail: "Failed to execute 'mapAsync' on 'GPUBuffer': Buffer was unmapped before mapping was resolved." };
+const completeOutline = { slides: Array.from({ length: 4 }, (_, index) => ({ title: `Supplied theme ${index + 1}`, points: ['Keep this supplied qualification.'] })) };
+
+test('phone installation downloads only 0.5B even if a stale Pro selection is forced', async () => {
+  const app = localAIApp();
+  const smallUrls = JSON.parse(app.run('JSON.stringify(aiCatalogue().models[0].assets.map(asset => asset.url))'));
+  assert.equal(app.get('ai-model').children.length, 1); assert.equal(app.get('ai-pro-name').hidden, true);
+  assert.match(app.get('ai-device-note').textContent, /phone or tablet.*0.5B/);
+  app.get('ai-model').value = '1';
+  await app.run('aiInstall()');
+  assert.deepEqual(app.downloads, smallUrls);
+  assert.match(app.workers[0].messages[0].model.id, /0\.5B/);
+  assert.equal(app.workers[0].messages[0].settings.context_window_size, 2048);
+  assert.equal(app.get('ai-download-size').textContent, '283.1 MiB');
+  assert.equal(app.workers[0].messages[0].settings.max_tokens, 256);
+});
+
+test('a checked desktop can select Pro; either insufficient buffer removes it before installation', async () => {
+  const app = localAIApp({ desktop: true, memory: 8 });
+  await app.run('aiRefresh()');
+  assert.equal(app.get('ai-model').children.length, 2);
+  app.get('ai-model').value = '1'; await app.run('aiRefresh()');
+  assert.match(app.run('aiSelected().id'), /1\.5B/);
+  // A later adapter check must enforce limits again, before downloading anything.
+  app.run('navigator.gpu.requestAdapter = async () => ({ limits: {maxBufferSize: 1073741824, maxStorageBufferBindingSize: 134217728}, features: new Set(["shader-f16"]) })');
+  await app.run('aiInstall()');
+  assert.equal(app.get('ai-model').children.length, 1);
+  assert.match(app.workers[0].messages[0].model.id, /0\.5B/);
+});
+
+test('outline generation immediately disables repeat submission and shows slide progress and cancellation beside it', () => {
+  const app = localAIApp(); app.boot();
+  app.get('ai-generate').click();
+  assert.equal(app.get('ai-generate').disabled, true); assert.equal(app.get('ai-writing').hidden, false);
+  assert.equal(app.get('ai-generation-cancel').hidden, false);
+  assert.match(app.get('ai-writing-status').textContent, /slide 1 of 4/);
+  const request = app.workers[0].messages.at(-1);
+  app.get('ai-generate').click(); assert.equal(app.workers[0].messages.at(-1), request);
+  app.workers[0].emit({ type: 'writing', requestId: request.requestId, slide: 2, tokens: 16 });
+  assert.match(app.get('ai-writing-status').textContent, /slide 2 of 4.*drafting points/);
+  assert.equal(app.get('ai-writing-progress').value, 1);
+  app.get('ai-generation-cancel').click();
+  assert.equal(app.get('ai-generation-cancel').hidden, true);
+  assert.match(app.get('ai-writing-status').textContent, /Cancelled.*notes and deck are safe/);
+  assert.equal(app.run('aiState.request'), null);
+});
+
+test('two GPU failures retry the identical source once from cache, then return a safe Standard proposal', async () => {
+  const app = localAIApp(); app.boot();
+  const oldDeck = app.run('JSON.stringify(state.slides)'), notes = app.get('ai-notes').value;
+  app.get('ai-generate').click(); const firstRequest = app.workers[0].messages.at(-1);
+  app.workers[0].emit(lostGPU);
+  assert.equal(app.get('ai-generate').disabled, true);
+  assert.match(app.get('ai-writing-status').textContent, /Reloading.*once/);
+  await app.settle();
+  assert.equal(app.workers[0].terminated, true);
+  assert.equal(app.workers[0].messages.at(-1).type, 'dispose');
+  assert.equal(app.workers.length, 2); assert.equal(app.downloads.length, 0);
+  assert.match(app.workers[1].messages[0].model.id, /0\.5B/);
+  app.workers[1].emit({ type: 'ready' });
+  assert.deepEqual(app.workers[1].messages.at(-1), firstRequest);
+  app.workers[1].emit({ type: 'error', kind: 'gpu', detail: 'GPU device lost: simulated reset' });
+  await app.settle();
+  assert.equal(app.workers.length, 2); assert.equal(app.workers[1].terminated, true);
+  assert.equal(app.run('JSON.stringify(state.slides)'), oldDeck); assert.equal(app.get('ai-notes').value, notes);
+  assert.equal(app.get('ai-result').hidden, false); assert.equal(app.get('ai-apply').disabled, false);
+  assert.match(app.get('ai-result-title').textContent, /Standard/);
+  assert.match(app.get('ai-writing-status').textContent, /standard sorting.*notes are safe/);
+  assert.doesNotMatch(app.get('ai-writing-status').textContent + app.get('ai-status').textContent, /mapAsync|GPUBuffer|simulated reset/);
+  assert.ok(app.warnings.some(line => line.includes('mapAsync')));
+  const expectedSlides = JSON.parse(app.run('JSON.stringify(aiState.fallbackPlan.slides, (key, value) => key === "id" ? undefined : value)'));
+  app.get('ai-apply').click();
+  assert.equal(app.get('messages').value, notes); assert.match(app.get('editor-heading').textContent, /Standard/);
+  assert.deepEqual(JSON.parse(app.run('JSON.stringify(state.slides, (key, value) => key === "id" ? undefined : value)')), expectedSlides);
+});
+
+test('the one retry can succeed and stale old-worker responses cannot replace it', async () => {
+  const app = localAIApp(); app.boot(); app.get('ai-generate').click();
+  app.workers[0].emit(lostGPU); await app.settle();
+  app.workers[1].emit({ type: 'ready' });
+  const requestId = app.workers[1].messages.at(-1).requestId;
+  app.workers[0].emit({ type: 'proposal', requestId, text: '{}' });
+  assert.equal(app.get('ai-result').hidden, true);
+  app.workers[1].emit({ type: 'proposal', requestId, text: JSON.stringify(completeOutline) });
+  assert.equal(app.get('ai-result').hidden, false); assert.equal(app.run('aiState.fallbackPlan'), null);
+  assert.equal(app.get('ai-generate').disabled, false); assert.equal(app.get('ai-generation-cancel').hidden, true);
+  assert.equal(app.run('aiState.proposal.length'), 4);
+});
+
+test('cancelling during teardown or reload prevents retries, fallback and late proposals', async () => {
+  for (const atReload of [false, true]) {
+    const app = localAIApp(); app.boot(); app.get('ai-generate').click();
+    app.workers[0].emit(lostGPU);
+    if (atReload) await app.settle();
+    app.get('ai-generation-cancel').click(); await app.settle();
+    const count = app.workers.length;
+    app.workers.at(-1).emit({ type: 'ready' });
+    app.workers.at(-1).emit({ type: 'proposal', text: JSON.stringify(completeOutline) });
+    await app.settle();
+    assert.equal(app.workers.length, count); assert.equal(count, atReload ? 2 : 1);
+    assert.equal(app.run('aiState.request'), null); assert.equal(app.run('aiState.proposal'), null);
+    assert.equal(app.get('ai-result').hidden, true); assert.match(app.get('ai-writing-status').textContent, /Cancelled/);
+  }
+});
+
+test('a hung teardown is terminated and a failed reload falls back without downloading', async () => {
+  const app = localAIApp({ dispose: false }); app.boot(); app.get('ai-generate').click();
+  app.workers[0].emit(lostGPU); app.fire(1500); await app.settle();
+  assert.equal(app.workers.length, 2); assert.equal(app.workers[0].terminated, true);
+  app.workers[1].emit({ type: 'error', detail: 'Internal runtime boot failure' });
+  assert.match(app.get('ai-writing-status').textContent, /standard sorting/);
+  assert.doesNotMatch(app.get('ai-status').textContent, /Internal runtime/);
+  assert.equal(app.downloads.length, 0);
+});
+
+test('GPU loss after a completed outline clears ready state without removing the reviewed proposal', () => {
+  const app = localAIApp(); app.boot(); app.get('ai-generate').click();
+  const requestId = app.workers[0].messages.at(-1).requestId;
+  app.workers[0].emit({ type: 'proposal', requestId, text: JSON.stringify(completeOutline) });
+  app.workers[0].emit({ ...lostGPU, requestId });
+  assert.equal(app.run('aiState.ready'), false); assert.equal(app.get('ai-generate').disabled, true);
+  assert.equal(app.get('ai-result').hidden, false); assert.equal(app.get('ai-apply').disabled, false);
+  assert.doesNotMatch(app.get('ai-status').textContent, /mapAsync|GPUBuffer/);
 });

@@ -57,9 +57,105 @@ test('worker blocks every network fallback and rejects a damaged cached runtime'
   vm.runInContext(readFileSync(new URL('../ai/model-worker.js', import.meta.url),'utf8'),context);
   await self.onmessage({data:{type:'boot',model:{assets:[{...asset,role:'runtime'}]},cacheName:'isolated-test'}});
   assert.deepEqual(opened,['isolated-test']); assert.equal(network,0);
-  assert.match(messages.at(-1).message,/failed verification/);
+  assert.match(messages.at(-1).detail,/failed verification/);
   await assert.rejects(self.fetch('https://example.com/prompt'),/unapproved/);
   assert.equal(network,0); assert.equal(messages.some(message=>message.type==='ready'),false);
+});
+
+test('mobile, tablet and low-memory policies never offer Pro even with generous GPU limits', () => {
+  const large = { maxBufferSize: 2 ** 31, maxStorageBufferBindingSize: 2 ** 31 };
+  for (const device of [
+    { userAgentData: { mobile: true }, userAgent: 'Windows NT', deviceMemory: 16 },
+    { userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8)', deviceMemory: 8 },
+    { userAgent: 'Mozilla/5.0 (Linux; Android 14; Tablet)', deviceMemory: 16 },
+    { userAgent: 'Mozilla/5.0 (iPad; CPU OS 18)', deviceMemory: 16 },
+    { userAgent: 'Mozilla/5.0 (Macintosh)', platform: 'MacIntel', maxTouchPoints: 5 },
+    { userAgent: 'Mozilla/5.0 (Windows NT 10.0)', deviceMemory: 4 }
+  ]) {
+    const policy = ai.devicePolicy(device, large);
+    assert.equal(policy.allowPro, false); assert.equal(policy.compact, true);
+  }
+  assert.equal(ai.devicePolicy({}, large).allowPro, false);
+});
+
+test('Pro requires a desktop and both buffer limits, while phone generation is bounded', () => {
+  const desktop = { userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', deviceMemory: 8 };
+  const large = { maxBufferSize: 2 ** 30, maxStorageBufferBindingSize: 2 ** 30 };
+  assert.equal(ai.devicePolicy(desktop, large).allowPro, true);
+  for (const limits of [undefined, {}, { ...large, maxBufferSize: 2 ** 28 }, { ...large, maxStorageBufferBindingSize: 2 ** 27 }]) {
+    assert.equal(ai.devicePolicy(desktop, limits).allowPro, false);
+  }
+  assert.ok(ai.generationSettings(true).max_tokens <= 256);
+  assert.ok(ai.generationSettings(true).context_window_size < ai.generationSettings(false).context_window_size);
+});
+
+function workerFixture(mockEngine, extra = {}) {
+  const messages = [];
+  const self = { postMessage: message => messages.push(message), addEventListener() {} };
+  const context = vm.createContext({ self, console, mockEngine, ...extra });
+  vm.runInContext(readFileSync(new URL('../ai/model-worker.js', import.meta.url), 'utf8'), context);
+  vm.runInContext('engine = mockEngine', context);
+  return { self, messages, run: code => vm.runInContext(code, context) };
+}
+
+test('phone inference streams one short slide per call, resets history and reports actual progress', async () => {
+  const calls = []; let resets = 0;
+  const fixture = workerFixture({ resetChat: async () => { resets++; }, chat: { completions: { create: async request => {
+    calls.push(request);
+    return (async function* () {
+      const text = JSON.stringify({ title: `Slide ${calls.length}`, points: ['A supplied fact with its caveat.'] });
+      for (const char of text) yield { choices: [{ delta: { content: char } }] };
+      yield { choices: [{ finish_reason: 'stop' }] };
+    })();
+  } } } });
+  const brief = { purpose: 'Agree a pilot', audience: 'Team', messagesText: 'The trial is small. Results may not apply elsewhere.' };
+  await fixture.self.onmessage({ data: { type: 'suggest', requestId: 9, brief, count: 4 } });
+  assert.equal(calls.length, 4); assert.equal(resets, 4);
+  for (let index = 0; index < calls.length; index++) {
+    const request = calls[index];
+    assert.equal(request.stream, true); assert.ok(request.max_tokens <= 256);
+    assert.equal(request.messages.length, 2); assert.ok(request.messages[0].content.length < 350);
+    const source = JSON.parse(request.messages[1].content);
+    assert.equal(source.notes, brief.messagesText); assert.equal(source.earlierTitles.length, index);
+    assert.equal(source.slide, `${index + 1}/4`);
+  }
+  assert.deepEqual([...new Set(fixture.messages.filter(m => m.type === 'writing').map(m => m.slide))], [1, 2, 3, 4]);
+  assert.ok(fixture.messages.some(m => m.type === 'writing' && m.tokens > 0));
+  assert.equal(ai.parseProposal(fixture.messages.at(-1).text).length, 4);
+});
+
+test('a mapAsync failure is classified for recovery and never returns a partial outline', async () => {
+  const fixture = workerFixture({ resetChat: async () => {}, chat: { completions: { create: async () => {
+    throw new Error("Failed to execute 'mapAsync' on 'GPUBuffer': Buffer was unmapped before mapping was resolved.");
+  } } } });
+  await fixture.self.onmessage({ data: { type: 'suggest', requestId: 3, brief: { purpose: '', audience: '', messagesText: 'Notes.' }, count: 3 } });
+  assert.equal(fixture.messages.at(-1).type, 'error'); assert.equal(fixture.messages.at(-1).kind, 'gpu');
+  assert.equal(fixture.messages.at(-1).requestId, 3);
+  assert.equal(fixture.messages.some(m => m.type === 'proposal'), false);
+});
+
+test('loss of the actual runtime device reports once, and disposal interrupts and unloads', async () => {
+  let lose, destroyed = 0, interrupted = 0, unloaded = 0;
+  const device = { lost: new Promise(resolve => { lose = resolve; }), destroy() { destroyed++; }, addEventListener() {} };
+  class GPUAdapter { async requestDevice() { return device; } }
+  const fixture = workerFixture({ interruptGenerate: async () => { interrupted++; }, unload: async () => { unloaded++; } }, { GPUAdapter });
+  fixture.run('watchDevices()'); await new GPUAdapter().requestDevice();
+  lose({ reason: 'unknown', message: 'Simulated GPU reset' }); await Promise.resolve();
+  fixture.run('fail(new Error("mapAsync failed"))');
+  assert.equal(fixture.messages.filter(m => m.type === 'error').length, 1);
+  assert.equal(fixture.messages[0].kind, 'gpu');
+  await fixture.self.onmessage({ data: { type: 'dispose' } });
+  assert.equal(interrupted, 1); assert.equal(unloaded, 1); assert.equal(destroyed, 1);
+  assert.equal(fixture.messages.at(-1).type, 'disposed');
+});
+
+test('incomplete bounded output fails rather than offering truncated slides', async () => {
+  const fixture = workerFixture({ resetChat: async () => {}, chat: { completions: { create: async () => (async function* () {
+    yield { choices: [{ delta: { content: '{"title":"Incomplete' }, finish_reason: 'length' }] };
+  })() } } });
+  await fixture.self.onmessage({ data: { type: 'suggest', brief: { purpose: '', audience: '', messagesText: 'Notes.' }, count: 3 } });
+  assert.equal(fixture.messages.at(-1).type, 'error');
+  assert.equal(fixture.messages.some(m => m.type === 'proposal'), false);
 });
 
 test('published service worker stays within this app navigation and the build contains all AI code', () => {

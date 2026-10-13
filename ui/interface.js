@@ -122,7 +122,11 @@ function showPage(page, focus = true) {
   if (page === 'guide') { syncGuideFromBrief(); renderGuide(); }
   if (page === 'review') renderReviewPage();
   if (page === 'offline') refreshDownloadInfo();
-  if (page === 'ai' && typeof aiRefresh === 'function') { aiRefresh(); if (!byId('ai-notes').value) aiCopyBrief(); }
+  if (page === 'ai' && typeof aiRefresh === 'function') {
+    aiRefresh();
+    if (!byId('ai-notes').value && !aiState.busy) aiCopyBrief();
+    if (aiState.request) aiShowProgress();
+  }
   if (page === 'editor') { setEditView(flow.editView); scheduleFit(); }
   if (focus) {
     const heading = { welcome: 'welcome-title', brief: 'brief-title', guide: `guide-title-${flow.step}`, review: 'review-title', ai: 'ai-title', offline: 'offline-title', editor: 'editor-heading' }[page];

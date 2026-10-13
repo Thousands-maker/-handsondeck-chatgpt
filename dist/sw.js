@@ -1,5 +1,5 @@
 /* The app shell is cached only when the user opts into Supercharged setup. */
-const SHELL_CACHE = 'hands-on-deck-shell-v9';
+const SHELL_CACHE = 'hands-on-deck-shell-v10';
 const ROOT = new URL('./', self.location.href).href;
 self.addEventListener('install', event => event.waitUntil((async () => {
   const cache = await caches.open(SHELL_CACHE);
