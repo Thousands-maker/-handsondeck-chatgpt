@@ -1,6 +1,6 @@
 'use strict';
 
-const flow = { page: 'welcome', step: 0, highest: 0, editView: 'slides', presenting: false, fileDirty: false, recoveryTimer: 0, recoveryEnabled: true, recoveryFailed: false, recoveryBlocked: false, reviewDone: false, example: false };
+const flow = { page: 'welcome', step: 0, highest: 0, editView: 'slides', presenting: false, fileDirty: false, recoveryTimer: 0, recoveryEnabled: true, recoveryFailed: false, recoveryBlocked: false, example: false };
 const RECOVERY_KEY = 'hands-on-deck-recovery-v1';
 const RECOVERY_SETTING = 'hands-on-deck-recovery-enabled';
 const examples = {
@@ -93,7 +93,7 @@ function addGuideDetail(value, input) {
 
 function updateJourney() {
   const hasSlides = !!state.slides.length;
-  const active = { brief: 'open-brief', guide: 'open-brief', editor: 'nav-edit', review: 'nav-edit', offline: 'open-offline' }[flow.page];
+  const active = { brief: 'open-brief', guide: 'open-brief', editor: 'nav-edit', offline: 'open-offline' }[flow.page];
   for (const id of ['open-brief', 'nav-edit', 'open-offline']) {
     const node = byId(id);
     if (id === active) node.setAttribute('aria-current', 'step'); else node.removeAttribute('aria-current');
@@ -111,16 +111,15 @@ function updateJourney() {
 
 function showPage(page, focus = true) {
   if (flow.page === 'guide' && page !== 'guide') syncBriefFromGuide();
-  if (['editor', 'review', 'offline'].includes(page) && !state.slides.length) page = 'guide';
+  if (['editor', 'offline'].includes(page) && !state.slides.length) page = 'guide';
   if (flow.presenting) stopPresenting();
   if (byId('drawer-dialog').open) byId('drawer-dialog').close();
   closeElementMenu();
   flow.page = page;
-  for (const id of ['welcome', 'brief', 'guide', 'review', 'ai', 'offline']) byId(id + '-page').classList.toggle('hidden', id !== page);
+  for (const id of ['welcome', 'brief', 'guide', 'ai', 'offline']) byId(id + '-page').classList.toggle('hidden', id !== page);
   document.querySelector('.app-shell').classList.toggle('hidden', page !== 'editor');
   updateJourney();
   if (page === 'guide') { syncGuideFromBrief(); renderGuide(); }
-  if (page === 'review') renderReviewPage();
   if (page === 'offline') refreshDownloadInfo();
   if (page === 'ai' && typeof aiRefresh === 'function') {
     aiRefresh();
@@ -129,7 +128,7 @@ function showPage(page, focus = true) {
   }
   if (page === 'editor') { setEditView(flow.editView); scheduleFit(); }
   if (focus) {
-    const heading = { welcome: 'welcome-title', brief: 'brief-title', guide: `guide-title-${flow.step}`, review: 'review-title', ai: 'ai-title', offline: 'offline-title', editor: 'editor-heading' }[page];
+    const heading = { welcome: 'welcome-title', brief: 'brief-title', guide: `guide-title-${flow.step}`, ai: 'ai-title', offline: 'offline-title', editor: 'editor-heading' }[page];
     byId(heading)?.focus({ preventScroll: true });
   }
 }
@@ -274,20 +273,6 @@ function renderOutline() {
   } catch (error) { byId('outline-note').textContent = error.message; }
 }
 
-function renderReviewPage() {
-  renderChecks();
-  const warnings = state.warnings;
-  byId('review-result').textContent = warnings.length ? `${warnings.length} suggestion${warnings.length === 1 ? '' : 's'} to look at` : 'No basic content issues found';
-  const list = byId('review-warnings'); list.replaceChildren();
-  if (!warnings.length) list.appendChild(make('p', '', 'Now check the facts and how each slide reads. Automated checks cannot judge your story or verify evidence.'));
-  warnings.forEach(item => {
-    const node = make(Number.isInteger(item.slide) ? 'button' : 'div', 'review-warning', item.text);
-    if (Number.isInteger(item.slide)) { node.type = 'button'; node.appendChild(make('small', '', `Edit slide ${item.slide + 1} →`)); node.addEventListener('click', () => { selectSlide(item.slide); showPage('editor'); }); }
-    list.appendChild(node);
-  });
-  flow.reviewDone = true;
-}
-
 function refreshDownloadInfo() {
   const blob = editorDownloadBlob();
   const presentation = new Blob([exportHtml()], { type: 'text/html;charset=utf-8' });
@@ -295,7 +280,8 @@ function refreshDownloadInfo() {
   byId('download-presentation').disabled = !state.slides.length || presentation.size > MAX_EDITOR_BYTES;
   renderChecks();
   byId('export-deck-summary').textContent = `${state.slides.length} slides · ${state.slides[0]?.title || 'Your presentation'}`;
-  byId('export-check-summary').textContent = state.warnings.length ? `${state.warnings.length} advisory suggestion${state.warnings.length === 1 ? '' : 's'} to consider. You can still download now.` : 'Ready for your final read-through. Check the facts and closing ask before sharing.';
+  byId('export-check-summary').textContent = state.warnings.length ? `${state.warnings.length} optional suggestion${state.warnings.length === 1 ? '' : 's'}. You can still download now.` : 'Choose a presentation to share or an editable copy for later changes.';
+  byId('export-suggestions').hidden = !state.warnings.length;
   byId('download-receipt').hidden = true;
   byId('editor-download-size').textContent = formatBytes(blob.size);
   byId('download-editor').disabled = blob.size > MAX_EDITOR_BYTES;
@@ -335,7 +321,7 @@ function applyProject(project) {
   state.slides = project.slides; state.logo = project.logo; state.style = project.style;
   state.current = project.current; state.metadata = project.metadata; state.dirty = !!project.slides.length; state.selectedBlockId = null;
   putBrief(project.brief); byId('style-select').value = state.style;
-  flow.example = false; flow.reviewDone = false; flow.highest = 0; flow.step = 0;
+  flow.example = false; flow.highest = 0; flow.step = 0;
   syncGuideFromBrief(); renderAll(); updateJourney();
 }
 
@@ -351,12 +337,11 @@ function loadExample(key) {
 }
 
 function afterBuild() {
-  flow.fileDirty = true; flow.reviewDone = false;
+  flow.fileDirty = true;
   flow.undo = null; byId('undo-delete').hidden = true;
   byId('editor-heading').textContent = flow.example ? 'A fictional example. Make it yours.' : 'Your first draft is ready.';
   byId('editor-guidance').textContent = 'Switch to Outline to refine the argument. Slides and downloads use the same content.';
   flow.editView = 'slides';
-  document.querySelectorAll('.review-check input').forEach(node => { node.checked = false; });
   showPage('editor'); queueRecovery();
 }
 
@@ -379,7 +364,7 @@ byId('brief-keep-editing').addEventListener('click', () => showPage('editor'));
 byId('view-slides').addEventListener('click', () => setEditView('slides'));
 byId('view-outline').addEventListener('click', () => setEditView('outline'));
 byId('open-source').addEventListener('click', showSourceBrief);
-byId('export-review').addEventListener('click', () => showPage('review'));
+byId('export-suggestions').addEventListener('click', () => openDrawer('checks'));
 byId('download-return').addEventListener('click', () => showPage('editor'));
 byId('nav-edit').addEventListener('click', () => showPage('editor'));
 byId('resume-deck').addEventListener('click', () => showPage('editor'));
@@ -387,10 +372,6 @@ byId('open-help').addEventListener('click', () => byId('help-dialog').showModal(
 byId('close-help').addEventListener('click', () => byId('help-dialog').close());
 byId('open-ai').addEventListener('click', () => showPage('ai'));
 byId('ai-standard').addEventListener('click', () => showPage(state.slides.length ? 'editor' : 'welcome'));
-byId('coach-review').addEventListener('click', () => showPage('review'));
-byId('review-back').addEventListener('click', () => showPage('editor'));
-byId('review-save').addEventListener('click', () => showPage('offline'));
-byId('review-present').addEventListener('click', startPresenting);
 byId('exit-present').addEventListener('click', () => { stopPresenting(); byId('present').focus(); });
 byId('download-presentation').addEventListener('click', downloadDeck);
 byId('download-project').addEventListener('click', () => {

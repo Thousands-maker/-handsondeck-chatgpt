@@ -32,7 +32,7 @@ People who present occasionally can use the optional guided brief and fictional 
 | Refine | Improve the argument after review | Editable Outline and 16:9 Slides views using the same plan; reorder/remove/undo; reference brief available beside the task. |
 | Download | Use the briefing outside the app | One self-contained presentation HTML file; editable HTML backup for feedback; offline opening guidance. |
 
-Quality suggestions belong within refinement and remain advisory. They do not add a required approval step or block generation or export. The app flags density, missing asks, unresolved placeholders and numbers that are absent from the reference brief. These are prompts to check evidence, not factual verification.
+Quality suggestions open in an optional drawer beside the slides. There is no separate review page or tick-box checklist. Suggestions do not block generation or export. The app flags density, missing asks, unresolved placeholders and numbers that are absent from the reference brief. These are prompts to check evidence, not factual verification.
 
 ## Core boundaries
 

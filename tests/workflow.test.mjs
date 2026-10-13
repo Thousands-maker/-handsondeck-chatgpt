@@ -32,7 +32,6 @@ function setup(seed, blocked = false, globals = {}) {
   function matches(node,selector) {
     if (selector === '*') return true;
     if (selector === 'dialog[open]') return node.tagName === 'DIALOG' && node.open;
-    if (selector === '.review-check input') return node.tagName === 'INPUT' && node.attributes.type === 'checkbox' && !node.id;
     if (selector.startsWith('.')) return node.classList.contains(selector.slice(1));
     const attr = selector.match(/^\[([^=\]]+)(?:="([^"]*)")?\](:checked)?$/);
     if (attr) return attr[1] in node.attributes && (attr[2] === undefined || node.attributes[attr[1]] === attr[2]) && (!attr[3] || node.checked);
@@ -80,13 +79,17 @@ test('first visit starts with guidance, validates notes, previews an outline and
   assert.ok(reload.get('messages').value.includes('queue'));
 });
 
-test('edit, undo deletion, review and save remain connected; presentation is read-only', () => {
+test('optional suggestions stay beside the editor and download opens directly; presentation is read-only', () => {
   const app = setup(); app.run("loadExample('decision')");
   const before = app.run('state.slides.length');
   app.get('delete-slide').click(); assert.equal(app.run('state.slides.length'),before - 1);
   app.get('undo-delete').click(); assert.equal(app.run('state.slides.length'),before);
-  app.get('open-checks').click(); assert.equal(app.run('flow.page'),'review');
-  app.get('review-save').click(); assert.equal(app.run('flow.page'),'offline');
+  app.get('open-checks').click(); assert.equal(app.run('flow.page'),'editor');
+  assert.equal(app.get('drawer-dialog').open,true);
+  assert.equal(app.get('checks-panel').classList.contains('hidden'),false);
+  assert.equal(app.get('drawer-title').textContent,'Suggestions');
+  app.get('close-drawer').click(); app.get('download').click(); assert.equal(app.run('flow.page'),'offline');
+  assert.equal(app.get('review-page'),undefined);
   assert.equal(app.get('download-editor').disabled,false);
   app.get('back-to-editor').click(); app.get('present').click();
   assert.equal(app.run('flow.presenting'),true);
@@ -193,6 +196,21 @@ test('missing asks, new numbers and placeholders remain advisory and never block
   assert.equal(app.get('download-presentation').disabled, false);
   assert.equal(app.get('download-editor').disabled, false);
   assert.match(app.get('export-check-summary').textContent, /still download/);
+  assert.equal(app.get('export-suggestions').hidden, false);
+  const before = app.run('JSON.stringify(state.slides)');
+  app.get('export-suggestions').click();
+  assert.equal(app.run('flow.page'), 'offline');
+  assert.equal(app.get('drawer-dialog').open, true);
+  const warning = app.get('warnings').children.find(node => node.textContent.includes('99%'));
+  assert.ok(warning); warning.click();
+  assert.equal(app.run('flow.page'), 'editor');
+  assert.equal(app.run('flow.editView'), 'slides');
+  assert.equal(app.run('state.current'), 1);
+  assert.equal(app.get('drawer-dialog').open, false);
+  assert.equal(app.run('JSON.stringify(state.slides)'), before);
+  app.run("state.slides = [{id:'a',kind:'title',title:'A clear purpose',eyebrow:'',blocks:[]},{id:'b',kind:'content',title:'A supplied point',eyebrow:'',blocks:[{id:'p',type:'paragraph',text:'Booking a room takes too many messages.'}]},{id:'c',kind:'statement',title:'Agree the trial',eyebrow:'',blocks:[{id:'q',type:'paragraph',text:'Approve a four-week trial of online room booking.'}]}]; state.metadata = {}; showPage('offline');");
+  assert.equal(app.get('export-suggestions').hidden, true);
+  assert.equal(app.get('download-presentation').disabled, false);
 });
 
 test('guided notes show their ideas live, preserve typed follow-ups, and build from added facts only', () => {

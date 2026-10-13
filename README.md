@@ -8,10 +8,9 @@ Open **index.html** in your browser. No installation, account, server or interne
 
 1. Choose **Create a briefing** for the one-page brief. **Help me shape my brief** offers guided questions when needed.
 2. Add the decision or outcome, audience and key messages. Choose a style and length, then **Build my first deck**. Standard works without an AI download and preserves your supplied wording.
-3. **Refine** in Slides or Outline. Edit headlines and supporting points, reorder or remove slides, and undo the last deletion. **Source brief** keeps your reference notes available for comparison. Both views and the export use the same slide data.
-4. **Check the case** for advisory suggestions about density, missing asks, placeholders and numbers absent from the reference brief. Checks do not verify facts and never block a download.
-5. **Download** a presentation to use or share, and an editable copy for later feedback. Reopen the saved HTML file in a browser and try it offline.
-6. Open an editable HTML file directly, or choose **Open a saved presentation** to import editable HTML or project JSON.
+3. **Refine** in Slides or Outline. Edit headlines and supporting points, reorder or remove slides, and undo the last deletion. **Source brief** keeps your reference notes available for comparison. Optional **Suggestions** open beside the slides and flag density, missing asks, placeholders and numbers absent from the reference brief. They do not verify facts or block downloads.
+4. **Download** a presentation to use or share, and an editable copy for later feedback. Reopen the saved HTML file in a browser and try it offline.
+5. Open an editable HTML file directly, or choose **Open a saved presentation** to import editable HTML or project JSON.
 
 Three clearly labelled fictional examples demonstrate a decision, an update and a discussion. **Help** is available throughout. **Supercharged** downloads and runs a local model on compatible WebGPU devices. It turns rough notes into a reviewable outline. Apply it only after checking the facts and caveats; the original notes remain in the brief.
 
