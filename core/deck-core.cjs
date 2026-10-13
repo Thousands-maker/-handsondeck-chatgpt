@@ -18,25 +18,97 @@
       const json = JSON.stringify(project).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
       return template.replace(marker, () => '<script id="saved-project" type="application/json">' + json + '<\/script>');
     }
+    function splitPlainSentences(line) {
+      const pieces = []; let start = 0;
+      const boundary = /[.!?]+(?:["'”’\])]+)?(?:\s+|$)/g;
+      for (const match of line.matchAll(boundary)) {
+        const end = match.index + match[0].trimEnd().length;
+        const before = line.slice(start, end);
+        const lastToken = before.match(/\S+$/)?.[0] || '';
+        // Do not split initials, decimal values, URLs or familiar abbreviations.
+        if (/^(?:Mr|Mrs|Ms|Dr|Prof|St|No|Fig|approx|vs|etc)\.$/i.test(lastToken) || /^(?:[A-Za-z]\.)+$/.test(lastToken)) continue;
+        if (line[end] && !/\s/.test(line[end])) continue;
+        if (before.trim()) pieces.push(before.trim());
+        start = match.index + match[0].length;
+      }
+      if (line.slice(start).trim()) pieces.push(line.slice(start).trim());
+      return pieces;
+    }
+
+    function splitIndependentIdeas(sentence) {
+      // Split only explicit independent clauses. Keep contrasts and qualifications together.
+      const cuts = /;\s+(?!but\b|however\b|although\b|unless\b)|,\s+(?=(?:and\s+)?(?:there\s+(?:is|are|was|were)\b|(?:we|I|they|it|this|that)\s+(?:need|have|has|will|can|is|are|want|propose|recommend|plan)\b))/gi;
+      const out = []; let start = 0;
+      for (const match of sentence.matchAll(cuts)) {
+        const left = sentence.slice(start, match.index).trim();
+        const right = sentence.slice(match.index + match[0].length).trim();
+        if (left.split(/\s+/).length < 4 || right.split(/\s+/).length < 4) continue;
+        // A conditional clause cannot become a standalone assertion.
+        if (/^(?:if|unless|when|provided|assuming|although|while|because|despite)\b/i.test(left)) continue;
+        out.push(left); start = match.index + match[0].length;
+      }
+      const tail = sentence.slice(start).trim(); if (tail) out.push(tail);
+      return out;
+    }
+
+    function ideaKind(text) {
+      if (/\b(raci|responsibilit\w*|accountab\w*|ownership|decision rights|roles?)\b/i.test(text)) return 'roles';
+      if (/\b(risks?|constraints?|uncertain\w*|unknown|blocked|delays?|not yet|cannot|can't|however|unless|must not|do not)\b/i.test(text)) return 'risk';
+      if (/\b(propos\w*|recommend\w*|suggest\w*|trial|pilot|test)\b/i.test(text)) return 'proposal';
+      if (/\b(impact|benefit|result|because|improv\w*|reduc\w*|sav\w*|evidence)\b/i.test(text)) return 'impact';
+      if (/\b(next|deadline|by (?:monday|tuesday|wednesday|thursday|friday)|need to|will)\b/i.test(text)) return 'action';
+      return 'context';
+    }
+
+    function ideaHeading(text, kind) {
+      const clean = text.replace(/^(?:and|also)\s+/i, '').replace(/[.!?;:,]+$/, '').trim();
+      // Neutral topic labels avoid repeating a long statement as both title and body.
+      if (/\b(?:raci|responsibilit\w*|accountab\w*|decision rights)\b/i.test(clean)) return 'Roles and responsibilities';
+      if (/\b(?:ways of working|workflows?|handovers?)\b/i.test(clean)) return 'Ways of working';
+      if (/\bteams?\b/i.test(clean) && /\b(?:join\w*|merg\w*|restructur\w*|integrat\w*)\b/i.test(clean)) return 'Team changes';
+      if (clean.length <= 100 && clean.split(/\s+/).length <= 17) return clean.charAt(0).toUpperCase() + clean.slice(1);
+      const labels = { roles: 'Roles and responsibilities', risk: 'Risks and constraints', proposal: 'Proposed approach', impact: 'Why this matters', action: 'Next steps to define' };
+      if (labels[kind]) return labels[kind];
+      return clean.split(/\s+/).slice(0, 12).join(' ').replace(/[,;:]$/, '') + '…';
+    }
+
     function organiseFreeText(text) {
       const source = String(text).replace(/\r\n?/g, '\n').trim();
       if (source.length > 20000) throw new Error('Keep free text to 20,000 characters or fewer.');
       if (!source) return [];
       const groups = [];
-      const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('en', { granularity: 'sentence' }) : null;
       source.split(/\n\s*\n/).forEach(paragraph => {
-        const sentences = paragraph.split('\n').flatMap(line => {
+        let current = null;
+        paragraph.split('\n').forEach(line => {
+          const bullet = /^\s*[-*•]\s+/.test(line);
           const clean = line.replace(/^\s*[-*•]\s+/, '').trim();
-          if (!clean) return [];
-          return segmenter ? [...segmenter.segment(clean)].map(part => part.segment.trim()).filter(Boolean) : [clean];
+          const ideas = splitPlainSentences(clean).flatMap(splitIndependentIdeas);
+          ideas.forEach(point => {
+            const support = bullet || /^(?:for example|for instance|e\.g\.|measured|specifically|this (?:means|shows|includes)|because|but|however|although|despite|only if|provided|unless|except)\b/i.test(point);
+            if ((support && current) || groups.length >= 80) {
+              const target = current || groups[groups.length - 1];
+              if (target.points.length < 80) target.points.push(point);
+              else target.points[target.points.length - 1] += ' ' + point;
+            } else {
+              const kind = ideaKind(point);
+              current = { heading: ideaHeading(point, kind), points: [point], kind };
+              groups.push(current);
+            }
+          });
         });
-        for (let start = 0; start < sentences.length; start += 4) {
-          const points = sentences.slice(start, start + 4);
-          const heading = points[0].length <= 110 ? points[0].replace(/[.!?]+$/, '') : `Notes ${groups.length + 1}`;
-          groups.push({ heading, points });
-        }
       });
       return groups;
+    }
+
+    function briefQuestions(text) {
+      if (!String(text).trim()) return [];
+      const questions = [];
+      if (/\b(raci|roles?|responsibilit\w*|ownership|merge\w*|joining)\b/i.test(text)) questions.push({ title: 'Which responsibilities are proposed?', prompt: 'Who will do the work, who approves, and who should be consulted or informed?', placeholder: 'Name the roles you know. Say “not yet agreed” where needed.' });
+      if (/\b(ways of working|process|handover|workflow|structure)\b/i.test(text)) questions.push({ title: 'What will work differently?', prompt: 'What changes in the process, handovers or decision-making?', placeholder: 'Describe a specific proposed change and what stays the same.' });
+      if (!/\d|\b(evidence|measured|survey|data|for example|feedback|observed)\b/i.test(text)) questions.push({ title: 'What supports the case?', prompt: 'Which observation, example or result makes this change worth considering?', placeholder: 'Add evidence you have. Leave blank if it is not available.' });
+      if (!/\b(risks?|constraints?|uncertain\w*|not yet|unknown|depend\w*|unresolved)\b/i.test(text)) questions.push({ title: 'What still needs agreement?', prompt: 'Are there risks, dependencies or details that have not been decided?', placeholder: 'Keep uncertainties explicit; do not guess an owner or deadline.' });
+      if (!questions.length) questions.push({ title: 'What is the next practical step?', prompt: 'What action follows the decision, and what information is still needed?', placeholder: 'Add only the next step you can support.' });
+      return questions.slice(0, 3);
     }
     const uid = () => 'id-' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
     const clone = value => typeof structuredClone === 'function' ? structuredClone(value) : JSON.parse(JSON.stringify(value));
@@ -89,6 +161,8 @@
       const contentSlots = Math.max(1, requested - 2);
       const buckets = distribute(groups, contentSlots);
       const slides = [];
+      const comparable = text => text.toLowerCase().replace(/^(?:and|also)\s+/, '').replace(/[.!?;:,]+$/, '').replace(/\s+/g, ' ').trim();
+      const supportingPoints = group => group.points.filter((point, index) => !(group.kind && index === 0 && comparable(point) === comparable(group.heading)));
 
       slides.push({
         id: uid(), kind: 'title', eyebrow: 'Decision brief',
@@ -100,8 +174,9 @@
         if (!bucket.length) return;
         if (bucket.length === 1) {
           const group = bucket[0];
-          const blocks = group.points.length
-            ? [{ id: uid(), type: 'bullets', items: group.points.slice() }]
+          const points = supportingPoints(group);
+          const blocks = points.length
+            ? [{ id: uid(), type: 'bullets', items: points }]
             : [];
           slides.push({ id: uid(), kind: 'content', eyebrow: `Message ${bucketIndex + 1}`, title: group.heading, blocks });
         } else {
@@ -109,8 +184,8 @@
             id: uid(), kind: 'content', eyebrow: `Messages ${bucketIndex + 1}`, title: 'Key messages',
             blocks: [{ id: uid(), type: bucket.length === 2 ? 'columns' : 'cards',
               ...(bucket.length === 2
-                ? { columns: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') })) }
-                : { items: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') })) })
+                ? { columns: bucket.map(group => ({ title: group.heading, text: supportingPoints(group).join(' · ') })) }
+                : { items: bucket.map(group => ({ title: group.heading, text: supportingPoints(group).join(' · ') })) })
             }]
           });
         }
@@ -226,7 +301,7 @@
           style: styles.includes(brief.style) ? brief.style : value.style, count: ['auto', '3', '4', '5', '6'].includes(String(brief.count)) ? String(brief.count) : 'auto' } };
     }
 
-  const api = { uid, clone, parseMessageGroups, organiseFreeText, embedEditorProject, distribute, newBlock, buildSlides, escapeHtml, blockToHtml, renderDeckHtml, DEFAULT_LOGO, isEmbeddedImage, deckLogo, slidePageNumber, parseSavedProject, normaliseProject };
+  const api = { uid, clone, parseMessageGroups, organiseFreeText, briefQuestions, embedEditorProject, distribute, newBlock, buildSlides, escapeHtml, blockToHtml, renderDeckHtml, DEFAULT_LOGO, isEmbeddedImage, deckLogo, slidePageNumber, parseSavedProject, normaliseProject };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.DeckCore = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -51,7 +51,7 @@ export const tools = [
     inputSchema: { type: 'object', required: ['purpose', 'messages'], additionalProperties: false, properties: {
       purpose: { ...textSchema, minLength: 1 }, audience: textSchema,
       messages: { type: 'string', minLength: 1, maxLength: 50000, description: 'Message headings, each followed by supporting lines beginning with a hyphen.' },
-      inputMode: { enum: ['structured', 'free'], default: 'structured', description: 'Free text uses basic local sentence grouping, not an AI model. Free text is limited to 20,000 characters.' },
+      inputMode: { enum: ['structured', 'free'], default: 'structured', description: 'Free text uses local sentence and idea separation, not an AI model. Free text is limited to 20,000 characters.' },
       style: { enum: styles, default: 'executive' }, count: { enum: ['auto', 3, 4, 5, 6], default: 'auto' }
     } }, annotations
   },

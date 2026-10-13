@@ -66,6 +66,15 @@ That version included direct editing, an element picker, local image embedding, 
 - Prioritised portable presentation downloads, with an editable backup and instructions to check the file offline.
 - Added automated coverage for direct creation, cancelled rebuilding, outline revisions, reorder/undo, export consistency and non-blocking suggestions.
 
+## Guided content improvement
+
+- Replaced browser-dependent sentence grouping with local segmentation that handles lowercase sentence starts, familiar abbreviations and clear independent clauses.
+- Kept explicit evidence, qualifications and conditions with their source wording; removed duplicate title/body statements where the headline already carries the point.
+- Added suggested topic headings for common workplace subjects and a live outline in the guided content step.
+- Added optional follow-up questions for responsibilities, ways of working, evidence and unresolved details. Only explicitly added answers enter the brief.
+- Expanded the pre-build outline to show supporting content, not just slide titles and element counts.
+- Added regression coverage for lowercase notes, caveats, numeric fidelity, offline consistency, bounded long input, guided answers and recovery.
+
 ## Verification limits
 
 Automated checks cover JavaScript syntax, matching standalone builds, generation, text escaping, and MCP request/response behaviour. They do not certify visual layout, browser-native undo, virtual keyboards, accessibility or cross-browser interaction. Those checks remain on the product backlog.

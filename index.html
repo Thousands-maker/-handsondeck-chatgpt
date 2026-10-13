@@ -989,6 +989,21 @@ body.is-presenting .refine-bar { display:none; }
   .story-field input, .story-field textarea { font-size:16px; }
   .download-review { align-items:flex-start; flex-direction:column; }
 }
+
+/* Show the content taking shape before asking the author to build. */
+.guide-ideas { margin:22px 0; padding-top:24px; border-top:1px solid var(--line); }
+.guide-ideas .section-heading { margin-bottom:6px; }
+.guide-ideas .section-heading h2 { font-size:17px; }
+.guide-ideas .section-index { display:block; margin-bottom:6px; }
+.outline-list .outline-points { margin:8px 0 0; padding-left:18px; list-style:disc; }
+.outline-list .outline-points li { display:list-item; border:0; padding:0 0 4px 2px; margin:0; background:none; color:var(--muted); font-size:12px; line-height:1.65; overflow-wrap:anywhere; }
+.guide-question-box { margin-top:18px; padding:16px 18px; background:#f3f7fd; border:1px solid #d9e4f5; border-radius:8px; }
+.guide-question-box summary { cursor:pointer; color:#34577f; font-size:13px; line-height:1.6; font-weight:600; }
+.optional-label { margin-left:6px; color:var(--muted); font-size:11px; font-weight:400; }
+.guide-followup { margin:22px 0 0; }
+.guide-followup .field-help { margin-bottom:10px; }
+.guide-followup textarea { min-height:76px; font-size:13px; }
+.guide-followup .btn { margin-top:7px; }
 </style>
 </head>
 <body>
@@ -1056,10 +1071,11 @@ What is still uncertain?" aria-describedby="input-hint"></textarea><p class="fie
         <div class="home-alternatives"><button class="chip" data-goal="Approve " type="button">Approve something</button><button class="chip" data-goal="Understand " type="button">Understand an update</button><button class="chip" data-goal="Give feedback on " type="button">Give their input</button></div>
         <div class="form-field"><label for="guide-audience">Who is it for? <small>Optional</small></label><input id="guide-audience" maxlength="1000" placeholder="e.g. My team, senior leaders or project partners"><p class="field-help">Keep their level of knowledge in mind as you write.</p></div>
       </section>
-      <section data-guide-panel="1" hidden><h1 id="guide-title-1" tabindex="-1">What do they need to know?</h1><p class="lead">Paste your notes, or give each key message a heading and a few supporting points.</p>
+      <section data-guide-panel="1" hidden><h1 id="guide-title-1" tabindex="-1">Let’s make the case clear.</h1><p class="lead">Tell us what is happening in your own words. See the ideas take shape, then add what your audience needs to understand them.</p>
         <div class="form-field"><label for="guide-mode">How are your notes written?</label><select id="guide-mode"><option value="free">Free text — paragraphs or rough notes</option><option value="structured">Structured — headings and supporting points</option></select></div>
-        <div class="form-field"><label for="guide-notes">Your content</label><textarea id="guide-notes" rows="9" maxlength="20000" placeholder="What is happening? Why does it matter? What should happen next?" aria-describedby="guide-notes-help"></textarea><p class="field-help" id="guide-notes-help">Use a new paragraph for each main idea. Your sentences are kept as written; Standard mode does not rewrite or fact-check them.</p><p class="field-help" id="guide-char-count">0 / 20,000 characters</p></div>
+        <div class="form-field"><label for="guide-notes">Your content</label><textarea id="guide-notes" rows="9" maxlength="20000" placeholder="What is happening? Why does it matter? What should happen next?" aria-describedby="guide-notes-help"></textarea><p class="field-help" id="guide-notes-help">Write naturally, including uncertainties. Standard separates clear ideas and keeps your wording as supporting content. The preview below shows what it found.</p><p class="field-help" id="guide-char-count">0 / 20,000 characters</p></div>
         <button class="text-button" id="guide-example" type="button">Fill in a short example</button>
+        <section class="guide-ideas" id="guide-ideas" hidden aria-labelledby="guide-ideas-title"><div class="section-heading"><h2 id="guide-ideas-title">Your emerging storyline</h2><span class="tag" id="guide-ideas-count" role="status"></span></div><p class="field-help">These are starting points from your notes. Your facts and caveats stay with them. Keep writing to update the outline.</p><ol class="outline-list" id="guide-idea-list"></ol><details class="guide-question-box" id="guide-question-box"><summary>Strengthen the content with a few questions <span class="optional-label">Optional</span></summary><p class="field-help">Only add what you know. Unanswered questions stay out of the slides.</p><div id="guide-followups"></div></details></section>
         <div class="draft-method"><label class="field-label" for="guide-engine">What would you like help with?</label><select id="guide-engine" class="ai-select"><option value="standard" selected>Build from my wording · no model download</option><option value="ai">Suggest headings and points with optional local AI</option></select><p class="field-help" id="guide-engine-help">Standard arranges your supplied wording into a slide plan. You can refine the argument and layout without rebuilding.</p></div>
       </section>
       <section data-guide-panel="2" hidden><h1 id="guide-title-2" tabindex="-1">Choose a presentation style.</h1><p class="lead">Pick a starting style. You can change it while editing.</p>
@@ -1070,7 +1086,7 @@ What is still uncertain?" aria-describedby="input-hint"></textarea><p class="fie
         </div></fieldset>
         <div class="form-field"><label for="guide-count">How many slides?</label><select id="guide-count"><option value="auto">Let the content decide · 3–6 slides</option><option value="3">3 slides</option><option value="4">4 slides</option><option value="5">5 slides</option><option value="6">6 slides</option></select><p class="field-help">A short deck may group points together. More slides will not create extra facts.</p></div>
       </section>
-      <section data-guide-panel="3" hidden><h1 id="guide-title-3" tabindex="-1">Review your outline.</h1><p class="lead">Here is your first outline. Go back to change your brief, or build it and edit any slide.</p><dl class="review-brief" id="guide-summary"></dl><p class="field-help" id="outline-note"></p><ol class="outline-list" id="guide-outline"></ol></section>
+      <section data-guide-panel="3" hidden><h1 id="guide-title-3" tabindex="-1">Does the story make your case?</h1><p class="lead">Read the headlines and supporting points together. Go back to add detail, or build the deck and refine it in the editor.</p><dl class="review-brief" id="guide-summary"></dl><p class="field-help" id="outline-note"></p><ol class="outline-list" id="guide-outline"></ol></section>
       <p class="guide-error" id="guide-error" role="alert" hidden></p>
       <div class="guide-bottom"><button class="btn btn-quiet" id="guide-back" type="button">Back to start</button><button class="btn btn-primary" id="guide-next" type="button">Next: your content →</button></div>
     </div>
@@ -1256,25 +1272,97 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
       const json = JSON.stringify(project).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
       return template.replace(marker, () => '<script id="saved-project" type="application/json">' + json + '<\/script>');
     }
+    function splitPlainSentences(line) {
+      const pieces = []; let start = 0;
+      const boundary = /[.!?]+(?:["'”’\])]+)?(?:\s+|$)/g;
+      for (const match of line.matchAll(boundary)) {
+        const end = match.index + match[0].trimEnd().length;
+        const before = line.slice(start, end);
+        const lastToken = before.match(/\S+$/)?.[0] || '';
+        // Do not split initials, decimal values, URLs or familiar abbreviations.
+        if (/^(?:Mr|Mrs|Ms|Dr|Prof|St|No|Fig|approx|vs|etc)\.$/i.test(lastToken) || /^(?:[A-Za-z]\.)+$/.test(lastToken)) continue;
+        if (line[end] && !/\s/.test(line[end])) continue;
+        if (before.trim()) pieces.push(before.trim());
+        start = match.index + match[0].length;
+      }
+      if (line.slice(start).trim()) pieces.push(line.slice(start).trim());
+      return pieces;
+    }
+
+    function splitIndependentIdeas(sentence) {
+      // Split only explicit independent clauses. Keep contrasts and qualifications together.
+      const cuts = /;\s+(?!but\b|however\b|although\b|unless\b)|,\s+(?=(?:and\s+)?(?:there\s+(?:is|are|was|were)\b|(?:we|I|they|it|this|that)\s+(?:need|have|has|will|can|is|are|want|propose|recommend|plan)\b))/gi;
+      const out = []; let start = 0;
+      for (const match of sentence.matchAll(cuts)) {
+        const left = sentence.slice(start, match.index).trim();
+        const right = sentence.slice(match.index + match[0].length).trim();
+        if (left.split(/\s+/).length < 4 || right.split(/\s+/).length < 4) continue;
+        // A conditional clause cannot become a standalone assertion.
+        if (/^(?:if|unless|when|provided|assuming|although|while|because|despite)\b/i.test(left)) continue;
+        out.push(left); start = match.index + match[0].length;
+      }
+      const tail = sentence.slice(start).trim(); if (tail) out.push(tail);
+      return out;
+    }
+
+    function ideaKind(text) {
+      if (/\b(raci|responsibilit\w*|accountab\w*|ownership|decision rights|roles?)\b/i.test(text)) return 'roles';
+      if (/\b(risks?|constraints?|uncertain\w*|unknown|blocked|delays?|not yet|cannot|can't|however|unless|must not|do not)\b/i.test(text)) return 'risk';
+      if (/\b(propos\w*|recommend\w*|suggest\w*|trial|pilot|test)\b/i.test(text)) return 'proposal';
+      if (/\b(impact|benefit|result|because|improv\w*|reduc\w*|sav\w*|evidence)\b/i.test(text)) return 'impact';
+      if (/\b(next|deadline|by (?:monday|tuesday|wednesday|thursday|friday)|need to|will)\b/i.test(text)) return 'action';
+      return 'context';
+    }
+
+    function ideaHeading(text, kind) {
+      const clean = text.replace(/^(?:and|also)\s+/i, '').replace(/[.!?;:,]+$/, '').trim();
+      // Neutral topic labels avoid repeating a long statement as both title and body.
+      if (/\b(?:raci|responsibilit\w*|accountab\w*|decision rights)\b/i.test(clean)) return 'Roles and responsibilities';
+      if (/\b(?:ways of working|workflows?|handovers?)\b/i.test(clean)) return 'Ways of working';
+      if (/\bteams?\b/i.test(clean) && /\b(?:join\w*|merg\w*|restructur\w*|integrat\w*)\b/i.test(clean)) return 'Team changes';
+      if (clean.length <= 100 && clean.split(/\s+/).length <= 17) return clean.charAt(0).toUpperCase() + clean.slice(1);
+      const labels = { roles: 'Roles and responsibilities', risk: 'Risks and constraints', proposal: 'Proposed approach', impact: 'Why this matters', action: 'Next steps to define' };
+      if (labels[kind]) return labels[kind];
+      return clean.split(/\s+/).slice(0, 12).join(' ').replace(/[,;:]$/, '') + '…';
+    }
+
     function organiseFreeText(text) {
       const source = String(text).replace(/\r\n?/g, '\n').trim();
       if (source.length > 20000) throw new Error('Keep free text to 20,000 characters or fewer.');
       if (!source) return [];
       const groups = [];
-      const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('en', { granularity: 'sentence' }) : null;
       source.split(/\n\s*\n/).forEach(paragraph => {
-        const sentences = paragraph.split('\n').flatMap(line => {
+        let current = null;
+        paragraph.split('\n').forEach(line => {
+          const bullet = /^\s*[-*•]\s+/.test(line);
           const clean = line.replace(/^\s*[-*•]\s+/, '').trim();
-          if (!clean) return [];
-          return segmenter ? [...segmenter.segment(clean)].map(part => part.segment.trim()).filter(Boolean) : [clean];
+          const ideas = splitPlainSentences(clean).flatMap(splitIndependentIdeas);
+          ideas.forEach(point => {
+            const support = bullet || /^(?:for example|for instance|e\.g\.|measured|specifically|this (?:means|shows|includes)|because|but|however|although|despite|only if|provided|unless|except)\b/i.test(point);
+            if ((support && current) || groups.length >= 80) {
+              const target = current || groups[groups.length - 1];
+              if (target.points.length < 80) target.points.push(point);
+              else target.points[target.points.length - 1] += ' ' + point;
+            } else {
+              const kind = ideaKind(point);
+              current = { heading: ideaHeading(point, kind), points: [point], kind };
+              groups.push(current);
+            }
+          });
         });
-        for (let start = 0; start < sentences.length; start += 4) {
-          const points = sentences.slice(start, start + 4);
-          const heading = points[0].length <= 110 ? points[0].replace(/[.!?]+$/, '') : `Notes ${groups.length + 1}`;
-          groups.push({ heading, points });
-        }
       });
       return groups;
+    }
+
+    function briefQuestions(text) {
+      if (!String(text).trim()) return [];
+      const questions = [];
+      if (/\b(raci|roles?|responsibilit\w*|ownership|merge\w*|joining)\b/i.test(text)) questions.push({ title: 'Which responsibilities are proposed?', prompt: 'Who will do the work, who approves, and who should be consulted or informed?', placeholder: 'Name the roles you know. Say “not yet agreed” where needed.' });
+      if (/\b(ways of working|process|handover|workflow|structure)\b/i.test(text)) questions.push({ title: 'What will work differently?', prompt: 'What changes in the process, handovers or decision-making?', placeholder: 'Describe a specific proposed change and what stays the same.' });
+      if (!/\d|\b(evidence|measured|survey|data|for example|feedback|observed)\b/i.test(text)) questions.push({ title: 'What supports the case?', prompt: 'Which observation, example or result makes this change worth considering?', placeholder: 'Add evidence you have. Leave blank if it is not available.' });
+      if (!/\b(risks?|constraints?|uncertain\w*|not yet|unknown|depend\w*|unresolved)\b/i.test(text)) questions.push({ title: 'What still needs agreement?', prompt: 'Are there risks, dependencies or details that have not been decided?', placeholder: 'Keep uncertainties explicit; do not guess an owner or deadline.' });
+      if (!questions.length) questions.push({ title: 'What is the next practical step?', prompt: 'What action follows the decision, and what information is still needed?', placeholder: 'Add only the next step you can support.' });
+      return questions.slice(0, 3);
     }
     const uid = () => 'id-' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
     const clone = value => typeof structuredClone === 'function' ? structuredClone(value) : JSON.parse(JSON.stringify(value));
@@ -1327,6 +1415,8 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
       const contentSlots = Math.max(1, requested - 2);
       const buckets = distribute(groups, contentSlots);
       const slides = [];
+      const comparable = text => text.toLowerCase().replace(/^(?:and|also)\s+/, '').replace(/[.!?;:,]+$/, '').replace(/\s+/g, ' ').trim();
+      const supportingPoints = group => group.points.filter((point, index) => !(group.kind && index === 0 && comparable(point) === comparable(group.heading)));
 
       slides.push({
         id: uid(), kind: 'title', eyebrow: 'Decision brief',
@@ -1338,8 +1428,9 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
         if (!bucket.length) return;
         if (bucket.length === 1) {
           const group = bucket[0];
-          const blocks = group.points.length
-            ? [{ id: uid(), type: 'bullets', items: group.points.slice() }]
+          const points = supportingPoints(group);
+          const blocks = points.length
+            ? [{ id: uid(), type: 'bullets', items: points }]
             : [];
           slides.push({ id: uid(), kind: 'content', eyebrow: `Message ${bucketIndex + 1}`, title: group.heading, blocks });
         } else {
@@ -1347,8 +1438,8 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
             id: uid(), kind: 'content', eyebrow: `Messages ${bucketIndex + 1}`, title: 'Key messages',
             blocks: [{ id: uid(), type: bucket.length === 2 ? 'columns' : 'cards',
               ...(bucket.length === 2
-                ? { columns: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') })) }
-                : { items: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') })) })
+                ? { columns: bucket.map(group => ({ title: group.heading, text: supportingPoints(group).join(' · ') })) }
+                : { items: bucket.map(group => ({ title: group.heading, text: supportingPoints(group).join(' · ') })) })
             }]
           });
         }
@@ -1464,7 +1555,7 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
           style: styles.includes(brief.style) ? brief.style : value.style, count: ['auto', '3', '4', '5', '6'].includes(String(brief.count)) ? String(brief.count) : 'auto' } };
     }
 
-  const api = { uid, clone, parseMessageGroups, organiseFreeText, embedEditorProject, distribute, newBlock, buildSlides, escapeHtml, blockToHtml, renderDeckHtml, DEFAULT_LOGO, isEmbeddedImage, deckLogo, slidePageNumber, parseSavedProject, normaliseProject };
+  const api = { uid, clone, parseMessageGroups, organiseFreeText, briefQuestions, embedEditorProject, distribute, newBlock, buildSlides, escapeHtml, blockToHtml, renderDeckHtml, DEFAULT_LOGO, isEmbeddedImage, deckLogo, slidePageNumber, parseSavedProject, normaliseProject };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.DeckCore = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
@@ -2092,7 +2183,7 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
     function updateInputMode() {
       const free = byId('input-mode').value === 'free';
       byId('messages-label').textContent = free ? 'Paste your notes or free text' : 'Key messages and supporting points';
-      byId('input-hint').textContent = free ? 'Up to 20,000 characters. Paragraphs and sentences become editable slide groups. This preserves your wording; it does not use an AI model.' : 'Start each key message on a new line. Add supporting points beneath it with “-”.';
+      byId('input-hint').textContent = free ? 'Up to 20,000 characters. Clear ideas become slide points, with your facts and caveats kept intact. Standard uses local rules; use the guided path to see the outline take shape.' : 'Start each key message on a new line. Add supporting points beneath it with “-”.';
       byId('messages').maxLength = free ? 20000 : 50000;
     }
 
@@ -2569,9 +2660,57 @@ function syncBriefFromGuide() {
 function updateGuideMode() {
   const free = byId('guide-mode').value === 'free';
   byId('guide-notes').maxLength = free ? 20000 : 50000;
-  byId('guide-notes-help').textContent = free ? 'Use a new paragraph for each main idea. Your sentences are kept as written; Standard mode does not rewrite or fact-check them.' : 'Write a headline, then supporting points on separate lines starting with a hyphen. Leave a blank line before the next headline.';
+  byId('guide-notes-help').textContent = free ? 'Write naturally, including uncertainties. Standard separates clear ideas and keeps your wording as supporting content. The preview below shows what it found.' : 'Write a headline, then supporting points on separate lines starting with a hyphen. Leave a blank line before the next headline.';
   byId('guide-notes').placeholder = free ? 'What is happening? Why does it matter? What should happen next?' : 'The main point\n- A supporting fact\n- Another detail\n\nThe next point\n- Its supporting detail';
   byId('guide-char-count').textContent = `${byId('guide-notes').value.length.toLocaleString()} / ${(free ? 20000 : 50000).toLocaleString()} characters`;
+  renderGuideIdeas();
+}
+
+function renderGuideIdeas() {
+  const text = byId('guide-notes').value;
+  const mode = byId('guide-mode').value;
+  const key = mode + '\n' + text;
+  if (flow.ideaPreviewKey === key) return;
+  flow.ideaPreviewKey = key;
+  const list = byId('guide-idea-list'); list.replaceChildren();
+  byId('guide-ideas').hidden = !text.trim();
+  const followups = byId('guide-followups'); followups.replaceChildren();
+  if (!text.trim()) return;
+  let groups;
+  try { groups = mode === 'free' ? DeckCore.organiseFreeText(text) : parseMessageGroups(text); }
+  catch (error) { byId('guide-ideas-count').textContent = error.message; return; }
+  byId('guide-ideas-count').textContent = `${groups.length} main point${groups.length === 1 ? '' : 's'}`;
+  const labels = { context: 'Context', roles: 'Responsibilities', risk: 'Risk or uncertainty', proposal: 'Proposed approach', impact: 'Impact or evidence', action: 'Next step' };
+  groups.slice(0, 12).forEach((group, index) => {
+    const row = make('li'), copy = make('div');
+    if (group.kind) copy.appendChild(make('span', 'section-index', labels[group.kind]));
+    copy.appendChild(make('strong', '', group.heading));
+    const points = make('ul', 'outline-points');
+    group.points.forEach(point => points.appendChild(make('li', '', point)));
+    copy.appendChild(points); row.append(make('span', 'outline-number', String(index + 1).padStart(2, '0')), copy); list.appendChild(row);
+  });
+  if (groups.length > 12) list.appendChild(make('li', 'field-help', `${groups.length - 12} more points will be included when building. Choose the final slide count in the next step.`));
+  DeckCore.briefQuestions(text).forEach((question, index) => {
+    const wrap = make('div', 'form-field guide-followup');
+    const id = `followup-${index}`, label = make('label', '', question.title);
+    label.setAttribute('for', id);
+    const prompt = make('p', 'field-help', question.prompt); prompt.id = `${id}-prompt`;
+    const input = make('textarea'); input.id = id; input.rows = 2; input.maxLength = 2000; input.placeholder = question.placeholder; input.setAttribute('aria-describedby', prompt.id);
+    const add = make('button', 'btn btn-quiet btn-small', 'Add this detail to my notes'); add.type = 'button';
+    add.addEventListener('click', () => addGuideDetail(input.value, input));
+    wrap.append(label, prompt, input, add); followups.appendChild(wrap);
+  });
+}
+
+function addGuideDetail(value, input) {
+  const detail = value.trim();
+  if (!detail) { toast('Add a detail first, or leave this optional question unanswered.'); input?.focus(); return; }
+  const notes = byId('guide-notes');
+  const addition = byId('guide-mode').value === 'structured' ? '\n- ' + detail.replace(/\n+/g, '\n- ') : '\n\n' + detail;
+  if (notes.value.length + addition.length > notes.maxLength) { toast('These notes have reached the character limit. Shorten them before adding more.', true); return; }
+  notes.value = notes.value.trimEnd() + addition;
+  updateGuideMode(); syncBriefFromGuide(); queueRecovery();
+  toast('Detail added to your notes and outline.'); notes.focus();
 }
 
 function updateJourney() {
@@ -2741,6 +2880,12 @@ function renderOutline() {
     for (const [i, slide] of plan.slides.entries()) {
       const row = make('li'), copy = make('div');
       copy.append(make('strong', '', slide.title), make('p', '', `${slide.kind === 'title' ? 'Opening' : slide.kind === 'statement' ? 'Closing' : 'Content'} · ${slide.blocks.length} content element${slide.blocks.length === 1 ? '' : 's'}`));
+      const points = make('ul', 'outline-points');
+      slide.blocks.forEach(block => {
+        const values = block.type === 'bullets' ? block.items : block.type === 'columns' || block.type === 'cards' ? (block.columns || block.items).map(item => item.title + (item.text ? ' — ' + item.text : '')) : [blockPlainText(block)];
+        values.filter(Boolean).forEach(value => points.appendChild(make('li', '', value)));
+      });
+      copy.appendChild(points);
       row.append(make('span', 'outline-number', String(i + 1).padStart(2, '0')), copy); list.appendChild(row);
     }
     byId('outline-note').textContent = `${plan.slides.length} suggested slides. ${plan.metadata.grouped ? 'Some messages are grouped to fit your chosen length. ' : ''}All wording can be edited after building.${state.slides.length ? ' Building again replaces the current slides; download a copy first to keep them.' : ''}`;
@@ -2898,7 +3043,7 @@ byId('guide-next').addEventListener('click', () => {
 });
 byId('guide-mode').addEventListener('change', () => { updateGuideMode(); syncBriefFromGuide(); queueRecovery(); });
 byId('guide-engine').addEventListener('change', () => {
-  byId('guide-engine-help').textContent = byId('guide-engine').value === 'ai' ? 'Local AI needs a one-time model download, starting at 283.1 MiB. You will choose and confirm the download before it starts. Your notes stay on this device.' : 'Standard splits and arranges the sentences you supplied. It does not summarise, rewrite or infer a storyline.';
+  byId('guide-engine-help').textContent = byId('guide-engine').value === 'ai' ? 'Local AI needs a one-time model download, starting at 283.1 MiB. You will choose and confirm the download before it starts. Your notes stay on this device.' : 'Standard separates clear ideas, keeps caveats and supporting details together, and suggests a structure. It uses local rules; it does not verify facts or invent missing details.';
   renderGuide();
 });
 byId('guide-example').addEventListener('click', () => {

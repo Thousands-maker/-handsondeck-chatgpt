@@ -49,9 +49,50 @@ test('free text organisation retains sentence wording, numbers, negation and par
   assert.deepEqual(groups.flatMap(group => group.points), ['The pilot costs $1.25 million.', 'Do not expand before review.', 'We need an owner.', 'The deadline is 13 October.', 'Preserve this separate point.']);
   const result = callTool('create_deck_plan', { ...sample, inputMode: 'free', messages: source });
   const exported = core.renderDeckHtml(result);
-  for (const point of groups.flatMap(group => group.points)) assert.ok(exported.includes(core.escapeHtml(point)));
+  for (const point of groups.flatMap(group => group.points)) assert.ok(exported.toLowerCase().includes(core.escapeHtml(point.replace(/[.!?]+$/, '')).toLowerCase()));
   assert.deepEqual(core.organiseFreeText(' \n '), []);
   assert.throws(() => core.organiseFreeText('x'.repeat(20001)), /20,000/);
+});
+
+test('natural lowercase notes become distinct ideas without a browser sentence segmenter', () => {
+  const notes = 'the support team is joining the service team, and there are new handovers to agree. i need a RACI before the new process can start.';
+  const groups = core.organiseFreeText(notes);
+  assert.equal(groups.length, 3);
+  assert.deepEqual(groups.map(g => g.heading), ['Team changes', 'Ways of working', 'Roles and responsibilities']);
+  const plan = core.buildSlides({ purpose: 'Approve the proposed structure', audience: 'Team leads', count: 'auto' }, groups);
+  assert.equal(plan.slides.length, 5);
+  assert.ok(plan.slides[3].blocks[0].items[0].includes('before the new process can start'));
+  assert.doesNotMatch(JSON.stringify(plan), /Notes 1/);
+  const browser = vm.createContext({ Intl: undefined });
+  vm.runInContext(read('core/deck-core.cjs'), browser);
+  assert.equal(JSON.stringify(browser.DeckCore.organiseFreeText(notes)), JSON.stringify(groups));
+});
+
+test('idea splitting preserves numbers, abbreviations, conditions, qualifications and supplied evidence', () => {
+  const source = 'Dr. Lee reviewed the pilot. it costs $1.25 million, but approval is not confirmed.\n\nIf funding is approved, we will extend the trial.\n- For example, the estimate excludes tax.\n\nComplaints fell 20%. However, fewer people could get through.';
+  const groups = core.organiseFreeText(source);
+  assert.equal(groups[0].points[0], 'Dr. Lee reviewed the pilot.');
+  assert.equal(groups[1].points[0], 'it costs $1.25 million, but approval is not confirmed.');
+  const conditional = groups.find(g => g.points[0].startsWith('If funding'));
+  assert.deepEqual(conditional.points, ['If funding is approved, we will extend the trial.', 'For example, the estimate excludes tax.']);
+  assert.deepEqual(groups.at(-1).points, ['Complaints fell 20%.', 'However, fewer people could get through.']);
+  const plan = core.buildSlides({ purpose: 'Decide on the trial', count: '3' }, groups);
+  const out = core.renderDeckHtml({ ...plan, style: 'executive' });
+  for (const text of ['$1.25 million, but approval is not confirmed', 'If funding is approved, we will extend the trial', 'excludes tax', 'However, fewer people could get through']) assert.ok(out.includes(text));
+});
+
+test('guided questions ask for missing detail without adding answers to the slide plan', () => {
+  const notes = 'We need a RACI and a new workflow.';
+  const questions = core.briefQuestions(notes);
+  assert.equal(questions.length, 3);
+  assert.ok(questions.some(q => q.prompt.includes('who approves')));
+  assert.ok(questions.some(q => q.prompt.includes('observation')));
+  const plan = core.buildSlides({ purpose: 'Approve a trial', count: 'auto' }, core.organiseFreeText(notes));
+  assert.doesNotMatch(JSON.stringify(plan), /Who will do the work|Which observation|not yet agreed/);
+  const longNotes = Array.from({ length: 240 }, (_, i) => `item ${i} needs review.`).join(' ');
+  const longPlan = core.buildSlides({ purpose: 'Agree priorities', count: 'auto' }, core.organiseFreeText(longNotes));
+  assert.equal(core.normaliseProject({ version: 1, style: 'executive', ...longPlan, brief: { inputMode: 'free', messagesText: longNotes } }).slides.length, 6);
+  assert.ok(JSON.stringify(longPlan).includes('item 239 needs review.'));
 });
 
 test('downloaded editable copies retain the full project without corrupting executable scripts', () => {

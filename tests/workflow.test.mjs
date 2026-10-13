@@ -194,3 +194,27 @@ test('missing asks, new numbers and placeholders remain advisory and never block
   assert.equal(app.get('download-editor').disabled, false);
   assert.match(app.get('export-check-summary').textContent, /still download/);
 });
+
+test('guided notes show their ideas live, preserve typed follow-ups, and build from added facts only', () => {
+  const app = setup(); app.get('start-guided').click();
+  app.get('guide-purpose').value = 'Approve a revised process'; app.get('guide-next').click();
+  app.get('guide-notes').value = 'the support team is joining the service team, and there are new handovers to agree. i need a RACI before starting.';
+  app.run('updateGuideMode(); syncBriefFromGuide();');
+  assert.equal(app.get('guide-idea-list').children.length, 3);
+  const followups = app.get('guide-followups');
+  const answer = followups.querySelector('textarea'); answer.value = 'Responsibility for approval is not yet agreed.';
+  app.run('updateGuideMode()');
+  assert.equal(followups.querySelector('textarea').value, answer.value);
+  followups.querySelector('button').click();
+  assert.ok(app.get('guide-notes').value.includes('Responsibility for approval is not yet agreed.'));
+  app.get('guide-next').click(); app.get('guide-next').click();
+  assert.equal(app.run('flow.step'), 3);
+  assert.ok(app.get('guide-outline').querySelectorAll('li').some(n => n.textContent.includes('not yet agreed')));
+  app.get('guide-next').click();
+  const output = app.run('exportHtml()');
+  assert.ok(output.includes('Responsibility for approval is not yet agreed.'));
+  assert.doesNotMatch(output, /Who will do the work|What supports the case/);
+  app.run('saveRecovery()');
+  const reopened = setup(app.storage.get('hands-on-deck-recovery-v1'));
+  assert.ok(reopened.get('messages').value.includes('not yet agreed'));
+});

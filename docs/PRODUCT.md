@@ -37,7 +37,8 @@ Quality suggestions belong within refinement and remain advisory. They do not ad
 ## Core boundaries
 
 - Standard generation and editing use fixed local rules, with no runtime CDNs, remote fonts, analytics, accounts or model calls.
-- Standard preserves supplied wording. It does not claim to synthesise arguments or verify evidence.
+- Standard preserves supplied factual wording and proposes headings using conservative local rules. It separates clear ideas instead of treating a paragraph as one slide. It does not claim to synthesise arguments with a model or verify evidence.
+- The guided path previews an emerging outline and offers relevant questions about evidence, responsibilities and unknowns. Missing information is requested rather than invented; unanswered prompts stay out of the presentation.
 - The opening establishes the intended outcome; middle slides use supplied messages; the close states the ask. Thin briefs stay short instead of gaining filler.
 - After generation, the slide plan is the source of truth for preview and export. The raw brief remains a reference and is not kept in two-way sync.
 - Rebuilding requires confirmation before replacing the current slides. Navigating back to the brief never replaces them.

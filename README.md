@@ -17,7 +17,7 @@ Three clearly labelled fictional examples demonstrate a decision, an update and 
 
 The editor includes text, bullets, quotes, callouts, statistics, columns, cards, tables, bar charts, local images and dividers. You can reorder, duplicate and remove slides and elements, and choose Executive, Operational or Minimal styling.
 
-Standard generation uses fixed local rules. Free text organisation preserves sentence wording; it does not perform AI rewriting or factual verification. The optional MCP integration lets a separately configured AI application or agent supply intelligent synthesis and use the deck tools. No model is bundled with or automatically connected to the editor.
+Standard generation uses fixed local rules. It separates sentences and clear independent ideas, including lowercase notes, and keeps explicit evidence and caveats with their point. It suggests short headings while preserving supplied facts in the slide content. The guided path shows an emerging outline and optional questions for missing detail. It does not perform AI rewriting or factual verification. The optional MCP integration lets a separately configured AI application or agent supply intelligent synthesis and use the deck tools. No model is bundled with or automatically connected to the editor.
 
 A recovery copy of the brief and deck is saved in this browser when storage is available. **Download** includes a switch to turn recovery off and remove its saved copy. Blocked or full storage is reported; a newer draft in another tab pauses recovery writes. Browser recovery is not a durable file backup. Download your work before clearing browser data or moving to another device.
 

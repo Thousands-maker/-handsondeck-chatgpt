@@ -4,13 +4,13 @@ Standard editing works from a single HTML file. Scripts, styles, the placeholder
 
 ## Save an editable copy
 
-Choose **Save & share → Download editable copy**. The file contains the editor, deck, original brief and embedded images, with a 10 MiB limit. Open it in a browser that supports local HTML. Download a fresh copy after editing. A presentation copy is for viewing; a project JSON needs an editor to reopen it.
+Choose **Download → Download editable copy**. The file contains the editor, deck, original brief and embedded images, with a 10 MiB limit. Open it in a browser that supports local HTML. Download a fresh copy after editing. A presentation copy is for viewing; a project JSON needs an editor to reopen it.
 
-Browser recovery saves the brief and deck locally when storage is available. It can be disabled and removed in Save & share. Storage failures and a newer draft in another tab are reported. Recovery is a convenience, not a file backup; keep an editable download before clearing browser data or changing devices.
+Browser recovery saves the brief and deck locally when storage is available. It can be disabled and removed in Download. Storage failures and a newer draft in another tab are reported. Recovery is a convenience, not a file backup; keep an editable download before clearing browser data or changing devices.
 
 ## Standard and Supercharged
 
-Standard organises up to 20,000 characters of free text into sentences and paragraphs while preserving wording. It does not synthesise an argument or rewrite content.
+Standard organises up to 20,000 characters of free text into distinct ideas using local rules. Its sentence splitting works with lowercase starts and without a browser sentence segmenter. Independent clauses can become separate points; explicit evidence and qualifications stay with their context. Suggested topic headings are labels, not new factual claims. The guided flow previews the points and asks optional questions about missing detail. Only answers explicitly added by the author enter the brief. It does not synthesise an argument with an AI model or verify facts.
 
 Supercharged runs WebLLM 0.2.86 in a dedicated worker using a compatible WebGPU device. Qwen2.5 0.5B is the smaller download (283.1 MiB); Qwen2.5 1.5B is the larger option (846.8 MiB). These totals cover runtime, compiled model library, configuration, tokenizer, tensor manifest and every weight shard. The app shell is saved separately and is under 1 MiB without user images. Runtime graphics memory needs are higher than download size; the setup screen gives an approximate allowance.
 

@@ -38,9 +38,57 @@ function syncBriefFromGuide() {
 function updateGuideMode() {
   const free = byId('guide-mode').value === 'free';
   byId('guide-notes').maxLength = free ? 20000 : 50000;
-  byId('guide-notes-help').textContent = free ? 'Use a new paragraph for each main idea. Your sentences are kept as written; Standard mode does not rewrite or fact-check them.' : 'Write a headline, then supporting points on separate lines starting with a hyphen. Leave a blank line before the next headline.';
+  byId('guide-notes-help').textContent = free ? 'Write naturally, including uncertainties. Standard separates clear ideas and keeps your wording as supporting content. The preview below shows what it found.' : 'Write a headline, then supporting points on separate lines starting with a hyphen. Leave a blank line before the next headline.';
   byId('guide-notes').placeholder = free ? 'What is happening? Why does it matter? What should happen next?' : 'The main point\n- A supporting fact\n- Another detail\n\nThe next point\n- Its supporting detail';
   byId('guide-char-count').textContent = `${byId('guide-notes').value.length.toLocaleString()} / ${(free ? 20000 : 50000).toLocaleString()} characters`;
+  renderGuideIdeas();
+}
+
+function renderGuideIdeas() {
+  const text = byId('guide-notes').value;
+  const mode = byId('guide-mode').value;
+  const key = mode + '\n' + text;
+  if (flow.ideaPreviewKey === key) return;
+  flow.ideaPreviewKey = key;
+  const list = byId('guide-idea-list'); list.replaceChildren();
+  byId('guide-ideas').hidden = !text.trim();
+  const followups = byId('guide-followups'); followups.replaceChildren();
+  if (!text.trim()) return;
+  let groups;
+  try { groups = mode === 'free' ? DeckCore.organiseFreeText(text) : parseMessageGroups(text); }
+  catch (error) { byId('guide-ideas-count').textContent = error.message; return; }
+  byId('guide-ideas-count').textContent = `${groups.length} main point${groups.length === 1 ? '' : 's'}`;
+  const labels = { context: 'Context', roles: 'Responsibilities', risk: 'Risk or uncertainty', proposal: 'Proposed approach', impact: 'Impact or evidence', action: 'Next step' };
+  groups.slice(0, 12).forEach((group, index) => {
+    const row = make('li'), copy = make('div');
+    if (group.kind) copy.appendChild(make('span', 'section-index', labels[group.kind]));
+    copy.appendChild(make('strong', '', group.heading));
+    const points = make('ul', 'outline-points');
+    group.points.forEach(point => points.appendChild(make('li', '', point)));
+    copy.appendChild(points); row.append(make('span', 'outline-number', String(index + 1).padStart(2, '0')), copy); list.appendChild(row);
+  });
+  if (groups.length > 12) list.appendChild(make('li', 'field-help', `${groups.length - 12} more points will be included when building. Choose the final slide count in the next step.`));
+  DeckCore.briefQuestions(text).forEach((question, index) => {
+    const wrap = make('div', 'form-field guide-followup');
+    const id = `followup-${index}`, label = make('label', '', question.title);
+    label.setAttribute('for', id);
+    const prompt = make('p', 'field-help', question.prompt); prompt.id = `${id}-prompt`;
+    const input = make('textarea'); input.id = id; input.rows = 2; input.maxLength = 2000; input.placeholder = question.placeholder; input.setAttribute('aria-describedby', prompt.id);
+    const add = make('button', 'btn btn-quiet btn-small', 'Add this detail to my notes'); add.type = 'button';
+    add.addEventListener('click', () => addGuideDetail(input.value, input));
+    wrap.append(label, prompt, input, add); followups.appendChild(wrap);
+  });
+}
+
+function addGuideDetail(value, input) {
+  const detail = value.trim();
+  if (!detail) { toast('Add a detail first, or leave this optional question unanswered.'); input?.focus(); return; }
+  const notes = byId('guide-notes');
+  const addition = byId('guide-mode').value === 'structured' ? '\n- ' + detail.replace(/\n+/g, '\n- ') : '\n\n' + detail;
+  if (notes.value.length + addition.length > notes.maxLength) { toast('These notes have reached the character limit. Shorten them before adding more.', true); return; }
+  notes.value = notes.value.trimEnd() + addition;
+  updateGuideMode(); syncBriefFromGuide(); queueRecovery();
+  toast('Detail added to your notes and outline.'); notes.focus();
 }
 
 function updateJourney() {
@@ -210,6 +258,12 @@ function renderOutline() {
     for (const [i, slide] of plan.slides.entries()) {
       const row = make('li'), copy = make('div');
       copy.append(make('strong', '', slide.title), make('p', '', `${slide.kind === 'title' ? 'Opening' : slide.kind === 'statement' ? 'Closing' : 'Content'} · ${slide.blocks.length} content element${slide.blocks.length === 1 ? '' : 's'}`));
+      const points = make('ul', 'outline-points');
+      slide.blocks.forEach(block => {
+        const values = block.type === 'bullets' ? block.items : block.type === 'columns' || block.type === 'cards' ? (block.columns || block.items).map(item => item.title + (item.text ? ' — ' + item.text : '')) : [blockPlainText(block)];
+        values.filter(Boolean).forEach(value => points.appendChild(make('li', '', value)));
+      });
+      copy.appendChild(points);
       row.append(make('span', 'outline-number', String(i + 1).padStart(2, '0')), copy); list.appendChild(row);
     }
     byId('outline-note').textContent = `${plan.slides.length} suggested slides. ${plan.metadata.grouped ? 'Some messages are grouped to fit your chosen length. ' : ''}All wording can be edited after building.${state.slides.length ? ' Building again replaces the current slides; download a copy first to keep them.' : ''}`;
@@ -367,7 +421,7 @@ byId('guide-next').addEventListener('click', () => {
 });
 byId('guide-mode').addEventListener('change', () => { updateGuideMode(); syncBriefFromGuide(); queueRecovery(); });
 byId('guide-engine').addEventListener('change', () => {
-  byId('guide-engine-help').textContent = byId('guide-engine').value === 'ai' ? 'Local AI needs a one-time model download, starting at 283.1 MiB. You will choose and confirm the download before it starts. Your notes stay on this device.' : 'Standard splits and arranges the sentences you supplied. It does not summarise, rewrite or infer a storyline.';
+  byId('guide-engine-help').textContent = byId('guide-engine').value === 'ai' ? 'Local AI needs a one-time model download, starting at 283.1 MiB. You will choose and confirm the download before it starts. Your notes stay on this device.' : 'Standard separates clear ideas, keeps caveats and supporting details together, and suggests a structure. It uses local rules; it does not verify facts or invent missing details.';
   renderGuide();
 });
 byId('guide-example').addEventListener('click', () => {

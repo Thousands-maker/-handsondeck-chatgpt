@@ -432,3 +432,18 @@ body.is-presenting .refine-bar { display:none; }
   .story-field input, .story-field textarea { font-size:16px; }
   .download-review { align-items:flex-start; flex-direction:column; }
 }
+
+/* Show the content taking shape before asking the author to build. */
+.guide-ideas { margin:22px 0; padding-top:24px; border-top:1px solid var(--line); }
+.guide-ideas .section-heading { margin-bottom:6px; }
+.guide-ideas .section-heading h2 { font-size:17px; }
+.guide-ideas .section-index { display:block; margin-bottom:6px; }
+.outline-list .outline-points { margin:8px 0 0; padding-left:18px; list-style:disc; }
+.outline-list .outline-points li { display:list-item; border:0; padding:0 0 4px 2px; margin:0; background:none; color:var(--muted); font-size:12px; line-height:1.65; overflow-wrap:anywhere; }
+.guide-question-box { margin-top:18px; padding:16px 18px; background:#f3f7fd; border:1px solid #d9e4f5; border-radius:8px; }
+.guide-question-box summary { cursor:pointer; color:#34577f; font-size:13px; line-height:1.6; font-weight:600; }
+.optional-label { margin-left:6px; color:var(--muted); font-size:11px; font-weight:400; }
+.guide-followup { margin:22px 0 0; }
+.guide-followup .field-help { margin-bottom:10px; }
+.guide-followup textarea { min-height:76px; font-size:13px; }
+.guide-followup .btn { margin-top:7px; }
