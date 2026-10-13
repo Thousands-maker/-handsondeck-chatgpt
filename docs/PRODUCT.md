@@ -14,7 +14,7 @@ Both groups use the same brief, with structured and free-text input formats. Fir
 - One standalone HTML editor that works offline from the outset.
 - Standalone HTML presentations that recipients can open independently.
 - Local generation using fixed rules, described honestly.
-- Structured, layout-aware blocks and an ink-and-orange studio interface.
+- Structured, layout-aware blocks and a light office workspace with restrained blue accents and clear, compact controls.
 - Edits preserved when navigating slides or changing styles.
 - Confirmation before regeneration replaces on-slide edits.
 - Text rendered safely and local images embedded in exports.

@@ -47,6 +47,14 @@ That version included direct editing, an element picker, local image embedding, 
 - Made the slide logo a keyboard-accessible control for replacement or removal; presentations stay read-only.
 - Added download boundary, cache isolation, proposal, workflow and logo-control checks. Device inference and visual browser QA were unavailable in the maintainer environment.
 
+## Office workspace refinement
+
+- Adopted a light, professional workspace with blue action controls, compact navigation and consistent sans-serif typography.
+- Replaced the oversized start-page artwork with direct create/open/resume actions and a gallery of editable examples.
+- Used restrained blue, green and violet accents in example previews, plus a quieter editing toolbar and slide rail.
+- Simplified guidance and model-setup labels while retaining all existing drafting, editing, logo, review and save controls.
+- Advanced the opt-in service-worker shell cache for the refreshed interface.
+
 ## Verification limits
 
 Automated checks cover JavaScript syntax, matching standalone builds, generation, text escaping, and MCP request/response behaviour. They do not certify visual layout, browser-native undo, virtual keyboards, accessibility or cross-browser interaction. Those checks remain on the product backlog.

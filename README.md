@@ -6,7 +6,7 @@ Open **index.html** in your browser. No installation, account, server or interne
 
 ## Use it
 
-1. Choose **Create a deck** for the guided brief, or **Paste a ready brief** for one form.
+1. Choose **Create presentation** for the guided brief, or **Have a brief? Paste it here** for one form.
 2. Add the outcome, audience and notes. Choose **Suggest headings, points and a storyline with AI**, or **Arrange my existing wording without AI**. AI opens the opt-in model setup; it never starts a download automatically.
 3. Edit text directly on the slides. Use **Add element** for visuals, tables and callouts. Deletions have a one-step undo.
 4. Open **Review** to follow suggested checks and read through the deck in presentation mode.
