@@ -1,6 +1,6 @@
 'use strict';
 
-const flow = { page: 'welcome', step: 0, highest: 0, presenting: false, fileDirty: false, recoveryTimer: 0, recoveryEnabled: true, recoveryFailed: false, recoveryBlocked: false, reviewDone: false, example: false };
+const flow = { page: 'welcome', step: 0, highest: 0, editView: 'slides', presenting: false, fileDirty: false, recoveryTimer: 0, recoveryEnabled: true, recoveryFailed: false, recoveryBlocked: false, reviewDone: false, example: false };
 const RECOVERY_KEY = 'hands-on-deck-recovery-v1';
 const RECOVERY_SETTING = 'hands-on-deck-recovery-enabled';
 const examples = {
@@ -45,8 +45,8 @@ function updateGuideMode() {
 
 function updateJourney() {
   const hasSlides = !!state.slides.length;
-  const active = { guide: 'open-brief', editor: 'nav-edit', review: 'open-checks', offline: 'open-offline' }[flow.page];
-  for (const id of ['open-brief', 'nav-edit', 'open-checks', 'open-offline']) {
+  const active = { brief: 'open-brief', guide: 'open-brief', editor: 'nav-edit', review: 'nav-edit', offline: 'open-offline' }[flow.page];
+  for (const id of ['open-brief', 'nav-edit', 'open-offline']) {
     const node = byId(id);
     if (id === active) node.setAttribute('aria-current', 'step'); else node.removeAttribute('aria-current');
     node.disabled = id !== 'open-brief' && !hasSlides;
@@ -57,6 +57,8 @@ function updateJourney() {
   byId('resume-description').textContent = `${state.slides.length} slides · ${state.slides[0]?.title || 'Untitled deck'}`;
   byId('download-presentation').disabled = !hasSlides;
   byId('download-project').disabled = !hasSlides;
+  byId('brief-rebuild').hidden = !hasSlides;
+  byId('generate').textContent = hasSlides ? 'Rebuild from this brief' : 'Build my first deck →';
 }
 
 function showPage(page, focus = true) {
@@ -66,26 +68,87 @@ function showPage(page, focus = true) {
   if (byId('drawer-dialog').open) byId('drawer-dialog').close();
   closeElementMenu();
   flow.page = page;
-  for (const id of ['welcome', 'guide', 'review', 'ai', 'offline']) byId(id + '-page').classList.toggle('hidden', id !== page);
+  for (const id of ['welcome', 'brief', 'guide', 'review', 'ai', 'offline']) byId(id + '-page').classList.toggle('hidden', id !== page);
   document.querySelector('.app-shell').classList.toggle('hidden', page !== 'editor');
   updateJourney();
   if (page === 'guide') { syncGuideFromBrief(); renderGuide(); }
   if (page === 'review') renderReviewPage();
   if (page === 'offline') refreshDownloadInfo();
   if (page === 'ai' && typeof aiRefresh === 'function') { aiRefresh(); if (!byId('ai-notes').value) aiCopyBrief(); }
-  if (page === 'editor') scheduleFit();
+  if (page === 'editor') { setEditView(flow.editView); scheduleFit(); }
   if (focus) {
-    const heading = { welcome: 'welcome-title', guide: `guide-title-${flow.step}`, review: 'review-title', ai: 'ai-title', offline: 'offline-title', editor: 'editor-heading' }[page];
+    const heading = { welcome: 'welcome-title', brief: 'brief-title', guide: `guide-title-${flow.step}`, review: 'review-title', ai: 'ai-title', offline: 'offline-title', editor: 'editor-heading' }[page];
     byId(heading)?.focus({ preventScroll: true });
   }
 }
 
 function openGuide() { syncGuideFromBrief(); flow.step = 0; showPage('guide'); }
 function openDirectBrief() {
-  if (flow.page === 'guide') syncBriefFromGuide();
-  if (state.slides.length) showPage('editor');
-  openDrawer('brief');
+  showPage('brief');
   byId('purpose').focus();
+}
+
+function setEditView(view) {
+  flow.editView = view === 'outline' ? 'outline' : 'slides';
+  const outline = flow.editView === 'outline' && !flow.presenting;
+  byId('story-outline').hidden = !outline;
+  byId('stage-shell').hidden = outline;
+  byId('stage-footer').hidden = outline;
+  document.querySelector('.editor-toolbar').hidden = outline;
+  document.querySelector('.app-shell').classList.toggle('outline-mode', outline);
+  byId('view-slides').setAttribute('aria-pressed', String(!outline));
+  byId('view-outline').setAttribute('aria-pressed', String(outline));
+  if (outline) renderStoryOutline(); else renderPreview();
+}
+
+function renderStoryOutline() {
+  if (flow.editView !== 'outline') return;
+  const list = byId('story-list'); list.replaceChildren();
+  state.slides.forEach((slide, index) => {
+    const row = make('li', 'story-card');
+    const head = make('div', 'story-card-head');
+    head.appendChild(make('span', 'section-index', `${String(index + 1).padStart(2, '0')} / ${slide.kind === 'title' || slide.kind === 'cover' ? 'Opening' : slide.kind === 'statement' ? 'Closing ask' : 'Key message'}`));
+    const actions = make('div', 'story-actions');
+    const action = (label, text, handler, disabled = false) => {
+      const button = make('button', 'btn btn-quiet btn-small', text); button.type = 'button'; button.disabled = disabled;
+      button.setAttribute('aria-label', `${label} slide ${index + 1}`);
+      button.addEventListener('click', () => { selectSlide(index); handler(); }); actions.appendChild(button);
+    };
+    action('Move up', '↑', () => moveSlide(-1), index === 0);
+    action('Move down', '↓', () => moveSlide(1), index === state.slides.length - 1);
+    action('Remove', 'Remove', deleteSlide, state.slides.length === 1);
+    action('Preview', 'View slide →', () => setEditView('slides'));
+    head.appendChild(actions); row.appendChild(head);
+    let fieldNumber = 0;
+    const field = (label, value, change, multiline = true) => {
+      const wrap = make('div', 'story-field'), id = `outline-${index}-${fieldNumber++}`;
+      const name = make('label', '', label); name.setAttribute('for', id);
+      const input = make(multiline ? 'textarea' : 'input'); input.id = id; input.value = value; input.maxLength = 10000;
+      if (multiline) input.rows = Math.min(7, Math.max(2, value.split('\n').length));
+      input.addEventListener('input', () => { change(input.value); markEdited(); scheduleSecondaryRenders(); });
+      wrap.append(name, input); row.appendChild(wrap);
+    };
+    field('Headline', slide.title, value => { slide.title = value; }, false);
+    slide.blocks.forEach(block => {
+      if (block.type === 'bullets') field('Supporting points · one per line', block.items.join('\n'), value => { block.items = value.split('\n'); });
+      else if (block.type === 'paragraph' || block.type === 'callout') field(block.type === 'callout' ? (block.label || 'Key point') : 'Supporting detail', block.text, value => { block.text = value; });
+      else if (block.type === 'columns' || block.type === 'cards') (block.columns || block.items).forEach(item => {
+        field('Message', item.title, value => { item.title = value; }, false);
+        field('Supporting detail', item.text, value => { item.text = value; });
+      });
+      else row.appendChild(make('p', 'field-help', `${block.type[0].toUpperCase() + block.type.slice(1)} element: use View slide to edit this visual. It stays in your deck.`));
+    });
+    if (!slide.blocks.length) row.appendChild(make('p', 'field-help', 'No supporting content yet. Use View slide to add evidence or a clear ask.'));
+    list.appendChild(row);
+  });
+}
+
+function showSourceBrief() {
+  const brief = getBrief();
+  byId('source-purpose').textContent = brief.purpose || 'Not supplied';
+  byId('source-audience').textContent = brief.audience || 'Not supplied';
+  byId('source-notes').textContent = brief.messagesText || 'No source notes were supplied.';
+  openDrawer('source');
 }
 
 function validGuideStep(step) {
@@ -169,6 +232,13 @@ function renderReviewPage() {
 
 function refreshDownloadInfo() {
   const blob = editorDownloadBlob();
+  const presentation = new Blob([exportHtml()], { type: 'text/html;charset=utf-8' });
+  byId('presentation-download-size').textContent = formatBytes(presentation.size);
+  byId('download-presentation').disabled = !state.slides.length || presentation.size > MAX_EDITOR_BYTES;
+  renderChecks();
+  byId('export-deck-summary').textContent = `${state.slides.length} slides · ${state.slides[0]?.title || 'Your presentation'}`;
+  byId('export-check-summary').textContent = state.warnings.length ? `${state.warnings.length} advisory suggestion${state.warnings.length === 1 ? '' : 's'} to consider. You can still download now.` : 'Ready for your final read-through. Check the facts and closing ask before sharing.';
+  byId('download-receipt').hidden = true;
   byId('editor-download-size').textContent = formatBytes(blob.size);
   byId('download-editor').disabled = blob.size > MAX_EDITOR_BYTES;
   byId('download-status').textContent = blob.size > MAX_EDITOR_BYTES ? 'This copy exceeds 10 MiB. Reduce or remove large images, then try again.' : 'Contains the editor, your slides, images and logo. Download only starts when you choose the button.';
@@ -226,17 +296,18 @@ function afterBuild() {
   flow.fileDirty = true; flow.reviewDone = false;
   flow.undo = null; byId('undo-delete').hidden = true;
   byId('editor-heading').textContent = flow.example ? 'A fictional example. Make it yours.' : 'Your first draft is ready.';
-  byId('editor-guidance').textContent = 'Click text to edit it. Use Add element for visuals, then review the story before saving.';
+  byId('editor-guidance').textContent = 'Switch to Outline to refine the argument. Slides and downloads use the same content.';
+  flow.editView = 'slides';
   document.querySelectorAll('.review-check input').forEach(node => { node.checked = false; });
   showPage('editor'); queueRecovery();
 }
 
 function startPresenting() {
   if (!state.slides.length) return;
-  showPage('editor'); flow.presenting = true; document.body.classList.add('is-presenting'); renderPreview();
+  showPage('editor'); flow.presenting = true; document.body.classList.add('is-presenting'); setEditView(flow.editView);
   byId('exit-present').focus();
 }
-function stopPresenting() { flow.presenting = false; document.body.classList.remove('is-presenting'); renderPreview(); }
+function stopPresenting() { flow.presenting = false; document.body.classList.remove('is-presenting'); setEditView(flow.editView); }
 
 function offerUndo(action, message) { flow.undo = action; byId('undo-delete').hidden = false; toast(message); }
 byId('undo-delete').addEventListener('click', () => { if (!flow.undo) return; flow.undo(); flow.undo = null; byId('undo-delete').hidden = true; markEdited(); renderAll(); toast('Deletion undone.'); });
@@ -246,6 +317,12 @@ byId('start-guided').addEventListener('click', openGuide);
 byId('start-direct').addEventListener('click', openDirectBrief);
 byId('guide-to-direct').addEventListener('click', openDirectBrief);
 byId('direct-to-guide').addEventListener('click', () => { byId('drawer-dialog').close(); openGuide(); });
+byId('brief-keep-editing').addEventListener('click', () => showPage('editor'));
+byId('view-slides').addEventListener('click', () => setEditView('slides'));
+byId('view-outline').addEventListener('click', () => setEditView('outline'));
+byId('open-source').addEventListener('click', showSourceBrief);
+byId('export-review').addEventListener('click', () => showPage('review'));
+byId('download-return').addEventListener('click', () => showPage('editor'));
 byId('nav-edit').addEventListener('click', () => showPage('editor'));
 byId('resume-deck').addEventListener('click', () => showPage('editor'));
 byId('open-help').addEventListener('click', () => byId('help-dialog').showModal());
@@ -272,7 +349,7 @@ byId('project-input').addEventListener('change', async event => {
     const project = DeckCore.parseSavedProject(await file.text());
     if (!allowReplacement()) return;
     applyProject(project); flow.fileDirty = false;
-    showPage(project.slides.length ? 'editor' : 'guide'); saveRecovery();
+    showPage(project.slides.length ? 'editor' : 'brief'); saveRecovery();
     toast('Your editable deck is open. Nothing was uploaded.');
   } catch (error) { toast(error.message || 'This file could not be opened.', true); }
 });
@@ -321,6 +398,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 // Capture the complete, still-unmodified page, including this inline workflow.
 editorTemplate = '<!doctype html>\n' + document.documentElement.outerHTML;
 putBrief({});
+byId('guide-engine').value = 'standard';
 try { flow.recoveryEnabled = localStorage.getItem(RECOVERY_SETTING) !== 'false'; } catch { flow.recoveryEnabled = false; flow.recoveryFailed = true; }
 let restored = false;
 try {
@@ -332,5 +410,5 @@ try {
   }
 } catch { toast('The saved copy could not be restored. Open a downloaded editable file to recover your deck.', true); }
 renderAll(); renderElementOptions();
-showPage(restored ? (state.slides.length ? 'editor' : 'guide') : 'welcome', false);
+showPage(restored ? (state.slides.length ? 'editor' : 'brief') : 'welcome', false);
 if (restored) toast('Welcome back. Your saved work is ready.');

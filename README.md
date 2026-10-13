@@ -6,12 +6,12 @@ Open **index.html** in your browser. No installation, account, server or interne
 
 ## Use it
 
-1. Choose **Create presentation** for the guided brief, or **Have a brief? Paste it here** for one form.
-2. Add the outcome, audience and notes. Choose **Suggest headings, points and a storyline with AI**, or **Arrange my existing wording without AI**. AI opens the opt-in model setup; it never starts a download automatically.
-3. Edit text directly on the slides. Use **Add element** for visuals, tables and callouts. Deletions have a one-step undo.
-4. Open **Review** to follow suggested checks and read through the deck in presentation mode.
-5. Choose **Save & share → Download editable copy** to keep the editor and deck together, or **Download presentation** for a viewing copy.
-6. Reopen an editable HTML copy directly in a browser, or choose **Open a saved deck** on the start screen to import editable HTML or a project JSON file.
+1. Choose **Create a briefing** for the one-page brief. **Help me shape my brief** offers guided questions when needed.
+2. Add the decision or outcome, audience and key messages. Choose a style and length, then **Build my first deck**. Standard works without an AI download and preserves your supplied wording.
+3. **Refine** in Slides or Outline. Edit headlines and supporting points, reorder or remove slides, and undo the last deletion. **Source brief** keeps your reference notes available for comparison. Both views and the export use the same slide data.
+4. **Check the case** for advisory suggestions about density, missing asks, placeholders and numbers absent from the reference brief. Checks do not verify facts and never block a download.
+5. **Download** a presentation to use or share, and an editable copy for later feedback. Reopen the saved HTML file in a browser and try it offline.
+6. Open an editable HTML file directly, or choose **Open a saved presentation** to import editable HTML or project JSON.
 
 Three clearly labelled fictional examples demonstrate a decision, an update and a discussion. **Help** is available throughout. **Supercharged** downloads and runs a local model on compatible WebGPU devices. It turns rough notes into a reviewable outline. Apply it only after checking the facts and caveats; the original notes remain in the brief.
 
@@ -19,7 +19,7 @@ The editor includes text, bullets, quotes, callouts, statistics, columns, cards,
 
 Standard generation uses fixed local rules. Free text organisation preserves sentence wording; it does not perform AI rewriting or factual verification. The optional MCP integration lets a separately configured AI application or agent supply intelligent synthesis and use the deck tools. No model is bundled with or automatically connected to the editor.
 
-A recovery copy of the brief and deck is saved in this browser when storage is available. **Save & share** includes a switch to turn recovery off and remove its saved copy. Blocked or full storage is reported; a newer draft in another tab pauses recovery writes. Browser recovery is not a durable file backup. Download your work before clearing browser data or moving to another device.
+A recovery copy of the brief and deck is saved in this browser when storage is available. **Download** includes a switch to turn recovery off and remove its saved copy. Blocked or full storage is reported; a newer draft in another tab pauses recovery writes. Browser recovery is not a durable file backup. Download your work before clearing browser data or moving to another device.
 
 An exported presentation is for viewing. An editable copy includes a snapshot you can reopen and edit. Save a fresh copy after further edits; the file on disk does not update itself.
 
@@ -29,7 +29,7 @@ Click the logo in the top-right of any editable slide to upload a replacement or
 
 ## Offline downloads
 
-The **Save & share** screen shows the actual editor-copy size before downloading. Copies are limited to 10 MiB, including images, and are generated on the device only after a button click. A SHA-256 checksum is shown when the browser supports it. Standard mode fetches no external scripts, fonts, trackers or model files. Supercharged fetches its declared model files only after an explicit setup action. Some mobile file previewers do not execute HTML; use a browser with local-HTML support.
+The **Download** screen shows the presentation and editable-copy sizes before downloading. Copies are limited to 10 MiB, including images, and are generated on the device only after a button click. A SHA-256 checksum is shown when the browser supports it. Standard mode fetches no external scripts, fonts, trackers or model files. Supercharged fetches its declared model files only after an explicit setup action. Some mobile file previewers do not execute HTML; use a browser with local-HTML support.
 
 ## Supercharged local AI
 

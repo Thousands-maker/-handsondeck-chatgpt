@@ -128,6 +128,16 @@ test('short decks retain every supplied message and point', () => {
   }
 });
 
+test('the planner uses content for the middle, preserves the ask and does not pad a thin brief', () => {
+  const groups = core.parseMessageGroups('Context is changing\n- Evidence remains uncertain\nA bounded trial\n- Review before expanding');
+  const plan = core.buildSlides({ purpose: 'Approve a two-week trial', audience: '', count: '6' }, groups);
+  assert.equal(plan.slides.length, 4);
+  assert.deepEqual(plan.slides.slice(1, -1).map(s => s.title), ['Context is changing', 'A bounded trial']);
+  assert.equal(plan.slides.at(-1).blocks[0].text, 'Approve a two-week trial');
+  assert.equal(plan.metadata.underfilled, 2);
+  assert.doesNotMatch(JSON.stringify(plan.slides), /Start from the intended outcome|Define the intended audience|Add evidence/);
+});
+
 test('every editor element exports with safe text', () => {
   const types = ['paragraph', 'bullets', 'quote', 'callout', 'stat', 'columns', 'cards', 'chart', 'table', 'image', 'divider'];
   const plan = samplePlan();
@@ -221,7 +231,8 @@ test('MCP handshake, tools, validation, and EOF shutdown work', () => {
   assert.equal(replies[0].error.code, -32000);
   assert.equal(replies[1].result.protocolVersion, '2025-11-25');
   assert.equal(replies[2].result.tools.length, 3);
-  assert.equal(replies[3].result.structuredContent.slides.length, 5);
+  assert.equal(replies[3].result.structuredContent.slides.length, 4);
+  assert.equal(replies[3].result.structuredContent.metadata.underfilled, 1);
   assert.match(replies[4].result.structuredContent.html, /^<!doctype html>/);
   assert.equal(replies[5].result.isError, true);
   assert.equal(replies[6].error.code, -32602);

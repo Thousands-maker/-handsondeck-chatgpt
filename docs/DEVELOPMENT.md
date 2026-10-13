@@ -55,6 +55,17 @@ That version included direct editing, an element picker, local image embedding, 
 - Simplified guidance and model-setup labels while retaining all existing drafting, editing, logo, review and save controls.
 - Advanced the opt-in service-worker shell cache for the refreshed interface.
 
+## Briefing workflow refinement
+
+- Made the primary app journey Brief → Refine → Download, with a one-page brief and optional guided questions.
+- Kept Standard as the default, so the required journey does not depend on local model setup.
+- Added an editable outline, reorder/remove actions and undo alongside the slide canvas. Both views and exports use the same slide data.
+- Added a reference-brief drawer and an explicit rebuild notice. Revising the source brief does not overwrite slide edits automatically.
+- Removed the repeated outcome-only middle slide from generated plans; short briefs remain short rather than gaining filler.
+- Added advisory checks for empty supporting content, unresolved placeholders and numbers absent from the brief. Closing-ask checks examine the content rather than accepting an “ask” label as sufficient.
+- Prioritised portable presentation downloads, with an editable backup and instructions to check the file offline.
+- Added automated coverage for direct creation, cancelled rebuilding, outline revisions, reorder/undo, export consistency and non-blocking suggestions.
+
 ## Verification limits
 
 Automated checks cover JavaScript syntax, matching standalone builds, generation, text escaping, and MCP request/response behaviour. They do not certify visual layout, browser-native undo, virtual keyboards, accessibility or cross-browser interaction. Those checks remain on the product backlog.

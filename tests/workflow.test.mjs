@@ -136,3 +136,61 @@ test('AI drafting takes the actual brief, requires setup, and applies only a rev
   assert.equal(app.get('messages').value,'Original facts and caveats.');
   assert.equal(app.run('flow.page'),'editor');
 });
+
+test('the primary brief builds offline and returning to it preserves edits until rebuilding is confirmed', () => {
+  const app = setup();
+  assert.equal(app.get('guide-engine').value, 'standard');
+  app.get('start-direct').click(); assert.equal(app.run('flow.page'), 'brief');
+  app.get('generate').click(); assert.equal(app.get('brief-error').hidden, false);
+  app.get('purpose').value = 'Approve a two-week trial';
+  app.get('messages').value = 'The queue is growing. Test a limited change.\n\nKeep the current process available. Review before expansion.';
+  app.get('generate').click(); assert.equal(app.run('flow.page'), 'editor');
+  assert.equal(app.get('ai-generate').disabled, true);
+  app.run("state.slides[1].title = 'An edited argument'; markEdited();");
+  const before = app.run('JSON.stringify(state.slides)');
+  app.get('open-brief').click(); assert.equal(app.get('brief-rebuild').hidden, false);
+  app.get('messages').value = 'Revised source notes.';
+  app.get('brief-keep-editing').click(); assert.equal(app.run('JSON.stringify(state.slides)'), before);
+  app.get('open-brief').click(); app.run('window.confirm = () => false'); app.get('generate').click();
+  assert.equal(app.run('JSON.stringify(state.slides)'), before);
+});
+
+test('outline revisions, reordering and undo flow to preview and export without changing the reference brief', async () => {
+  const app = setup(); app.run("loadExample('decision')");
+  const originalNotes = app.get('messages').value;
+  app.get('view-outline').click(); assert.equal(app.get('stage-shell').hidden, true);
+  let rows = app.get('story-list').children;
+  const field = rows[1].querySelector('input'); field.value = 'The revised case for change';
+  field.listeners.input[0]();
+  assert.equal(app.run('state.slides[1].title'), 'The revised case for change');
+  assert.ok(app.run('exportHtml()').includes('The revised case for change'));
+  const points = rows[1].querySelector('textarea'); points.value = 'Preserve this caveat\nConfirm the evidence'; points.listeners.input[0]();
+  assert.ok(app.run('exportHtml()').includes('Preserve this caveat'));
+  rows[1].querySelectorAll('button').find(n => n.getAttribute('aria-label') === 'Move down slide 2').click();
+  assert.equal(app.run('state.slides[2].title'), 'The revised case for change');
+  rows = app.get('story-list').children;
+  rows[2].querySelectorAll('button').find(n => n.getAttribute('aria-label') === 'Remove slide 3').click();
+  assert.equal(app.get('undo-delete').hidden, false); app.get('undo-delete').click();
+  assert.equal(app.run('state.slides[2].title'), 'The revised case for change');
+  app.get('open-source').click(); assert.equal(app.get('source-notes').textContent, originalNotes);
+  app.get('close-drawer').click();
+  app.get('present').click(); assert.equal(app.get('stage-shell').hidden, false);
+  assert.equal(app.get('slide-frame').querySelectorAll('*').some(n => n.contentEditable === 'plaintext-only'), false);
+  app.get('exit-present').click(); assert.equal(app.get('story-outline').hidden, false);
+  const copy = await app.run('editorDownloadBlob()').text();
+  const reopened = app.run('DeckCore.parseSavedProject(' + JSON.stringify(copy) + ')');
+  assert.equal(reopened.slides[2].title, 'The revised case for change');
+  assert.equal(reopened.brief.messagesText, originalNotes);
+});
+
+test('missing asks, new numbers and placeholders remain advisory and never block downloads', () => {
+  const app = setup(); app.run("loadExample('decision')");
+  app.run("state.slides.at(-1).blocks = [{type:'callout',label:'Proposed ask',text:'Thank you.'}]; state.slides[1].blocks.push({type:'paragraph',text:'Savings are 99%. Owner to confirm.'}); renderAll();");
+  const messages = app.run('state.warnings.map(w => w.text).join(" ")');
+  assert.match(messages, /closing slide no longer states an ask/);
+  assert.match(messages, /99%/); assert.match(messages, /placeholder or an unresolved detail/);
+  app.get('open-offline').click();
+  assert.equal(app.get('download-presentation').disabled, false);
+  assert.equal(app.get('download-editor').disabled, false);
+  assert.match(app.get('export-check-summary').textContent, /still download/);
+});

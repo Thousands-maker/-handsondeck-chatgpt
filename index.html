@@ -920,6 +920,75 @@ body.is-presenting .edit-hint { display:none; }
   .guide-bottom .btn { min-width:0; padding-inline:11px; font-size:12px; }
 }
 @media (prefers-reduced-motion:reduce) { *, *::before, *::after { transition:none !important; scroll-behavior:auto !important; } }
+
+/* Brief → refine → download: the argument stays at the centre of the workspace. */
+.brief-layout { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:26px; align-items:start; }
+.brief-form { padding:28px 30px; background:#fff; border:1px solid var(--line); border-radius:12px; }
+.brief-section + .brief-section { border-top:1px solid #edf0f5; padding-top:23px; }
+.brief-section .section-index { margin-bottom:18px; color:#6b7f9e; }
+.brief-form .form-field { margin-bottom:23px; }
+.brief-form #purpose { min-height:84px; }
+.brief-form #messages { min-height:190px; }
+.brief-form .field-grid { grid-template-columns:1.2fr 1fr; gap:16px; }
+.brief-submit { display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding-top:7px; }
+.brief-submit span { font-size:11px; color:var(--muted); }
+.brief-guidance { padding:24px; background:#edf3fc; border:1px solid #dce6f5; border-radius:10px; }
+.brief-guidance h2 { font-size:17px; line-height:1.4; font-weight:600; letter-spacing:-.02em; margin:15px 0; }
+.brief-guidance p { font-size:12px; color:var(--muted); line-height:1.7; margin:5px 0 14px; }
+.brief-guidance ol { padding-left:20px; margin:0; }
+.brief-guidance li { padding-left:4px; color:#5179af; font-size:12px; }
+.brief-guidance strong { color:#324d75; font-weight:600; }
+.brief-guidance.quiet { margin-top:18px; background:#fff; border-color:var(--line); }
+.brief-guidance.quiet h2 { margin-top:0; font-size:14px; }
+.brief-rebuild { padding:16px; margin:0 0 20px; border:1px solid #e7d9b9; background:#fffbf2; border-radius:7px; font-size:13px; }
+.brief-rebuild p { font-size:12px; line-height:1.6; color:#776441; margin:5px 0; }
+.refine-bar { display:flex; align-items:center; gap:20px; padding:0 18px 12px; flex-shrink:0; }
+.refine-bar > .text-button { font-size:11px; min-height:32px; }
+.refine-bar > .text-button:last-child { margin-left:auto; }
+.view-switch { display:flex; border:1px solid #d6deeb; padding:3px; border-radius:7px; background:#f6f8fc; }
+.view-switch button { min-height:30px; padding:5px 16px; border:0; border-radius:4px; background:transparent; color:var(--muted); font-size:12px; font-weight:500; }
+.view-switch button[aria-pressed="true"] { color:#27569d; background:#fff; box-shadow:0 1px 4px #2539551c; font-weight:600; }
+.app-shell.outline-mode { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr); }
+.outline-mode .editor-area { min-height:0; }
+.outline-mode .slide-rail { display:none; }
+.story-outline { flex:1; min-height:0; overflow:auto; padding:24px max(24px,calc((100% - 900px) / 2)); background:var(--surface-soft); }
+.outline-intro h2 { margin:0 0 6px; font-size:22px; font-weight:600; letter-spacing:-.03em; }
+.outline-intro p { margin:0 0 22px; color:var(--muted); font-size:13px; line-height:1.6; }
+.story-outline ol { list-style:none; padding:0; margin:0; display:grid; gap:16px; }
+.story-card { min-width:0; padding:22px 24px; border:1px solid var(--line); border-radius:10px; background:#fff; }
+.story-card-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding-bottom:15px; margin-bottom:16px; border-bottom:1px solid #edf0f5; }
+.story-actions { display:flex; gap:6px; }
+.story-actions .btn { min-height:32px; font-size:11px; }
+.story-field { margin:0 0 14px; }
+.story-field:last-child { margin-bottom:0; }
+.story-field label { display:block; color:#566986; font-size:11px; font-weight:600; margin:0 0 7px; }
+.story-field input, .story-field textarea { width:100%; border:1px solid #d7dfe9; border-radius:5px; padding:10px 12px; font-size:14px; color:var(--ink); background:#fff; line-height:1.65; resize:vertical; }
+.story-field input { font-weight:600; }
+.story-field input:hover, .story-field textarea:hover { border-color:#9eb6d9; }
+.source-panel h3 { margin:24px 0 8px; font-size:13px; font-weight:600; }
+.source-panel p:not(.field-help) { white-space:pre-wrap; overflow-wrap:anywhere; font-size:13px; line-height:1.7; color:#40516b; }
+.download-review { display:flex; justify-content:space-between; align-items:center; gap:18px; margin:24px 0 20px; padding:17px 20px; border:1px solid #d8e4f4; border-radius:8px; background:#edf3fc; }
+.download-review strong { font-size:13px; font-weight:600; overflow-wrap:anywhere; }
+.download-review p { color:var(--muted); font-size:12px; line-height:1.6; margin:5px 0 0; }
+.download-review .btn { flex-shrink:0; }
+.download-receipt { padding:20px 24px; border:1px solid #c4ddcc; border-radius:9px; margin:18px 0; background:#f1f8f3; }
+.download-receipt strong { font-size:14px; color:#365f46; }
+.download-receipt p { font-size:13px; color:var(--muted); line-height:1.7; margin:8px 0 0; }
+body.is-presenting .refine-bar { display:none; }
+@media(max-width:900px) { .brief-layout { grid-template-columns:minmax(0,1fr) 240px; gap:18px; } .brief-form { padding:22px; } .brief-guidance { padding:19px; } }
+@media(max-width:680px) {
+  .brief-layout { grid-template-columns:1fr; }
+  .brief-aside { display:grid; grid-template-columns:1fr; }
+  .brief-form { padding:21px 18px; }
+  .brief-form .field-grid { grid-template-columns:1fr; gap:0; }
+  .brief-submit { align-items:stretch; flex-direction:column; text-align:center; }
+  .refine-bar { padding:0 12px 10px; gap:12px; flex-wrap:wrap; }
+  .view-switch button { padding-inline:12px; }
+  .story-outline { padding:20px 12px; }
+  .story-card { padding:16px; }
+  .story-field input, .story-field textarea { font-size:16px; }
+  .download-review { align-items:flex-start; flex-direction:column; }
+}
 </style>
 </head>
 <body>
@@ -933,16 +1002,15 @@ body.is-presenting .edit-hint { display:none; }
       <button class="btn" id="open-ai" type="button">✦ Supercharged</button>
       <button class="btn btn-quiet" id="open-help" type="button">Help</button>
       <button class="btn btn-quiet" id="present" type="button" hidden>▷ Present</button>
-      <button class="btn btn-dark" id="download" type="button" hidden>Save &amp; share</button>
+      <button class="btn btn-dark" id="download" type="button" hidden>Download</button>
     </div>
   </header>
   <!-- interface:start -->
 <nav class="journey-bar" aria-label="Build your presentation">
   <div class="journey-steps">
     <button class="journey-step" id="open-brief" type="button"><b>1</b> Brief</button>
-    <button class="journey-step" id="nav-edit" type="button"><b>2</b> Edit</button>
-    <button class="journey-step" id="open-checks" type="button"><b>3</b> Review <span class="badge clear" id="checks-badge">0</span></button>
-    <button class="journey-step" id="open-offline" type="button"><b>4</b> Save &amp; share</button>
+    <button class="journey-step" id="nav-edit" type="button"><b>2</b> Refine</button>
+    <button class="journey-step" id="open-offline" type="button"><b>3</b> Download</button>
   </div>
   <span class="save-state" id="save-state" role="status">Your work stays on this device</span>
 </nav>
@@ -950,17 +1018,33 @@ body.is-presenting .edit-hint { display:none; }
 <main class="flow-page" id="welcome-page" aria-labelledby="welcome-title">
   <div class="flow-wrap">
     <div class="resume-card" id="resume-card" hidden><div><strong>Continue your presentation</strong><p id="resume-description">Your saved work is ready to edit.</p></div><button class="btn btn-primary" id="resume-deck" type="button">Continue editing →</button></div>
-    <div class="workspace-heading"><div><div class="eyebrow">Your workspace</div><h1 id="welcome-title" tabindex="-1">Good ideas. Clearly presented.</h1><p class="lead">Build a presentation for your next proposal, update or discussion.<br>Start with your notes and shape the story as you go.</p></div><span class="workspace-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="3" width="16" height="13" rx="2"/><path d="M8 21h8M12 16v5m-4-12 2.5 2.5L16 7"/></svg>Built for working offline</span></div>
-    <section class="create-panel" aria-labelledby="create-title"><div class="create-symbol" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="4" width="22" height="17" rx="2"/><path d="M11 28h10m-5-7v7M11 12h10m-5-5v10"/></svg></div><div class="create-copy"><h2 id="create-title">Start a new presentation</h2><p>A few guided steps help you define the audience, organise your content and build an editable first draft.</p></div><div class="create-actions"><button class="btn btn-primary" id="start-guided" type="button">+ Create presentation</button><button class="text-button" id="start-direct" type="button">Have a brief? Paste it here</button></div></section>
+    <div class="workspace-heading"><div><div class="eyebrow">Your workspace</div><h1 id="welcome-title" tabindex="-1">Make your case. Get to a decision.</h1><p class="lead">Turn what you already know into a clear briefing.<br>Shape the argument, refine the slides, and take one file into the room.</p></div><span class="workspace-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="3" width="16" height="13" rx="2"/><path d="M8 21h8M12 16v5m-4-12 2.5 2.5L16 7"/></svg>Built for working offline</span></div>
+    <section class="create-panel" aria-labelledby="create-title"><div class="create-symbol" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="4" width="22" height="17" rx="2"/><path d="M11 28h10m-5-7v7M11 12h10m-5-5v10"/></svg></div><div class="create-copy"><h2 id="create-title">From brief to briefing</h2><p>Describe your audience, decision and key messages. Get a 3–6 slide starting deck, ready to edit and use offline.</p></div><div class="create-actions"><button class="btn btn-primary" id="start-direct" type="button">+ Create a briefing</button><button class="text-button" id="start-guided" type="button">Help me shape my brief</button></div></section>
     <div class="workspace-utilities"><button class="text-button" id="open-project" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 8V5h7l2 3h9v12H3z"/><path d="M3 11h18"/></svg>Open a saved presentation</button><p>Editable HTML or project JSON · your files stay on this device</p></div>
     <section class="sample-section" aria-labelledby="sample-title"><div class="section-heading"><h2 id="sample-title">Explore an example</h2><p>Fictional content. Fully editable.</p></div><div class="sample-gallery">
       <button class="sample-card" data-example="decision" type="button"><div class="sample-preview" aria-hidden="true"><span>Proposal / Executive</span><strong>A clearer way<br>to book a room.</strong><div class="preview-lines"><i></i><i></i></div></div><div class="sample-description"><div><strong>Get a decision</strong><small>Make the case and end with a clear ask.</small></div><span aria-hidden="true">→</span></div></button>
       <button class="sample-card" data-example="update" type="button"><div class="sample-preview sample-update" aria-hidden="true"><span>Project update / Operational</span><strong>Progress today.<br>Priorities next.</strong><div class="preview-lines"><i></i><i></i></div></div><div class="sample-description"><div><strong>Share an update</strong><small>Bring progress, gaps and next steps together.</small></div><span aria-hidden="true">→</span></div></button>
       <button class="sample-card" data-example="workshop" type="button"><div class="sample-preview sample-workshop" aria-hidden="true"><span>Team workshop / Minimal</span><strong>One team.<br>A better handover.</strong><div class="preview-lines"><i></i><i></i></div></div><div class="sample-description"><div><strong>Start a discussion</strong><small>Give the group a useful starting point.</small></div><span aria-hidden="true">→</span></div></button>
     </div></section>
-    <section class="workspace-help" aria-label="Ways to build your presentation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0l-1 2H9z"/></svg><div><h2>A little structure, or a little more help</h2><p><b>Standard</b> arranges your original wording. <b>Supercharged</b> uses optional local AI to suggest headings, points and a storyline. You review the draft and make it yours.</p></div></section>
+    <section class="workspace-help" aria-label="Ways to build your presentation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0l-1 2H9z"/></svg><div><h2>Your argument. A clear structure.</h2><p>Start with <b>Standard</b>: your wording, arranged into editable slides with no model download. Optional <b>Supercharged</b> helps synthesise rough notes into headings and points after local AI setup.</p></div></section>
   </div>
 </main>
+
+<main class="flow-page hidden" id="brief-page" aria-labelledby="brief-title"><div class="flow-wrap">
+  <div class="page-kicker"><span class="eyebrow">01 / Brief</span><button class="text-button" id="direct-to-guide" type="button">Help me shape my brief</button></div>
+  <h1 id="brief-title" tabindex="-1">What decision do you need?</h1><p class="lead">Bring the thinking. We’ll give it a clear starting structure. Your words stay editable throughout.</p>
+  <div class="brief-layout"><section class="brief-form" id="brief-panel" aria-label="Your presentation brief">
+    <div class="brief-section"><span class="section-index">THE OUTCOME</span><div class="form-field"><label for="purpose">What should they decide or do?</label><textarea id="purpose" rows="2" maxlength="1000" placeholder="e.g. Approve a four-week trial of a shared booking calendar" aria-describedby="purpose-help"></textarea><p class="field-help" id="purpose-help">Be specific. This becomes the ask on your closing slide.</p></div>
+    <div class="form-field"><label for="audience">Who needs to act? <small>Optional</small></label><input id="audience" maxlength="1000" placeholder="e.g. Senior leadership team"></div></div>
+    <div class="brief-section"><span class="section-index">THE CASE</span><div class="form-field"><label for="input-mode">How is your content written?</label><select id="input-mode"><option value="free">Rough notes or paragraphs</option><option value="structured">Headlines with supporting points</option></select></div><div class="form-field"><label for="messages" id="messages-label">Your notes and key messages</label><textarea id="messages" rows="8" maxlength="20000" placeholder="What is happening?
+Why does it matter?
+What do you recommend, and what supports it?
+What is still uncertain?" aria-describedby="input-hint"></textarea><p class="field-help" id="input-hint"></p></div></div>
+    <div class="brief-section"><span class="section-index">THE FORMAT</span><div class="field-grid"><div class="form-field"><label for="brief-style">Style</label><select id="brief-style"><option value="executive">Executive · decisions and proposals</option><option value="operational">Operational · working reviews</option><option value="minimal">Minimal · a simple message</option></select></div><div class="form-field"><label for="count">Length</label><select id="count"><option value="auto">Let the content decide · 3–6</option><option value="3">3 slides</option><option value="4">4 slides</option><option value="5">5 slides</option><option value="6">6 slides</option></select></div></div></div>
+    <div class="brief-rebuild" id="brief-rebuild" hidden><strong>Your current slides are still here.</strong><p>Change feedback directly in Refine. Rebuilding from this brief replaces the slides; changes here do not update them automatically.</p><button class="text-button" id="brief-keep-editing" type="button">Continue refining my deck →</button></div>
+    <p class="guide-error" id="brief-error" role="alert" hidden></p><div class="brief-submit"><button class="btn btn-primary" id="generate" type="button">Build my first deck →</button><span>No model download · works offline</span></div>
+  </section><aside class="brief-aside" aria-label="Briefing guidance"><div class="brief-guidance"><span class="tag">A useful first deck</span><h2>A clear case has three parts.</h2><ol><li><strong>Set the context</strong><p>What has changed, and why does it matter now?</p></li><li><strong>Make your case</strong><p>State the key messages, evidence and uncertainty.</p></li><li><strong>End with an ask</strong><p>What needs approval, from whom, and by when?</p></li></ol><button class="text-button" id="reset" type="button">Explore a fictional example →</button></div><div class="brief-guidance quiet"><h2>Need help finding the story?</h2><p>Supercharged can suggest headings and concise points from rough notes. It needs an optional local model download first.</p><button class="btn btn-quiet" id="direct-ai" type="button">Suggest with local AI</button><p class="field-help">Standard keeps your wording. It does not rewrite or verify your facts.</p></div></aside></div>
+</div></main>
 
 <main class="flow-page hidden" id="guide-page" aria-labelledby="guide-title-0">
   <div class="flow-wrap guide-wrap">
@@ -976,7 +1060,7 @@ body.is-presenting .edit-hint { display:none; }
         <div class="form-field"><label for="guide-mode">How are your notes written?</label><select id="guide-mode"><option value="free">Free text — paragraphs or rough notes</option><option value="structured">Structured — headings and supporting points</option></select></div>
         <div class="form-field"><label for="guide-notes">Your content</label><textarea id="guide-notes" rows="9" maxlength="20000" placeholder="What is happening? Why does it matter? What should happen next?" aria-describedby="guide-notes-help"></textarea><p class="field-help" id="guide-notes-help">Use a new paragraph for each main idea. Your sentences are kept as written; Standard mode does not rewrite or fact-check them.</p><p class="field-help" id="guide-char-count">0 / 20,000 characters</p></div>
         <button class="text-button" id="guide-example" type="button">Fill in a short example</button>
-        <div class="draft-method"><label class="field-label" for="guide-engine">What would you like help with?</label><select id="guide-engine" class="ai-select"><option value="ai" selected>Suggest headings, points and a storyline with AI</option><option value="standard">Arrange my existing wording without AI</option></select><p class="field-help" id="guide-engine-help">Local AI needs a one-time model download, starting at 283.1 MiB. You will choose and confirm the download before it starts. Your notes stay on this device.</p></div>
+        <div class="draft-method"><label class="field-label" for="guide-engine">What would you like help with?</label><select id="guide-engine" class="ai-select"><option value="standard" selected>Build from my wording · no model download</option><option value="ai">Suggest headings and points with optional local AI</option></select><p class="field-help" id="guide-engine-help">Standard arranges your supplied wording into a slide plan. You can refine the argument and layout without rebuilding.</p></div>
       </section>
       <section data-guide-panel="2" hidden><h1 id="guide-title-2" tabindex="-1">Choose a presentation style.</h1><p class="lead">Pick a starting style. You can change it while editing.</p>
         <fieldset style="border:0;padding:0;margin:0"><legend class="field-label">Presentation style</legend><div class="style-options">
@@ -995,10 +1079,10 @@ body.is-presenting .edit-hint { display:none; }
 </main>
 
 <main class="flow-page hidden" id="review-page" aria-labelledby="review-title"><div class="flow-wrap">
-  <div class="eyebrow">One last look</div><h1 id="review-title" tabindex="-1">Review your presentation.</h1><p class="lead">These checks catch common issues. You know the facts and your audience best.</p>
+  <div class="eyebrow">One last look</div><h1 id="review-title" tabindex="-1">Check the case before you share.</h1><p class="lead">Look for a clear ask, readable slides and facts you can support. These suggestions never block your download.</p>
   <div class="review-grid"><section class="offline-card"><h2 id="review-result">Checking your deck…</h2><p>Choose an issue to return to that slide.</p><div id="review-warnings"></div></section>
     <section class="offline-card"><h2>Your final read-through</h2><label class="review-check"><input type="checkbox">The facts, numbers and sources are correct.</label><label class="review-check"><input type="checkbox">Each slide makes a clear point for this audience.</label><label class="review-check"><input type="checkbox">The closing slide says what happens next.</label><label class="review-check"><input type="checkbox">I have checked every slide at presentation size.</label><button class="btn btn-quiet" id="review-present" type="button">Preview the presentation</button></section>
-  </div><div class="review-actions"><button class="btn btn-quiet" id="review-back" type="button">← Keep editing</button><button class="btn btn-primary" id="review-save" type="button">Save &amp; share →</button></div>
+  </div><div class="review-actions"><button class="btn btn-quiet" id="review-back" type="button">← Keep editing</button><button class="btn btn-primary" id="review-save" type="button">Continue to download →</button></div>
 </div></main>
 
 <main class="flow-page hidden" id="ai-page" aria-labelledby="ai-title"><div class="flow-wrap">
@@ -1032,7 +1116,7 @@ Outcome: [what they should understand, decide or do]
 Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" type="button">Copy prompt</button></details></section>
 </div></main>
 
-<dialog class="help-dialog" id="help-dialog" aria-labelledby="help-title"><div class="help-head"><h2 id="help-title">How to use Hands on Deck</h2><button class="btn btn-quiet" id="close-help" type="button" aria-label="Close help">×</button></div><ol><li><strong>Brief.</strong> Say who the deck is for, the outcome you need and the key information. Try an example if you are unsure.</li><li><strong>Edit.</strong> Click any text on the slide. Use Add element for a chart, image, table or callout. Select a slide in the left rail to move, duplicate or delete it.</li><li><strong>Review.</strong> Follow the suggested checks, then use Present to check the whole story. Use the arrow buttons or <kbd>←</kbd> <kbd>→</kbd>; press <kbd>Esc</kbd> to leave presentation mode.</li><li><strong>Save &amp; share.</strong> An editable copy keeps your deck and the editor together. A presentation copy is for viewing. Download again after making changes.</li></ol><p class="field-help">Your notes and images are not uploaded. Supercharged downloads a local model only when you choose to enable it. Browser recovery is a convenience; keep an editable download as your backup.</p></dialog>
+<dialog class="help-dialog" id="help-dialog" aria-labelledby="help-title"><div class="help-head"><h2 id="help-title">How to use Hands on Deck</h2><button class="btn btn-quiet" id="close-help" type="button" aria-label="Close help">×</button></div><ol><li><strong>Brief.</strong> Say who the deck is for, the outcome you need and the key information. Try an example if you are unsure.</li><li><strong>Refine.</strong> Click any text on the slide. Switch to Outline to revise the argument and reorder slides. Use Source brief to compare the wording with your notes.</li><li><strong>Check.</strong> Follow the suggested checks, then use Present to check the whole story. Use the arrow buttons or <kbd>←</kbd> <kbd>→</kbd>; press <kbd>Esc</kbd> to leave presentation mode.</li><li><strong>Download.</strong> An editable copy keeps your deck and the editor together. A presentation copy is for viewing. Download again after making changes.</li></ol><p class="field-help">Your notes and images are not uploaded. Supercharged downloads a local model only when you choose to enable it. Browser recovery is a convenience; keep an editable download as your backup.</p></dialog>
 <input id="project-input" type="file" accept=".html,.json,text/html,application/json" hidden>
 <!-- interface:end -->
 
@@ -1052,7 +1136,8 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
     </aside>
 
     <section class="editor-area" aria-label="Slide editor">
-      <div class="editor-coach"><div><strong id="editor-heading" tabindex="-1">Your deck, ready to edit.</strong><p id="editor-guidance">Click text to edit it. Add visuals, then review the story before saving.</p></div><button class="btn btn-quiet btn-small" id="coach-review" type="button">Review deck →</button></div>
+      <div class="editor-coach"><div><strong id="editor-heading" tabindex="-1">Refine the argument.</strong><p id="editor-guidance">Edit the outline or click text on a slide. Your changes appear in the download.</p></div><button class="btn btn-quiet btn-small" id="coach-review" type="button">Check the case →</button></div>
+      <div class="refine-bar"><div class="view-switch" role="group" aria-label="Editing view"><button id="view-slides" type="button" aria-pressed="true">Slides</button><button id="view-outline" type="button" aria-pressed="false">Outline</button></div><button class="btn btn-quiet btn-small" id="undo-delete" type="button" hidden>Undo deletion</button><button class="text-button" id="open-source" type="button">Source brief</button><button class="text-button" id="open-checks" type="button">Suggestions <span class="badge clear" id="checks-badge">0</span></button></div>
       <div class="editor-toolbar">
         <div class="toolbar-group">
           <button class="btn btn-primary btn-small" id="add-element" type="button" aria-haspopup="true" aria-expanded="false">+ Add element</button>
@@ -1086,15 +1171,15 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
         </div>
       </div>
 
+      <section class="story-outline" id="story-outline" hidden aria-label="Editable slide outline"><div class="outline-intro"><h2>Get the argument right.</h2><p>Edit headlines and supporting points here. Reorder the story without rebuilding your slides.</p></div><ol id="story-list"></ol></section>
       <div class="stage-shell" id="stage-shell">
         <div class="slide-frame style-executive" id="slide-frame" aria-live="polite"></div>
       </div>
-      <div class="stage-footer">
+      <div class="stage-footer" id="stage-footer">
         <button class="btn btn-quiet btn-small btn-icon" id="previous" type="button" aria-label="Previous slide">←</button>
         <span class="counter" id="counter">0 / 0</span>
         <button class="btn btn-quiet btn-small btn-icon" id="next" type="button" aria-label="Next slide">→</button>
         <span class="edit-hint">Click text to edit · use the arrows to move between slides.</span>
-        <button class="btn btn-quiet btn-small" id="undo-delete" type="button" hidden>Undo deletion</button>
         <button class="btn btn-quiet present-exit" id="exit-present" type="button">Exit presentation</button>
       </div>
     </section>
@@ -1103,29 +1188,17 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
   <section class="offline-page hidden" id="offline-page" aria-labelledby="offline-title">
     <div class="offline-wrap">
       <button class="btn btn-quiet" id="back-to-editor" type="button">← Back to editor</button>
-      <h1 id="offline-title" tabindex="-1">Save and share your presentation.</h1>
-      <p class="intro">Choose the file you need. Keep an editable copy for yourself, and share a presentation copy when your deck is ready.</p>
+      <h1 id="offline-title" tabindex="-1">Take your briefing with you.</h1>
+      <p class="intro">One self-contained HTML file opens in a browser, with no server or special software. Keep an editable copy for the next round of feedback.</p>
+      <div class="download-review"><div><strong id="export-deck-summary"></strong><p id="export-check-summary"></p></div><button class="btn btn-quiet" id="export-review" type="button">Check the case</button></div>
       <div class="offline-grid">
-        <article class="offline-card featured">
-          <span class="tag">Keep working · recommended backup</span>
-          <h2>Editable copy</h2>
-          <p>One HTML file with your deck and this editor. Reopen it in a browser to edit, even without internet. Download a fresh copy after making changes.</p>
-          <div class="download-size"><span id="editor-download-size">Calculating…</span><small>Maximum download: 10 MiB, including your images</small></div>
-          <button class="btn btn-primary" id="download-editor" type="button">Download editable copy</button>
-          <p id="download-status" role="status" aria-live="polite">Your content stays on this device. No account or additional installation is required.</p>
-          <code id="download-checksum" class="download-checksum"></code>
-        </article>
-        <article class="offline-card">
-          <span class="tag neutral">Present or send</span><h2>Presentation copy</h2>
-          <p>A clean slideshow without editing controls. Open it in a browser, use the arrows to navigate, and present without internet.</p>
-          <div class="download-size">Ready to share<small>HTML slideshow · for viewing</small></div>
-          <button class="btn btn-quiet" id="download-presentation" type="button">Download presentation</button>
-          <p class="field-help">This file does not contain the editor. Keep an editable copy too if you may need to make changes.</p>
-        </article>
+        <article class="offline-card featured"><span class="tag">For your audience</span><h2>Presentation</h2><p>Your current slides in one file, without editing controls. Use arrow keys to present, or print one slide per page.</p><div class="download-size" id="presentation-download-size">Ready to share</div><p class="field-help">Self-contained HTML · opens offline · maximum 10 MiB</p><button class="btn btn-primary" id="download-presentation" type="button">Download presentation</button><p class="field-help">Open the downloaded file once to check it on the device you will use.</p></article>
+        <article class="offline-card"><span class="tag neutral">For your next revision</span><h2>Editable backup</h2><p>Your slides, source brief and this editor in one HTML file. Reopen it to act on feedback without starting again.</p><div class="download-size"><span id="editor-download-size">Calculating…</span><small>Maximum 10 MiB, including images</small></div><button class="btn btn-quiet" id="download-editor" type="button">Download editable copy</button><p id="download-status" role="status" aria-live="polite">Download a fresh copy after making changes.</p><code id="download-checksum" class="download-checksum"></code></article>
       </div>
+      <section class="download-receipt" id="download-receipt" role="status" hidden><strong id="download-receipt-title">Download started.</strong><p>Open the HTML file in a browser. Check the slides with the arrow keys, then try it with Wi-Fi off. Keep an editable backup for feedback.</p><button class="text-button" id="download-return" type="button">Return to refining →</button></section>
       <section class="save-help"><h2>Keep a recovery copy here</h2><label class="recovery-control"><input id="recovery-toggle" type="checkbox" checked><span>Save a recovery copy in this browser. Turning this off removes that copy.</span></label><p id="recovery-note" role="status">Recovery is a convenience, not a file backup. Browser data can be cleared or storage can fill up. Download an editable copy to keep your work.</p></section>
       <section class="save-help"><details><summary>First time using the editor offline?</summary><ol><li>Download an editable copy while you have internet.</li><li>Open the saved <strong>.html</strong> file in a browser. Some mobile file previewers do not run HTML apps.</li><li>Turn off Wi-Fi and check that you can edit and save a new copy.</li></ol><p>The editable file includes its code and embedded images, and works offline in Standard mode. File downloads are created on this device and limited to 10 MiB. Optional Supercharged model files are separate; set them up at the web address and keep that browser’s site data for offline AI.</p></details></section>
-      <section class="save-help"><details><summary>Save a smaller project file</summary><p>A JSON project contains your slides and brief. Return to the start screen and choose <strong>Open a saved deck</strong> to reopen it. It needs a copy of this editor.</p><button class="btn btn-quiet" id="download-project" type="button">Download project data</button></details></section>
+      <section class="save-help"><details><summary>Save a smaller project file</summary><p>A JSON project contains your slides and brief. Return to the start screen and choose <strong>Open a saved presentation</strong> to reopen it. It needs a copy of this editor.</p><button class="btn btn-quiet" id="download-project" type="button">Download project data</button></details></section>
     </div>
   </section>
 
@@ -1138,44 +1211,6 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
         </div>
         <button class="btn btn-quiet btn-small btn-icon" id="close-drawer" type="button" aria-label="Close">×</button>
       </div>
-      <div class="drawer-body" id="brief-panel">
-        <label for="purpose">Purpose</label>
-        <textarea id="purpose" rows="3" placeholder="What should the audience understand, decide or do?"></textarea>
-        <label for="audience">Audience</label>
-        <input id="audience" type="text" placeholder="Who will see this? (optional)">
-        <label for="input-mode">Input format</label>
-        <select id="input-mode"><option value="structured">Structured messages</option><option value="free">Free text · basic offline organisation</option></select>
-        <label for="messages" id="messages-label">Key messages and supporting points</label>
-        <textarea id="messages" rows="10" placeholder="Paste your notes or key messages here."></textarea>
-        <p class="syntax-hint" id="input-hint">Start each key message on a new line. Add supporting points beneath it with “-”.</p>
-        <div class="field-grid">
-          <div>
-            <label for="brief-style">Style</label>
-            <select id="brief-style">
-              <option value="executive">Executive</option>
-              <option value="operational">Operational</option>
-              <option value="minimal">Minimal</option>
-            </select>
-          </div>
-          <div>
-            <label for="count">Target length</label>
-            <select id="count">
-              <option value="auto">Auto · 3–6</option>
-              <option value="3">3 slides</option>
-              <option value="4">4 slides</option>
-              <option value="5">5 slides</option>
-              <option value="6">6 slides</option>
-            </select>
-          </div>
-        </div>
-        <div class="drawer-actions">
-          <button class="btn btn-primary" id="direct-ai" type="button">Suggest with local AI</button>
-          <button class="btn btn-quiet" id="generate" type="button">Arrange my wording</button>
-          <button class="btn btn-quiet" id="reset" type="button">Try an example</button>
-          <button class="text-button" id="direct-to-guide" type="button">Guide me through this</button>
-        </div>
-        <div class="mvp-note"><strong>Generated locally:</strong> your brief is arranged into slides using fixed rules. Review and edit the content before sharing.</div>
-      </div>
       <div class="drawer-body hidden" id="branding-panel">
         <h3>Logo on every slide</h3>
         <img class="logo-preview" id="logo-preview" alt="Current presentation logo">
@@ -1184,6 +1219,7 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
         <p class="syntax-hint">PNG, JPEG or WebP, up to 1 MiB. Your logo is embedded into the editor copy and exported deck for offline use.</p>
         <h3>Page numbers</h3><p class="syntax-hint">Title/front and Cover layouts have no page number. Content and Statement slides are numbered from 1. Numbers update when you reorder, add or delete slides.</p>
       </div>
+      <div class="drawer-body hidden source-panel" id="source-panel"><p class="field-help">Compare the deck with your reference brief. Slides may contain later edits; this view does not verify facts or synchronise changes.</p><h3>Intended outcome</h3><p id="source-purpose"></p><h3>Audience</h3><p id="source-audience"></p><h3>Your supplied notes</h3><p id="source-notes"></p></div>
       <div class="drawer-body hidden" id="checks-panel">
         <div class="quality-summary">
           <div class="quality-score" id="quality-score">0</div>
@@ -1288,24 +1324,15 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
     function buildSlides(brief, groups) {
       const autoCount = Math.min(6, Math.max(3, groups.length + 2));
       const requested = brief.count === 'auto' ? autoCount : Number(brief.count);
-      const includeContext = requested >= 4;
-      const fixedSlides = includeContext ? 3 : 2;
-      const contentSlots = Math.max(1, requested - fixedSlides);
+      const contentSlots = Math.max(1, requested - 2);
       const buckets = distribute(groups, contentSlots);
       const slides = [];
 
       slides.push({
         id: uid(), kind: 'title', eyebrow: 'Decision brief',
         title: brief.purpose || 'Untitled presentation',
-        blocks: [{ id: uid(), type: 'paragraph', text: brief.audience ? `Prepared for ${brief.audience}` : 'Define the intended audience.' }]
+        blocks: brief.audience ? [{ id: uid(), type: 'paragraph', text: `Prepared for ${brief.audience}` }] : []
       });
-
-      if (includeContext) {
-        slides.push({
-          id: uid(), kind: 'content', eyebrow: 'Why this matters', title: 'Start from the intended outcome',
-          blocks: [{ id: uid(), type: 'callout', label: 'Purpose', text: brief.purpose || 'Clarify the decision or outcome this presentation should support.' }]
-        });
-      }
 
       buckets.forEach((bucket, bucketIndex) => {
         if (!bucket.length) return;
@@ -1313,15 +1340,15 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
           const group = bucket[0];
           const blocks = group.points.length
             ? [{ id: uid(), type: 'bullets', items: group.points.slice() }]
-            : [{ id: uid(), type: 'paragraph', text: 'Add evidence or supporting detail for this message.' }];
+            : [];
           slides.push({ id: uid(), kind: 'content', eyebrow: `Message ${bucketIndex + 1}`, title: group.heading, blocks });
         } else {
           slides.push({
-            id: uid(), kind: 'content', eyebrow: `Messages ${bucketIndex + 1}`, title: 'Bring the related points together',
+            id: uid(), kind: 'content', eyebrow: `Messages ${bucketIndex + 1}`, title: 'Key messages',
             blocks: [{ id: uid(), type: bucket.length === 2 ? 'columns' : 'cards',
               ...(bucket.length === 2
-                ? { columns: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') || 'Add supporting detail.' })) }
-                : { items: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') || 'Add supporting detail.' })) })
+                ? { columns: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') })) }
+                : { items: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') })) })
             }]
           });
         }
@@ -1330,7 +1357,7 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
       const decisionBrief = /\b(approve|approval|decision|recommend|endorse|authorise|authorize|fund)\b/i.test(brief.purpose);
       slides.push({
         id: uid(), kind: 'statement', eyebrow: decisionBrief ? 'Decision required' : 'Next step',
-        title: decisionBrief ? 'Confirm the next bounded step' : 'Agree what happens next',
+        title: decisionBrief ? 'The decision we need' : 'Agree what happens next',
         blocks: [{ id: uid(), type: 'callout', label: decisionBrief ? 'Proposed ask' : 'Action', text: brief.purpose || 'Confirm the owner, timing and next action.' }]
       });
 
@@ -1505,9 +1532,11 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
     }
 
     function generateDeck(silent = false) {
-      if (state.dirty && !silent && !window.confirm('Regenerating from the brief will replace your on-slide edits. Continue?')) return;
+      byId('brief-error').hidden = true;
+      for (const id of ['purpose', 'messages']) byId(id).removeAttribute('aria-invalid');
+      if (state.slides.length && !silent && !window.confirm('Rebuilding from this brief replaces the current slides and their edits. Continue?')) return;
       const brief = getBrief();
-      if (!brief.purpose || !brief.messagesText) { toast('Add your intended outcome and some content before building.', true); byId(!brief.purpose ? 'purpose' : 'messages').focus(); return; }
+      if (!brief.purpose || !brief.messagesText) { const id = !brief.purpose ? 'purpose' : 'messages'; byId('brief-error').textContent = !brief.purpose ? 'What decision or outcome should this briefing support?' : 'Add your key messages or notes to build a deck.'; byId('brief-error').hidden = false; byId(id).setAttribute('aria-invalid', 'true'); byId(id).focus(); return; }
       let groups;
       try { groups = brief.inputMode === 'free' ? DeckCore.organiseFreeText(brief.messagesText) : parseMessageGroups(brief.messagesText); }
       catch (error) { toast(error.message, true); return; }
@@ -1995,9 +2024,7 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
     function collectWarnings() {
       const warnings = [];
       const brief = getBrief();
-      (brief.inputMode === 'free' ? [] : parseMessageGroups(brief.messagesText)).forEach(group => {
-        if (!group.points.length) warnings.push({ type: 'attention', text: `No supporting points under “${excerpt(group.heading, 58)}”.` });
-      });
+      const sourceNumbers = new Set((brief.purpose + ' ' + brief.audience + ' ' + brief.messagesText).match(/\d+(?:[.,]\d+)*(?:%)?/g) || []);
       if (state.metadata.grouped > 0) warnings.push({ type: 'note', text: `${state.metadata.grouped} key message${state.metadata.grouped === 1 ? '' : 's'} were grouped to meet the selected length.` });
       if (state.metadata.underfilled > 0) warnings.push({ type: 'note', text: `The brief did not contain enough distinct material for ${state.metadata.requested} slides; filler was not added.` });
       state.slides.forEach((slide, index) => {
@@ -2005,6 +2032,11 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
         if (slide.title.length > 110) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} headline exceeds 110 characters.` });
         const words = slide.blocks.map(blockPlainText).join(' ').trim().split(/\s+/).filter(Boolean).length;
         const limit = state.style === 'minimal' ? 60 : state.style === 'operational' ? 100 : 78;
+        if (!words && !['title', 'cover'].includes(slide.kind)) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} has a headline but no supporting content.` });
+        const suppliedText = slide.title + ' ' + slide.blocks.map(blockPlainText).join(' ');
+        const newNumbers = [...new Set(suppliedText.match(/\d+(?:[.,]\d+)*(?:%)?/g) || [])].filter(number => !sourceNumbers.has(number));
+        if (newNumbers.length) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1}: check ${newNumbers.slice(0, 5).join(', ')} against your evidence. These numbers do not appear in the reference brief; later additions may be intentional.` });
+        if (/\b(?:to confirm|tbd|add (?:evidence|supporting detail|a short explanation|the message|a caption)|first supporting point)\b/i.test(suppliedText)) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} includes a placeholder or an unresolved detail. Confirm it before sharing.` });
         if (words > limit) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} has ${words} content words; the ${state.style} style is designed for about ${limit}.` });
         if (slide.blocks.length > 6) warnings.push({ type: 'attention', slide: index, text: `Slide ${index + 1} has ${slide.blocks.length} elements and may feel crowded.` });
         slide.blocks.forEach(block => {
@@ -2014,7 +2046,8 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
       });
       const decisionBrief = /\b(approve|approval|decision|recommend|endorse|authorise|authorize|fund)\b/i.test(brief.purpose);
       const close = state.slides[state.slides.length - 1];
-      if (decisionBrief && close && !/\b(decision|approve|approval|ask|recommend|endorse|authorise|authorize|fund)\b/i.test(close.title + ' ' + close.blocks.map(blockPlainText).join(' '))) {
+      const closeContent = close?.blocks.map(block => block.type === 'callout' ? block.text : blockPlainText(block)).join(' ') || '';
+      if (decisionBrief && close && !/\b(approve|approval|recommend|endorse|authorise|authorize|fund|agree|confirm|decide|select|choose|accept)\b/i.test(closeContent)) {
         warnings.push({ type: 'attention', slide: state.slides.length - 1, text: 'The brief seeks a decision, but the closing slide no longer states an ask.' });
       }
       return warnings;
@@ -2043,12 +2076,13 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
       state.thumbTimer = setTimeout(renderThumbnails, delay);
       state.checkTimer = setTimeout(renderChecks, delay);
     }
-    function renderAll() { renderPreview(); renderThumbnails(); renderChecks(); updateJourney(); }
+    function renderAll() { renderPreview(); renderThumbnails(); renderChecks(); updateJourney(); renderStoryOutline(); }
 
     function openDrawer(mode) {
-      ['brief', 'checks', 'branding'].forEach(panel => byId(panel + '-panel').classList.toggle('hidden', panel !== mode));
-      const titles = { brief: 'Presentation brief', checks: 'Quality checks', branding: 'Logo & page numbers' };
-      const subtitles = { brief: 'Create a starting deck from a structured brief or free text.', checks: 'Review density, completeness and basic accessibility.', branding: 'Keep your presentation consistent, online and offline.' };
+      if (mode === 'brief') { openDirectBrief(); return; }
+      ['source', 'checks', 'branding'].forEach(panel => byId(panel + '-panel').classList.toggle('hidden', panel !== mode));
+      const titles = { source: 'Your reference brief', brief: 'Presentation brief', checks: 'Quality checks', branding: 'Logo & page numbers' };
+      const subtitles = { source: 'Keep the facts and caveats in view as you refine.', brief: 'Create a starting deck from a structured brief or free text.', checks: 'Review density, completeness and basic accessibility.', branding: 'Keep your presentation consistent, online and offline.' };
       byId('drawer-title').textContent = titles[mode];
       byId('drawer-subtitle').textContent = subtitles[mode];
       if (mode === 'branding') updateLogoPanel();
@@ -2059,7 +2093,7 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
       const free = byId('input-mode').value === 'free';
       byId('messages-label').textContent = free ? 'Paste your notes or free text' : 'Key messages and supporting points';
       byId('input-hint').textContent = free ? 'Up to 20,000 characters. Paragraphs and sentences become editable slide groups. This preserves your wording; it does not use an AI model.' : 'Start each key message on a new line. Add supporting points beneath it with “-”.';
-      if (free) byId('messages').maxLength = 20000; else byId('messages').removeAttribute('maxlength');
+      byId('messages').maxLength = free ? 20000 : 50000;
     }
 
     function updateLogoPanel() {
@@ -2097,6 +2131,8 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
       try {
         saveBlob(blob, 'handsondeck-offline.html');
         flow.fileDirty = false;
+        byId('download-receipt').hidden = false;
+        byId('download-receipt-title').textContent = 'Editable copy download started. Keep it for your next revision.';
         byId('save-state').textContent = 'Editable download started · check your Downloads';
         byId('editor-download-size').textContent = formatBytes(blob.size);
         byId('download-status').textContent = 'Download started. This copy contains your current deck. Reopen it in a browser to continue editing offline.';
@@ -2116,10 +2152,12 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
       const blob = new Blob([exportHtml()], { type: 'text/html;charset=utf-8' });
       if (blob.size > MAX_EDITOR_BYTES) { toast('This presentation exceeds 10 MiB. Reduce large images first.', true); return; }
       saveBlob(blob, 'handsondeck-presentation.html');
-      toast(`Downloaded one offline HTML deck with ${state.slides.length} slides.`);
+      byId('download-receipt').hidden = false;
+      byId('download-receipt-title').textContent = 'Presentation download started. Check your Downloads folder.';
+      toast(`Presentation download started: ${state.slides.length} slides in one HTML file.`);
     }
 
-    byId('open-brief').addEventListener('click', () => openGuide());
+    byId('open-brief').addEventListener('click', () => openDirectBrief());
     byId('open-checks').addEventListener('click', () => showPage('review'));
     byId('open-branding').addEventListener('click', () => openDrawer('branding'));
     byId('input-mode').addEventListener('change', updateInputMode);
@@ -2493,7 +2531,7 @@ byId('ai-example').addEventListener('click', () => {
 <script id="interface-code">
 'use strict';
 
-const flow = { page: 'welcome', step: 0, highest: 0, presenting: false, fileDirty: false, recoveryTimer: 0, recoveryEnabled: true, recoveryFailed: false, recoveryBlocked: false, reviewDone: false, example: false };
+const flow = { page: 'welcome', step: 0, highest: 0, editView: 'slides', presenting: false, fileDirty: false, recoveryTimer: 0, recoveryEnabled: true, recoveryFailed: false, recoveryBlocked: false, reviewDone: false, example: false };
 const RECOVERY_KEY = 'hands-on-deck-recovery-v1';
 const RECOVERY_SETTING = 'hands-on-deck-recovery-enabled';
 const examples = {
@@ -2538,8 +2576,8 @@ function updateGuideMode() {
 
 function updateJourney() {
   const hasSlides = !!state.slides.length;
-  const active = { guide: 'open-brief', editor: 'nav-edit', review: 'open-checks', offline: 'open-offline' }[flow.page];
-  for (const id of ['open-brief', 'nav-edit', 'open-checks', 'open-offline']) {
+  const active = { brief: 'open-brief', guide: 'open-brief', editor: 'nav-edit', review: 'nav-edit', offline: 'open-offline' }[flow.page];
+  for (const id of ['open-brief', 'nav-edit', 'open-offline']) {
     const node = byId(id);
     if (id === active) node.setAttribute('aria-current', 'step'); else node.removeAttribute('aria-current');
     node.disabled = id !== 'open-brief' && !hasSlides;
@@ -2550,6 +2588,8 @@ function updateJourney() {
   byId('resume-description').textContent = `${state.slides.length} slides · ${state.slides[0]?.title || 'Untitled deck'}`;
   byId('download-presentation').disabled = !hasSlides;
   byId('download-project').disabled = !hasSlides;
+  byId('brief-rebuild').hidden = !hasSlides;
+  byId('generate').textContent = hasSlides ? 'Rebuild from this brief' : 'Build my first deck →';
 }
 
 function showPage(page, focus = true) {
@@ -2559,26 +2599,87 @@ function showPage(page, focus = true) {
   if (byId('drawer-dialog').open) byId('drawer-dialog').close();
   closeElementMenu();
   flow.page = page;
-  for (const id of ['welcome', 'guide', 'review', 'ai', 'offline']) byId(id + '-page').classList.toggle('hidden', id !== page);
+  for (const id of ['welcome', 'brief', 'guide', 'review', 'ai', 'offline']) byId(id + '-page').classList.toggle('hidden', id !== page);
   document.querySelector('.app-shell').classList.toggle('hidden', page !== 'editor');
   updateJourney();
   if (page === 'guide') { syncGuideFromBrief(); renderGuide(); }
   if (page === 'review') renderReviewPage();
   if (page === 'offline') refreshDownloadInfo();
   if (page === 'ai' && typeof aiRefresh === 'function') { aiRefresh(); if (!byId('ai-notes').value) aiCopyBrief(); }
-  if (page === 'editor') scheduleFit();
+  if (page === 'editor') { setEditView(flow.editView); scheduleFit(); }
   if (focus) {
-    const heading = { welcome: 'welcome-title', guide: `guide-title-${flow.step}`, review: 'review-title', ai: 'ai-title', offline: 'offline-title', editor: 'editor-heading' }[page];
+    const heading = { welcome: 'welcome-title', brief: 'brief-title', guide: `guide-title-${flow.step}`, review: 'review-title', ai: 'ai-title', offline: 'offline-title', editor: 'editor-heading' }[page];
     byId(heading)?.focus({ preventScroll: true });
   }
 }
 
 function openGuide() { syncGuideFromBrief(); flow.step = 0; showPage('guide'); }
 function openDirectBrief() {
-  if (flow.page === 'guide') syncBriefFromGuide();
-  if (state.slides.length) showPage('editor');
-  openDrawer('brief');
+  showPage('brief');
   byId('purpose').focus();
+}
+
+function setEditView(view) {
+  flow.editView = view === 'outline' ? 'outline' : 'slides';
+  const outline = flow.editView === 'outline' && !flow.presenting;
+  byId('story-outline').hidden = !outline;
+  byId('stage-shell').hidden = outline;
+  byId('stage-footer').hidden = outline;
+  document.querySelector('.editor-toolbar').hidden = outline;
+  document.querySelector('.app-shell').classList.toggle('outline-mode', outline);
+  byId('view-slides').setAttribute('aria-pressed', String(!outline));
+  byId('view-outline').setAttribute('aria-pressed', String(outline));
+  if (outline) renderStoryOutline(); else renderPreview();
+}
+
+function renderStoryOutline() {
+  if (flow.editView !== 'outline') return;
+  const list = byId('story-list'); list.replaceChildren();
+  state.slides.forEach((slide, index) => {
+    const row = make('li', 'story-card');
+    const head = make('div', 'story-card-head');
+    head.appendChild(make('span', 'section-index', `${String(index + 1).padStart(2, '0')} / ${slide.kind === 'title' || slide.kind === 'cover' ? 'Opening' : slide.kind === 'statement' ? 'Closing ask' : 'Key message'}`));
+    const actions = make('div', 'story-actions');
+    const action = (label, text, handler, disabled = false) => {
+      const button = make('button', 'btn btn-quiet btn-small', text); button.type = 'button'; button.disabled = disabled;
+      button.setAttribute('aria-label', `${label} slide ${index + 1}`);
+      button.addEventListener('click', () => { selectSlide(index); handler(); }); actions.appendChild(button);
+    };
+    action('Move up', '↑', () => moveSlide(-1), index === 0);
+    action('Move down', '↓', () => moveSlide(1), index === state.slides.length - 1);
+    action('Remove', 'Remove', deleteSlide, state.slides.length === 1);
+    action('Preview', 'View slide →', () => setEditView('slides'));
+    head.appendChild(actions); row.appendChild(head);
+    let fieldNumber = 0;
+    const field = (label, value, change, multiline = true) => {
+      const wrap = make('div', 'story-field'), id = `outline-${index}-${fieldNumber++}`;
+      const name = make('label', '', label); name.setAttribute('for', id);
+      const input = make(multiline ? 'textarea' : 'input'); input.id = id; input.value = value; input.maxLength = 10000;
+      if (multiline) input.rows = Math.min(7, Math.max(2, value.split('\n').length));
+      input.addEventListener('input', () => { change(input.value); markEdited(); scheduleSecondaryRenders(); });
+      wrap.append(name, input); row.appendChild(wrap);
+    };
+    field('Headline', slide.title, value => { slide.title = value; }, false);
+    slide.blocks.forEach(block => {
+      if (block.type === 'bullets') field('Supporting points · one per line', block.items.join('\n'), value => { block.items = value.split('\n'); });
+      else if (block.type === 'paragraph' || block.type === 'callout') field(block.type === 'callout' ? (block.label || 'Key point') : 'Supporting detail', block.text, value => { block.text = value; });
+      else if (block.type === 'columns' || block.type === 'cards') (block.columns || block.items).forEach(item => {
+        field('Message', item.title, value => { item.title = value; }, false);
+        field('Supporting detail', item.text, value => { item.text = value; });
+      });
+      else row.appendChild(make('p', 'field-help', `${block.type[0].toUpperCase() + block.type.slice(1)} element: use View slide to edit this visual. It stays in your deck.`));
+    });
+    if (!slide.blocks.length) row.appendChild(make('p', 'field-help', 'No supporting content yet. Use View slide to add evidence or a clear ask.'));
+    list.appendChild(row);
+  });
+}
+
+function showSourceBrief() {
+  const brief = getBrief();
+  byId('source-purpose').textContent = brief.purpose || 'Not supplied';
+  byId('source-audience').textContent = brief.audience || 'Not supplied';
+  byId('source-notes').textContent = brief.messagesText || 'No source notes were supplied.';
+  openDrawer('source');
 }
 
 function validGuideStep(step) {
@@ -2662,6 +2763,13 @@ function renderReviewPage() {
 
 function refreshDownloadInfo() {
   const blob = editorDownloadBlob();
+  const presentation = new Blob([exportHtml()], { type: 'text/html;charset=utf-8' });
+  byId('presentation-download-size').textContent = formatBytes(presentation.size);
+  byId('download-presentation').disabled = !state.slides.length || presentation.size > MAX_EDITOR_BYTES;
+  renderChecks();
+  byId('export-deck-summary').textContent = `${state.slides.length} slides · ${state.slides[0]?.title || 'Your presentation'}`;
+  byId('export-check-summary').textContent = state.warnings.length ? `${state.warnings.length} advisory suggestion${state.warnings.length === 1 ? '' : 's'} to consider. You can still download now.` : 'Ready for your final read-through. Check the facts and closing ask before sharing.';
+  byId('download-receipt').hidden = true;
   byId('editor-download-size').textContent = formatBytes(blob.size);
   byId('download-editor').disabled = blob.size > MAX_EDITOR_BYTES;
   byId('download-status').textContent = blob.size > MAX_EDITOR_BYTES ? 'This copy exceeds 10 MiB. Reduce or remove large images, then try again.' : 'Contains the editor, your slides, images and logo. Download only starts when you choose the button.';
@@ -2719,17 +2827,18 @@ function afterBuild() {
   flow.fileDirty = true; flow.reviewDone = false;
   flow.undo = null; byId('undo-delete').hidden = true;
   byId('editor-heading').textContent = flow.example ? 'A fictional example. Make it yours.' : 'Your first draft is ready.';
-  byId('editor-guidance').textContent = 'Click text to edit it. Use Add element for visuals, then review the story before saving.';
+  byId('editor-guidance').textContent = 'Switch to Outline to refine the argument. Slides and downloads use the same content.';
+  flow.editView = 'slides';
   document.querySelectorAll('.review-check input').forEach(node => { node.checked = false; });
   showPage('editor'); queueRecovery();
 }
 
 function startPresenting() {
   if (!state.slides.length) return;
-  showPage('editor'); flow.presenting = true; document.body.classList.add('is-presenting'); renderPreview();
+  showPage('editor'); flow.presenting = true; document.body.classList.add('is-presenting'); setEditView(flow.editView);
   byId('exit-present').focus();
 }
-function stopPresenting() { flow.presenting = false; document.body.classList.remove('is-presenting'); renderPreview(); }
+function stopPresenting() { flow.presenting = false; document.body.classList.remove('is-presenting'); setEditView(flow.editView); }
 
 function offerUndo(action, message) { flow.undo = action; byId('undo-delete').hidden = false; toast(message); }
 byId('undo-delete').addEventListener('click', () => { if (!flow.undo) return; flow.undo(); flow.undo = null; byId('undo-delete').hidden = true; markEdited(); renderAll(); toast('Deletion undone.'); });
@@ -2739,6 +2848,12 @@ byId('start-guided').addEventListener('click', openGuide);
 byId('start-direct').addEventListener('click', openDirectBrief);
 byId('guide-to-direct').addEventListener('click', openDirectBrief);
 byId('direct-to-guide').addEventListener('click', () => { byId('drawer-dialog').close(); openGuide(); });
+byId('brief-keep-editing').addEventListener('click', () => showPage('editor'));
+byId('view-slides').addEventListener('click', () => setEditView('slides'));
+byId('view-outline').addEventListener('click', () => setEditView('outline'));
+byId('open-source').addEventListener('click', showSourceBrief);
+byId('export-review').addEventListener('click', () => showPage('review'));
+byId('download-return').addEventListener('click', () => showPage('editor'));
 byId('nav-edit').addEventListener('click', () => showPage('editor'));
 byId('resume-deck').addEventListener('click', () => showPage('editor'));
 byId('open-help').addEventListener('click', () => byId('help-dialog').showModal());
@@ -2765,7 +2880,7 @@ byId('project-input').addEventListener('change', async event => {
     const project = DeckCore.parseSavedProject(await file.text());
     if (!allowReplacement()) return;
     applyProject(project); flow.fileDirty = false;
-    showPage(project.slides.length ? 'editor' : 'guide'); saveRecovery();
+    showPage(project.slides.length ? 'editor' : 'brief'); saveRecovery();
     toast('Your editable deck is open. Nothing was uploaded.');
   } catch (error) { toast(error.message || 'This file could not be opened.', true); }
 });
@@ -2814,6 +2929,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 // Capture the complete, still-unmodified page, including this inline workflow.
 editorTemplate = '<!doctype html>\n' + document.documentElement.outerHTML;
 putBrief({});
+byId('guide-engine').value = 'standard';
 try { flow.recoveryEnabled = localStorage.getItem(RECOVERY_SETTING) !== 'false'; } catch { flow.recoveryEnabled = false; flow.recoveryFailed = true; }
 let restored = false;
 try {
@@ -2825,7 +2941,7 @@ try {
   }
 } catch { toast('The saved copy could not be restored. Open a downloaded editable file to recover your deck.', true); }
 renderAll(); renderElementOptions();
-showPage(restored ? (state.slides.length ? 'editor' : 'guide') : 'welcome', false);
+showPage(restored ? (state.slides.length ? 'editor' : 'brief') : 'welcome', false);
 if (restored) toast('Welcome back. Your saved work is ready.');
 </script>
 </body>

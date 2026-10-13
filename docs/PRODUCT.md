@@ -1,53 +1,61 @@
 # Product direction
 
-Help people turn a briefing into a clear presentation without spending hours on formatting.
+Hands on Deck helps people turn what they already know into a credible, decision-ready briefing, then revise it without rebuilding the presentation.
 
-## Who it serves
+## North Star
 
-- People who regularly prepare updates, proposals or decision papers and already know their argument.
-- Occasional presenters who know their subject but benefit from structure and examples.
+**Weekly briefings used for a real decision or endorsement without being rebuilt in another tool.**
 
-Both groups use the same brief, with structured and free-text input formats. First-time users can follow a four-step guided journey and inspect an outline before building. A one-page brief form serves people ready to write. The editor, review and save screens have persistent navigation and contextual guidance. Fictional examples and help remain available. The slide canvas is the main editing surface, with direct text editing and an element picker.
+A qualifying briefing has been reviewed by its author, used in a real briefing or sent for review, and remains usable in the exported format. A generated outline or a download alone does not prove this outcome. “Decision-ready” means a clear purpose and audience, a coherent case using supplied facts and caveats, and an explicit closing ask. It does not mean a decision was approved; that depends on factors beyond this app.
 
-## Core requirements
+The current app collects no telemetry. Validate this measure through consensual user research and short follow-ups about actual use. Establish a baseline before setting numerical targets. Do not collect briefing content to measure success.
 
-- One standalone HTML editor that works offline from the outset.
-- Standalone HTML presentations that recipients can open independently.
-- Local generation using fixed rules, described honestly.
-- Structured, layout-aware blocks and a light office workspace with restrained blue accents and clear, compact controls.
-- Edits preserved when navigating slides or changing styles.
-- Confirmation before regeneration replaces on-slide edits.
-- Text rendered safely and local images embedded in exports.
-- Replaceable embedded logo; title/front and cover slides excluded from page numbering.
-- Distinct editable, presentation and project downloads, each capped at 10 MiB.
-- Browser recovery with a visible failure state and a control to remove it.
-- Safe import of editable HTML or JSON without executing the imported file.
-- Undo for the most recent slide or element deletion.
-- Standard editing needs no runtime CDNs, remote fonts, analytics, accounts or model calls.
-- Optional MCP tools let a connected AI application or agent synthesise a brief, propose a deck, review it and render a presentation.
-- Local browser AI is opt-in; external-agent model selection and orchestration belong to the connected host.
+Supporting measures and guardrails:
 
-## AI and agent integration
+- End-to-end time from receiving a task to a usable briefing, including review and revision.
+- How often authors rebuild in another tool, and why: output quality, editability or workflow fit.
+- Preservation of supplied facts, numbers and uncertainty; unsupported additions found during review.
+- Successful offline opening, navigation and printing on the intended devices.
+- Ability to act on feedback without regenerating or losing edits.
 
-MCP is the integration interface for an AI application or agent to use Hands on Deck. The connected host runs a cloud or local model and supplies the reasoning and writing. The MCP server exposes deck planning, content review and HTML rendering. An agent can author its own plan, call review, revise the plan and render again; the fixed-rule planner is an optional starting point.
+## Primary user and job
 
-The current interface is a local stdio server. It accepts explicitly supplied data and returns results. A live MCP connection to the browser’s current deck and a remote HTTP MCP endpoint are not implemented.
+Staff officers and programme managers who know the subject and need a senior decision or endorsement. They want their argument to be understood and acted on without spending a day formatting it. The experience should build confidence in the presentation without pretending to validate the thinking.
 
-The **Supercharged** screen downloads and runs Qwen2.5 0.5B or 1.5B on supported devices. It checks assets and graphics support, generates an outline locally, and requires review before applying. The guided brief and direct brief both lead into this flow. Standard keeps the original wording and is clearly distinguished from AI synthesis.
+People who present occasionally can use the optional guided brief and fictional examples. The primary journey should work for a person who can already state their argument.
 
-## Current limits
+## The app journey
 
-The editor has no cloud storage, collaboration, PowerPoint export or factual verification. Browser recovery may be unavailable, full or cleared; it does not replace a downloaded backup. Checks flag basic content issues; people remain responsible for the content and final review. Exported presentation HTML is for viewing; offline-editor HTML carries an editable snapshot. The free-text organiser preserves supplied sentences and is not an AI synthesiser.
+| Step | User outcome | Interface |
+| --- | --- | --- |
+| Brief | State the decision, audience and case | One-page brief with context, evidence and ask prompts; three styles; 3–6 slide target. Optional guided questions. |
+| Refine | Improve the argument after review | Editable Outline and 16:9 Slides views using the same plan; reorder/remove/undo; reference brief available beside the task. |
+| Download | Use the briefing outside the app | One self-contained presentation HTML file; editable HTML backup for feedback; offline opening guidance. |
 
-## Next improvements
+Quality suggestions belong within refinement and remain advisory. They do not add a required approval step or block generation or export. The app flags density, missing asks, unresolved placeholders and numbers that are absent from the reference brief. These are prompts to check evidence, not factual verification.
 
-1. Verify real desktop and mobile interaction, including touch editing and exported presentations.
-2. Add user-defined version names for editable snapshots.
-3. Refine guidance from user testing and improve content-fitting feedback.
-4. Evaluate additional export formats through real usage.
-5. Verify local AI inference, offline reload and writing quality across actual supported devices.
-6. Add a connection for a configured AI host or agent to read and update the current editor deck, with visible connection state and a way to disconnect.
+## Core boundaries
 
-## Useful measures
+- Standard generation and editing use fixed local rules, with no runtime CDNs, remote fonts, analytics, accounts or model calls.
+- Standard preserves supplied wording. It does not claim to synthesise arguments or verify evidence.
+- The opening establishes the intended outcome; middle slides use supplied messages; the close states the ask. Thin briefs stay short instead of gaining filler.
+- After generation, the slide plan is the source of truth for preview and export. The raw brief remains a reference and is not kept in two-way sync.
+- Rebuilding requires confirmation before replacing the current slides. Navigating back to the brief never replaces them.
+- Three fixed styles keep attention on the case. Existing visual elements remain available; rich media and bespoke themes are not the main journey.
+- Exports contain their styling, code and embedded images. Presentation HTML supports keyboard navigation and one slide per printed page. Editable HTML contains the app and a project snapshot.
+- Editable, presentation and project downloads are capped at 10 MiB. Browser recovery is optional and is not a file backup.
+- Safe import validates project data without executing imported HTML. Logos remain embedded and replaceable; title/front and cover slides have no page number.
 
-Time from brief to usable presentation, the amount of rework after generation, successful exports, repeat use, and whether people still rebuild the output in another tool. The current editor does not collect telemetry.
+## Optional AI and agent integration
+
+Supercharged is an optional path for synthesising rough notes into suggested headings and points. It downloads and runs Qwen2.5 0.5B or 1.5B on supported devices, verifies the files and performs a device inference check. Setup is explicit. The user reviews every proposed outline before applying it. Original notes remain in the reference brief. The required Standard journey does not need this setup.
+
+MCP exposes planning, review and rendering tools to a separately configured AI application or agent. The host supplies its own model and reasoning. The current local stdio integration does not control the live browser deck; a browser connection and remote endpoint remain future work.
+
+## Validate before expanding
+
+The key adoption risk is whether self-contained HTML fits real review and sharing practices. Observe users opening and forwarding files on target devices and approved networks. If they rebuild in PowerPoint, investigate output quality, editability and workflow fit before adding more features.
+
+Also validate whether the generated structure earns trust, whether primary users can supply a usable brief, and how much delay slide production causes today. Compare matched tasks and observe corrections, review cycles and actual use.
+
+The app has no cloud storage, collaboration, automatic sharing, PowerPoint export or factual verification. Visual browser, touch, cross-browser and real-device AI quality checks remain outstanding. Automated checks cover logic and data flow; they are not evidence of those user outcomes.

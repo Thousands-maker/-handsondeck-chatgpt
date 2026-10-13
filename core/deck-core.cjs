@@ -86,24 +86,15 @@
     function buildSlides(brief, groups) {
       const autoCount = Math.min(6, Math.max(3, groups.length + 2));
       const requested = brief.count === 'auto' ? autoCount : Number(brief.count);
-      const includeContext = requested >= 4;
-      const fixedSlides = includeContext ? 3 : 2;
-      const contentSlots = Math.max(1, requested - fixedSlides);
+      const contentSlots = Math.max(1, requested - 2);
       const buckets = distribute(groups, contentSlots);
       const slides = [];
 
       slides.push({
         id: uid(), kind: 'title', eyebrow: 'Decision brief',
         title: brief.purpose || 'Untitled presentation',
-        blocks: [{ id: uid(), type: 'paragraph', text: brief.audience ? `Prepared for ${brief.audience}` : 'Define the intended audience.' }]
+        blocks: brief.audience ? [{ id: uid(), type: 'paragraph', text: `Prepared for ${brief.audience}` }] : []
       });
-
-      if (includeContext) {
-        slides.push({
-          id: uid(), kind: 'content', eyebrow: 'Why this matters', title: 'Start from the intended outcome',
-          blocks: [{ id: uid(), type: 'callout', label: 'Purpose', text: brief.purpose || 'Clarify the decision or outcome this presentation should support.' }]
-        });
-      }
 
       buckets.forEach((bucket, bucketIndex) => {
         if (!bucket.length) return;
@@ -111,15 +102,15 @@
           const group = bucket[0];
           const blocks = group.points.length
             ? [{ id: uid(), type: 'bullets', items: group.points.slice() }]
-            : [{ id: uid(), type: 'paragraph', text: 'Add evidence or supporting detail for this message.' }];
+            : [];
           slides.push({ id: uid(), kind: 'content', eyebrow: `Message ${bucketIndex + 1}`, title: group.heading, blocks });
         } else {
           slides.push({
-            id: uid(), kind: 'content', eyebrow: `Messages ${bucketIndex + 1}`, title: 'Bring the related points together',
+            id: uid(), kind: 'content', eyebrow: `Messages ${bucketIndex + 1}`, title: 'Key messages',
             blocks: [{ id: uid(), type: bucket.length === 2 ? 'columns' : 'cards',
               ...(bucket.length === 2
-                ? { columns: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') || 'Add supporting detail.' })) }
-                : { items: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') || 'Add supporting detail.' })) })
+                ? { columns: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') })) }
+                : { items: bucket.map(group => ({ title: group.heading, text: group.points.join(' · ') })) })
             }]
           });
         }
@@ -128,7 +119,7 @@
       const decisionBrief = /\b(approve|approval|decision|recommend|endorse|authorise|authorize|fund)\b/i.test(brief.purpose);
       slides.push({
         id: uid(), kind: 'statement', eyebrow: decisionBrief ? 'Decision required' : 'Next step',
-        title: decisionBrief ? 'Confirm the next bounded step' : 'Agree what happens next',
+        title: decisionBrief ? 'The decision we need' : 'Agree what happens next',
         blocks: [{ id: uid(), type: 'callout', label: decisionBrief ? 'Proposed ask' : 'Action', text: brief.purpose || 'Confirm the owner, timing and next action.' }]
       });
 
