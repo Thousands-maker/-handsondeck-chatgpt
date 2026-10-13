@@ -380,3 +380,55 @@ test('GPU loss after a completed outline clears ready state without removing the
   assert.equal(app.get('ai-result').hidden, false); assert.equal(app.get('ai-apply').disabled, false);
   assert.doesNotMatch(app.get('ai-status').textContent, /mapAsync|GPUBuffer/);
 });
+
+test('changing deck style immediately updates every sidebar slide without changing content or selection', async () => {
+  const app = setup(); app.run("loadExample('decision'); selectSlide(state.slides.length - 1)");
+  const original = app.run('JSON.stringify(state.slides)'), selected = app.run('state.current');
+  for (const style of ['minimal', 'operational', 'executive']) {
+    const select = app.get('style-select'); select.value = style;
+    select.listeners.change[0]({ target: select });
+    assert.equal(app.run('state.style'), style);
+    assert.equal(app.get('brief-style').value, style);
+    assert.ok(app.get('slide-frame').classList.contains('style-' + style));
+    const rows = app.get('slide-list').children;
+    assert.equal(rows.length, app.run('state.slides.length'));
+    rows.forEach((row, index) => {
+      const thumbnail = row.querySelector('.thumb-slide');
+      assert.ok(thumbnail.classList.contains('style-' + style));
+      assert.equal(thumbnail.querySelector('.slide-title').textContent, app.run(`state.slides[${index}].title`));
+      assert.equal(thumbnail.querySelector('.slide-canvas').dataset.slideId, app.run(`state.slides[${index}].id`));
+      assert.equal(row.classList.contains('current'), index === selected);
+    });
+    assert.equal(rows[selected].getAttribute('aria-current'), 'true');
+    assert.equal(app.run('JSON.stringify(state.slides)'), original);
+    assert.equal(app.run('state.current'), selected);
+    assert.ok(app.run('exportHtml()').includes(`class="style-${style}"`));
+    app.run('saveRecovery()');
+    const reloaded = setup(app.storage.get('hands-on-deck-recovery-v1'));
+    assert.ok(reloaded.get('slide-list').children[0].querySelector('.thumb-slide').classList.contains('style-' + style));
+    const editable = await app.run('editorDownloadBlob()').text();
+    assert.equal(app.run('DeckCore.parseSavedProject(' + JSON.stringify(editable) + ').style'), style);
+  }
+});
+
+test('sidebar previews use current slide content, individual page numbers and read-only images', () => {
+  const app = setup(); app.run("loadExample('decision'); selectSlide(state.slides.length - 1)");
+  app.run("state.slides[1].blocks = [newBlock('callout'), newBlock('image')]; state.slides[1].blocks[0].text = 'A revised point'; renderAll();");
+  let rows = app.get('slide-list').children;
+  assert.equal(rows[0].querySelector('.slide-number'), null);
+  assert.equal(rows[1].querySelector('.slide-number').textContent, '1');
+  assert.equal(rows[2].querySelector('.slide-number').textContent, '2');
+  assert.equal(rows[1].querySelector('.block-callout').children[1].textContent, 'A revised point');
+  for (const row of rows) {
+    const frame = row.querySelector('.thumb-slide');
+    assert.equal(frame.inert, true); assert.equal(frame.getAttribute('aria-hidden'), 'true');
+    assert.equal(frame.querySelectorAll('button').length, 0);
+    assert.equal(frame.querySelectorAll('*').some(node => node.contentEditable === 'plaintext-only'), false);
+    assert.ok(frame.querySelector('.slide-logo'));
+  }
+  rows[1].click(); assert.equal(app.run('state.current'), 1);
+  assert.equal(app.get('slide-frame').querySelector('.block-callout').children[1].textContent, 'A revised point');
+  app.run('state.logo = null; renderAll();');
+  rows = app.get('slide-list').children;
+  assert.equal(rows.some(row => row.querySelector('.slide-logo')), false);
+});

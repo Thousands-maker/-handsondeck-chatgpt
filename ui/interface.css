@@ -154,7 +154,9 @@ a { color:var(--accent); text-underline-offset:3px; }
 .rail-head strong { color:#415571; font-size:12px; font-weight:600; }
 .slide-list { display:block; overflow:auto; padding:12px 10px; scrollbar-width:thin; }
 .thumb-row { min-width:0; margin:0 0 13px; }
-.thumb-card { border-radius:4px; box-shadow:0 1px 4px #263c5910; }
+.thumb-card { aspect-ratio:auto; border-radius:4px; box-shadow:0 1px 4px #263c5910; }
+.thumb-card::before { content:""; display:block; padding-top:56.25%; }
+.thumb-slide { position:absolute; top:0; left:0; width:1120px; height:630px; transform-origin:top left; box-shadow:none; pointer-events:none; user-select:none; visibility:hidden; }
 .thumb-row.current .thumb-card { border-color:#6591d2; box-shadow:0 0 0 1px #d5e2f6; }
 .thumb-number { color:#7a879a; font-weight:500; }
 .rail-actions { display:grid; padding:10px; background:#f8faff; }
@@ -174,7 +176,7 @@ a { color:var(--accent); text-underline-offset:3px; }
 .stage-shell { min-height:200px; container-type:size; padding:clamp(18px,2.5vw,36px); background:#edf1f7; }
 .stage-shell .slide-frame { width:min(1120px,100cqw,calc(100cqh * 16 / 9)); box-shadow:0 3px 18px #243b571f; }
 /* Keep slide typography independent from the application controls. */
-.slide-canvas, .thumb-inner { font-family:Arial,Helvetica,sans-serif; }
+.slide-canvas { font-family:Arial,Helvetica,sans-serif; }
 .stage-footer { min-height:48px; background:#fff; padding:7px 12px; }
 .counter { color:#536782; font-weight:500; }
 .edit-hint { color:#6e7c90; font-size:11px; }

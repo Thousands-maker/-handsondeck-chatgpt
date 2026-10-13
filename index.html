@@ -187,13 +187,6 @@
     }
     .thumb-row:hover .thumb-card { border-color: #a8a9b4; }
     .thumb-row.current .thumb-card { border-color: var(--teal-600); box-shadow: 0 0 0 2px rgba(0,143,150,.12); }
-    .thumb-inner { position: absolute; inset: 0; padding: 8% 8%; color: #1e293b; background: #fff; }
-    .thumb-inner.kind-title, .thumb-inner.kind-cover { color: var(--purple-950); background: linear-gradient(135deg, #fff 0 66%, #eeebf7 66% 82%, #dff5f3 82%); }
-    .thumb-inner.kind-statement { border-left: 4px solid var(--teal-600); }
-    .thumb-eyebrow { color: var(--teal-700); font-size: 5px; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
-    .thumb-title { max-width: 90%; margin-top: 7%; font-size: 9px; line-height: 1.05; font-weight: 900; }
-    .thumb-lines { width: 74%; margin-top: 7%; display: grid; gap: 3px; }
-    .thumb-lines i { display: block; height: 2px; border-radius: 2px; background: #bec6d1; }
     .rail-actions {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -372,8 +365,6 @@
     .slide-logo { position: absolute; right: 4%; top: 3%; width: 8%; height: 12%; object-fit: contain; object-position: right top; }
     .slide-eyebrow { max-width: 70%; }
     .slide-number { font-size: clamp(.55rem, 1.15cqw, .95rem); }
-    .thumb-logo { position: absolute; right: 5%; top: 4%; width: 9%; height: 16%; object-fit: contain; }
-    .thumb-page { position: absolute; right: 6%; bottom: 5%; font-size: 6px; color: #718199; }
     .editable-text { min-width: 1ch; cursor: text; }
     .editable-text:empty::before { content: attr(data-placeholder); color: #97a0ae; }
     .editable-text:hover { box-shadow: 0 0 0 1px rgba(0,143,150,.28); }
@@ -711,7 +702,9 @@ a { color:var(--accent); text-underline-offset:3px; }
 .rail-head strong { color:#415571; font-size:12px; font-weight:600; }
 .slide-list { display:block; overflow:auto; padding:12px 10px; scrollbar-width:thin; }
 .thumb-row { min-width:0; margin:0 0 13px; }
-.thumb-card { border-radius:4px; box-shadow:0 1px 4px #263c5910; }
+.thumb-card { aspect-ratio:auto; border-radius:4px; box-shadow:0 1px 4px #263c5910; }
+.thumb-card::before { content:""; display:block; padding-top:56.25%; }
+.thumb-slide { position:absolute; top:0; left:0; width:1120px; height:630px; transform-origin:top left; box-shadow:none; pointer-events:none; user-select:none; visibility:hidden; }
 .thumb-row.current .thumb-card { border-color:#6591d2; box-shadow:0 0 0 1px #d5e2f6; }
 .thumb-number { color:#7a879a; font-weight:500; }
 .rail-actions { display:grid; padding:10px; background:#f8faff; }
@@ -731,7 +724,7 @@ a { color:var(--accent); text-underline-offset:3px; }
 .stage-shell { min-height:200px; container-type:size; padding:clamp(18px,2.5vw,36px); background:#edf1f7; }
 .stage-shell .slide-frame { width:min(1120px,100cqw,calc(100cqh * 16 / 9)); box-shadow:0 3px 18px #243b571f; }
 /* Keep slide typography independent from the application controls. */
-.slide-canvas, .thumb-inner { font-family:Arial,Helvetica,sans-serif; }
+.slide-canvas { font-family:Arial,Helvetica,sans-serif; }
 .stage-footer { min-height:48px; background:#fff; padding:7px 12px; }
 .counter { color:#536782; font-weight:500; }
 .edit-hint { color:#6e7c90; font-size:11px; }
@@ -1746,9 +1739,11 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
           img.alt = block.alt || '';
           node.appendChild(img);
         } else {
-          const placeholder = make('button', 'image-placeholder', 'Click to choose an image from this device');
-          placeholder.type = 'button';
-          placeholder.addEventListener('click', event => { event.stopPropagation(); state.selectedBlockId = block.id; byId('image-input').click(); });
+          const placeholder = make(editMode ? 'button' : 'div', 'image-placeholder', editMode ? 'Click to choose an image from this device' : 'Image placeholder');
+          if (editMode) {
+            placeholder.type = 'button';
+            placeholder.addEventListener('click', event => { event.stopPropagation(); state.selectedBlockId = block.id; byId('image-input').click(); });
+          }
           node.appendChild(placeholder);
         }
         const captionWrap = make('div');
@@ -1767,10 +1762,10 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
       return node;
     }
 
-    function renderSlide(slide, editMode = true) {
+    function renderSlide(slide, editMode = true, slideIndex = state.current) {
       const canvas = make('article', 'slide-canvas kind-' + slide.kind);
       canvas.dataset.slideId = slide.id;
-      canvas.setAttribute('aria-label', `Slide ${state.current + 1}: ${slide.title}`);
+      canvas.setAttribute('aria-label', `Slide ${slideIndex + 1}: ${slide.title}`);
       const eyebrow = editMode ? editable('div', 'slide-eyebrow', slide.eyebrow, 'slide-eyebrow', 'Section label') : make('div', 'slide-eyebrow', slide.eyebrow);
       const content = make('div', 'slide-content');
       const title = editMode ? editable('h1', 'slide-title', slide.title, 'slide-title', 'Add a headline') : make('h1', 'slide-title', slide.title);
@@ -1790,7 +1785,7 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
           canvas.appendChild(control);
         } else canvas.appendChild(image);
       }
-      const pageNumber = DeckCore.slidePageNumber(state.slides, state.current);
+      const pageNumber = DeckCore.slidePageNumber(state.slides, slideIndex);
       if (pageNumber !== null) { const number = make('div', 'slide-number', String(pageNumber)); number.setAttribute('aria-label', `Page ${pageNumber}`); canvas.appendChild(number); }
       if (editMode) wireCanvas(canvas, slide);
       return canvas;
@@ -1930,8 +1925,7 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
         && Math.max(titleBounds.bottom, stackBounds.bottom) <= safeBottom
         && Math.max(titleBounds.right, stackBounds.right) <= safeRight;
     }
-    function fitSlide() {
-      const content = byId('slide-frame').querySelector('.slide-content');
+    function fitSlideContent(content) {
       if (!content) return;
       content.style.transform = '';
       content.style.width = '';
@@ -1948,6 +1942,10 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
         content.style.width = `${100 / best}%`;
       }
       content.dataset.fitScale = best.toFixed(3);
+    }
+    function fitSlide() {
+      fitSlideContent(byId('slide-frame').querySelector('.slide-content'));
+      fitThumbnails();
     }
     function scheduleFit() {
       cancelAnimationFrame(state.fitFrame);
@@ -1968,29 +1966,37 @@ Notes: [your notes]</textarea><button class="btn btn-quiet" id="copy-ai-prompt" 
       scheduleFit();
     }
 
+    const thumbnailObserver = typeof ResizeObserver === 'function' ? new ResizeObserver(fitThumbnails) : null;
+    function fitThumbnails() {
+      byId('slide-list').querySelectorAll('.thumb-card').forEach(card => {
+        if (!card.clientWidth) return;
+        const frame = card.querySelector('.thumb-slide');
+        frame.style.transform = `scale(${card.clientWidth / 1120})`;
+        fitSlideContent(frame.querySelector('.slide-content'));
+        frame.style.visibility = 'visible';
+      });
+    }
     function renderThumbnails() {
       const list = byId('slide-list');
+      thumbnailObserver?.disconnect();
       list.replaceChildren();
       state.slides.forEach((slide, index) => {
         const row = make('button', 'thumb-row' + (index === state.current ? ' current' : ''));
         row.type = 'button';
         row.setAttribute('aria-label', `Open slide ${index + 1}: ${slide.title}`);
+        if (index === state.current) row.setAttribute('aria-current', 'true');
         const card = make('div', 'thumb-card');
-        const inner = make('div', 'thumb-inner kind-' + slide.kind);
-        inner.append(make('div', 'thumb-eyebrow', slide.eyebrow), make('div', 'thumb-title', slide.title));
-        const lines = make('div', 'thumb-lines');
-        const lineCount = Math.max(1, Math.min(4, slide.blocks.length + 1));
-        for (let i = 0; i < lineCount; i += 1) { const line = make('i'); line.style.width = (94 - i * 11) + '%'; lines.appendChild(line); }
-        inner.appendChild(lines);
-        const logo = DeckCore.deckLogo(state);
-        if (logo) { const image = make('img', 'thumb-logo'); image.src = logo.src; image.alt = ''; inner.appendChild(image); }
-        const pageNumber = DeckCore.slidePageNumber(state.slides, index);
-        if (pageNumber !== null) inner.appendChild(make('span', 'thumb-page', String(pageNumber)));
-        card.appendChild(inner);
+        // Share the full-size renderer and theme rules; shrink only the read-only frame.
+        const frame = make('div', 'slide-frame thumb-slide style-' + state.style);
+        frame.setAttribute('aria-hidden', 'true'); frame.inert = true;
+        frame.appendChild(renderSlide(slide, false, index));
+        card.appendChild(frame);
         row.append(make('span', 'thumb-number', String(index + 1)), card);
         row.addEventListener('click', () => selectSlide(index));
         list.appendChild(row);
+        thumbnailObserver?.observe(card);
       });
+      fitThumbnails();
       const hasSlides = state.slides.length > 0;
       byId('slide-up').disabled = !hasSlides || state.current === 0;
       byId('slide-down').disabled = !hasSlides || state.current === state.slides.length - 1;
